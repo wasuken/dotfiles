@@ -1,0 +1,43 @@
+(in-package :lem)
+
+;; Key Bindings
+(define-command split-3-window-horizontally () ()
+  (let ((w-width (window-width)))
+    (split-active-window-horizontally)
+    (shrink-window-horizontally (- (window-width) (floor (/ w-width 3))))
+    (other-window)
+    (split-active-window-horizontally)
+    (other-window)
+    (other-window -2)))
+
+(define-command back-window () ()
+  (other-window -1))
+
+(define-key *global-keymap* "C-x >" 'other-window)
+(define-key *global-keymap* "C-x <" 'back-window)
+(define-key *global-keymap* "M-i" 'delete-other-windows)
+(define-key *global-keymap* "M-u" 'split-active-window-vertically)
+(define-key *global-keymap* "M-U" 'split-3-window-horizontally)
+(define-key *global-keymap* "M-z" 'query-replace)
+(define-key *global-keymap* "C-x l" 'start-lisp-repl)
+(define-key *global-keymap* "C-x u" 'undo)
+
+(in-package :lem-lisp-mode)
+
+(setf *auto-mode-alist*
+      (nconc '((".lemrc$" . lisp-mode)) *auto-mode-alist*))
+
+(define-command insert-parens () ()
+  (insert-string (current-point) "()")
+  (move-to-column (current-point) 
+                  (- (point-column (current-point)) 1)))
+
+(print (line-number-at-point (current-point)))
+(print (point-column (current-point)))
+
+
+
+(line-offset (current-point) 1)
+(move-to-column (current-point) 1)
+
+(define-key *lisp-mode-keymap* "(" 'insert-parens)

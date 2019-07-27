@@ -22,22 +22,17 @@
 (define-key *global-keymap* "C-x l" 'start-lisp-repl)
 (define-key *global-keymap* "C-x u" 'undo)
 
+(setf *auto-mode-alist*
+      (nconc '((".lemrc$" . lem-paredit-mode:paredit-mode)) *auto-mode-alist*))
+(setf *auto-mode-alist*
+      (nconc '(("\\.lisp$" . lem-paredit-mode:paredit-mode)) *auto-mode-alist*))
+
 (in-package :lem-lisp-mode)
+
+(LINE-OFFSET (CURRENT-POINT) 1)
+(MOVE-TO-COLUMN (CURRENT-POINT) 1)
 
 (setf *auto-mode-alist*
       (nconc '((".lemrc$" . lisp-mode)) *auto-mode-alist*))
-
-(define-command insert-parens () ()
-  (insert-string (current-point) "()")
-  (move-to-column (current-point) 
-                  (- (point-column (current-point)) 1)))
-
-(print (line-number-at-point (current-point)))
-(print (point-column (current-point)))
-
-
-
-(line-offset (current-point) 1)
-(move-to-column (current-point) 1)
-
-(define-key *lisp-mode-keymap* "(" 'insert-parens)
+(setf *auto-mode-alist*
+      (nconc '(("\\.lisp$" . lisp-mode)) *auto-mode-alist*))

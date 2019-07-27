@@ -12,8 +12,7 @@
 																","
 																left)
 												   cur-strs)
-						 right)))
-  (print right))
+						 right))  (print right)))
 (defun replace-dc ()
   (interactive)
   (replace-sepa "\""))

@@ -821,23 +821,51 @@ Start `ielm' if it's not already running."
 (setenv "JDK_HOME" "/usr/lib/jvm/java-8-openjdk/")
 (setenv "JAVA_HOME" "/usr/lib/jvm/java-8-openjdk/")
 
-(use-package ensime
-  :ensure t
-  :config
-  (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
-  (add-hook 'java-mode-hook 'ensime-mode)
-  :hook (java-mode . ensime-mode))
+;; (use-package ensime
+;;   :ensure t
+;;   :config
+;;   ;; (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+;;   (add-hook 'java-mode-hook 'ensime-mode)
+;;   :hook (java-mode . ensime-mode))
 
-(use-package lsp-scala
-  :load-path "~/.emacs.d/elpa/lsp-scala"
-  :after scala-mode
-  :demand t
-  :hook (scala-mode . lsp)
-  :init (setq lsp-scala-server-command "/usr/local/bin/metals-emacs"))
+;; (use-package company-lsp
+;;   :ensure t)
 
-(use-package sbt-mode
-  :ensure t
-  :commands sbt-start sbt-command)
+;; (use-package lsp-scala
+;;   :ensure t
+;;   :after scala-mode
+;;   :demand t
+;;   :hook (scala-mode . lsp)
+;;   :config (setq lsp-prefer-flymake nil)
+;;   :init (setq lsp-scala-server-command "/usr/local/bin/metals-emacs"))
+
+;; (add-to-list 'load-path "~/.emacs.d/scala-bootstrap-el/")
+;; (require 'scala-bootstrap)
+
+;; (add-hook 'scala-mode-hook
+;;           '(lambda ()
+;;              (scala-bootstrap:with-metals-installed
+;;               (scala-bootstrap:with-bloop-server-started
+;;                (lsp)))
+;; 			 ))
+
+;; (use-package sbt-mode
+;;   :ensure t
+;;   :commands sbt-start sbt-command)
+
+;; (use-package sbt-mode
+;;   :commands sbt-start sbt-command
+;;   :config
+;;   ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+;;   ;; allows using SPACE when in the minibuffer
+;;   (substitute-key-definition
+;;    'minibuffer-complete-word
+;;    'self-insert-command
+;;    minibuffer-local-completion-map))
+(put 'upcase-region 'disabled nil)
+
+(use-package scala-mode
+  :mode "\\.s\\(cala\\|bt\\)$")
 
 (use-package sbt-mode
   :commands sbt-start sbt-command
@@ -848,7 +876,20 @@ Start `ielm' if it's not already running."
    'minibuffer-complete-word
    'self-insert-command
    minibuffer-local-completion-map))
-(put 'upcase-region 'disabled nil)
+
+;; Enable nice rendering of diagnostics like compile errors.
+(use-package flycheck
+  :init (global-flycheck-mode))
+
+(use-package lsp-mode
+  ;; Optional - enable lsp-mode automatically in scala files
+  :hook (scala-mode . lsp)
+  :config (setq lsp-prefer-flymake nil))
+
+(use-package lsp-ui)
+
+;; Add company-lsp backend for metals
+(use-package company-lsp)
 
 ;; Timeoutの変更
 (if (>= emacs-major-version 22)
@@ -998,6 +1039,10 @@ Start `ielm' if it's not already running."
 
 (use-package eglot
   :ensure t)
+(use-package lsp-ui
+  :ensure t)
+(use-package lsp-haskell
+  :ensure t)
 (use-package haskell-mode
   :ensure t
   :config
@@ -1061,14 +1106,14 @@ Start `ielm' if it's not already running."
   :ensure t
   :config)
 
-(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(setq inferior-lisp-program "sbcl")
 (add-to-list 'load-path "~/.emacs.d/slime/")
 (require 'slime)
 (slime-setup)
 
-;; (let ((ros-path "~/.roswell/helper.el"))
-;;   (cond ((file-exists-p ros-path)
-;; 		 (load (expand-file-name ros-path)))))
+(let ((ros-path "~/.roswell/helper.el"))
+  (cond ((file-exists-p ros-path)
+		 (load (expand-file-name ros-path)))))
 
 
 ;;; OSX用の設定
@@ -1103,9 +1148,9 @@ Start `ielm' if it's not already running."
 									  (interactive)
 									  (insert "\\")))
 
-(add-to-list 'load-path "~/.emacs.d/elpa/lsp-ruby")
-(require 'lsp-ruby)
-(add-hook 'ruby-mode-hook #'lsp)
+;; (use-package lsp-ruby
+;;   :ensure t)
+;; (add-hook 'ruby-mode-hook #'lsp)
 
 ;; (use-package web-mode
 ;;   :ensure t
@@ -1228,4 +1273,3 @@ Start `ielm' if it's not already running."
 (use-package racer
 	:defer t
 	:ensure t)
-(require 'docker-tramp-compat)

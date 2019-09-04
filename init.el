@@ -718,6 +718,8 @@ Start `ielm' if it's not already running."
 ;;; use-package では駄目だったり、後から追加したもの
 (setq inferior-lisp-program "sbcl")
 ;; ~/.emacs.d/slimeをload-pathに追加
+(unless (file-exists-p "~/.emacs.d/slime/")
+  (shell-command-to-string "git clone https://github.com/slime/slime && mv -f evcxr-mode ~/.emacs.d/"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/slime"))
 (require 'slime)
 (slime-setup '(slime-repl slime-fancy slime-banner))
@@ -756,6 +758,10 @@ Start `ielm' if it's not already running."
 		'(windmove-left windmove-right windmove-down windmove-up))
   )
 
+
+(unless (file-exists-p "~/.emacs.d/Emacs-gosh-mode/")
+  (shell-command-to-string "git clone https://github.com/mhayashi1120/Emacs-gosh-mode && mv -f Emacs-gosh-mode ~/.emacs.d/"))
+
 ;; UTF-8 に統一
 (setq process-coding-system-alist
       (cons '("gosh" utf-8 . utf-8) process-coding-system-alist))
@@ -768,8 +774,6 @@ Start `ielm' if it's not already running."
 (require 'gosh-config)
 ;;; こいつはgit cloneしてきて、sudo make installしていれたので
 ;;; 最初は動かないので注意
-;;gauche-manual
-;; (autoload 'gauche-manual "gauche-manual" "jump to gauche online manual." t)
 (add-to-list 'auto-mode-alist '("\\.scm$'" . gosh-mode))
 
 (add-hook 'gosh-mode-hook
@@ -821,47 +825,6 @@ Start `ielm' if it's not already running."
 (setenv "JDK_HOME" "/usr/lib/jvm/java-8-openjdk/")
 (setenv "JAVA_HOME" "/usr/lib/jvm/java-8-openjdk/")
 
-;; (use-package ensime
-;;   :ensure t
-;;   :config
-;;   ;; (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
-;;   (add-hook 'java-mode-hook 'ensime-mode)
-;;   :hook (java-mode . ensime-mode))
-
-;; (use-package company-lsp
-;;   :ensure t)
-
-;; (use-package lsp-scala
-;;   :ensure t
-;;   :after scala-mode
-;;   :demand t
-;;   :hook (scala-mode . lsp)
-;;   :config (setq lsp-prefer-flymake nil)
-;;   :init (setq lsp-scala-server-command "/usr/local/bin/metals-emacs"))
-
-;; (add-to-list 'load-path "~/.emacs.d/scala-bootstrap-el/")
-;; (require 'scala-bootstrap)
-
-;; (add-hook 'scala-mode-hook
-;;           '(lambda ()
-;;              (scala-bootstrap:with-metals-installed
-;;               (scala-bootstrap:with-bloop-server-started
-;;                (lsp)))
-;; 			 ))
-
-;; (use-package sbt-mode
-;;   :ensure t
-;;   :commands sbt-start sbt-command)
-
-;; (use-package sbt-mode
-;;   :commands sbt-start sbt-command
-;;   :config
-;;   ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-;;   ;; allows using SPACE when in the minibuffer
-;;   (substitute-key-definition
-;;    'minibuffer-complete-word
-;;    'self-insert-command
-;;    minibuffer-local-completion-map))
 (put 'upcase-region 'disabled nil)
 
 (use-package scala-mode
@@ -909,16 +872,6 @@ Start `ielm' if it's not already running."
 (add-hook 'shell-mode-hook
           (lambda ()
             (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix)))
-
-;; (add-hook 'set-language-environment-hook
-;;           (lambda ()
-;;             (when (equal "ja_JP.UTF-8" (getenv "LANG"))
-;;              (setq default-process-coding-system '(utf-8 . utf-8))
-;;              (setq default-file-name-coding-system 'utf-8))
-;;             (when (equal "Japanese" current-language-environment)
-;;              (setq default-buffer-file-coding-system 'utf-8))))
-
-;; (set-language-environment "Japanese")
 
 ;;; R言語の設定
 (setq load-path (cons "/usr/share/emacs/site-lisp/ess" load-path))
@@ -1008,12 +961,6 @@ Start `ielm' if it's not already running."
   :config
   (setq auto-mode-alist (cons '("\\.py$'" . python-mode) auto-mode-alist)))
 
-;; (use-package jedi
-;;   :ensure t
-;;   :config
-;;   (add-hook 'python-mode-hook 'jedi:setup)
-;;   (setq jedi:complete-on-dot t))
-
 (defun insert-current-time()
   (interactive)
   (insert (format-time-string "%Y-%m-%d(%a) %H:%M:%S" (current-time))))
@@ -1070,11 +1017,6 @@ Start `ielm' if it's not already running."
   :config
   (global-company-mode)
   (push 'company-lsp company-backends))
-
-;; (use-package lsp-haskell
-;;   :ensure t
-;;   :config
-;;   (add-hook 'haskell-mode-hook #'lsp))
 
 (define-key haskell-mode-map (kbd "C-c C->") 'insert->)
 (define-key haskell-mode-map (kbd "C-c C-<") 'insert<-)
@@ -1148,113 +1090,28 @@ Start `ielm' if it's not already running."
 									  (interactive)
 									  (insert "\\")))
 
-;; (use-package lsp-ruby
-;;   :ensure t)
-;; (add-hook 'ruby-mode-hook #'lsp)
-
-;; (use-package web-mode
-;;   :ensure t
-;;   :config
-;;   (add-to-list 'auto-mode-alist '("\\.js[x]?$" . web-mode))
-;;   (setq web-mode-content-types-alist
-;; 		'(("jsx" . "\\.js[x]?\\'")))
-;;   (add-hook 'web-mode-hook
-;; 			'(lambda ()
-;;                (setq web-mode-attr-indent-offset nil)
-;;                (setq web-mode-markup-indent-offset 2)
-;;                (setq web-mode-css-indent-offset 2)
-;;                (setq web-mode-code-indent-offset 2)
-;;                (setq web-mode-sql-indent-offset 2)
-;;                (setq indent-tabs-mode nil)
-;;                (setq tab-width 2)
-;; 			   )))
-
 (use-package rjsx-mode
   :ensure t
   :config
   (add-to-list 'auto-mode-alist '(".*\\.js\\'" . rjsx-mode)))
 
-;; (use-package ace-window
-;;   :ensure t
-;;   :functions hydra-frame-window/body
-;;   :custom
-;;   (aw-keys '(?j ?k ?l ?i ?o ?h ?y ?u ?p))
-;;   :custom-face
-;;   (aw-leading-char-face ((t (:height 4.0 :foreground "#f1fa8c"))))
-;;   :config
-;;   (global-set-key (kbd "C-x o") 'ace-window)
-;;   (add-hook 'ace-window-display-mode-hook 'golden-ratio--post-command-hook))
+(use-package rust-mode
+  :ensure t)
 
-;; (use-package doom-themes
-;;   :ensure t
-;;   :custom
-;;   (doom-themes-enable-italic t)
-;;   (doom-themes-enable-bold t)
-;;   :custom-face
-;;   (doom-modeline-bar ((t (:background "#6272a4"))))
-;;   :config
-;;   (load-theme 'doom-dracula t)
-;;   (doom-themes-neotree-config)
-;;   (doom-themes-org-config))
+(use-package parsec
+  :ensure t)
 
-;; (use-package doom-modeline
-;;   :ensure t
-;;   :custom
-;;   (doom-modeline-buffer-file-name-style 'truncate-with-project)
-;;   (doom-modeline-icon t)
-;;   (doom-modeline-major-mode-icon nil)
-;;   (doom-modeline-minor-modes nil)
-;;   :hook
-;;   (after-init . doom-modeline-mode)
-;;   :config
-;;   (line-number-mode 0)
-;;   (column-number-mode 0)
-;;   (doom-modeline-def-modeline 'main
-;; 	'(bar workspace-number window-number evil-state god-state ryo-modal xah-fly-keys matches buffer-info remote-host buffer-position parrot selection-info)
-;; 	'(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker)))
+(use-package hydra
+  :ensure t)
 
-;; (use-package highlight-indent-guides
-;;   :ensure t
-;;   :diminish
-;;   :hook
-;;   ((prog-mode yaml-mode) . highlight-indent-guides-mode)
-;;   :custom
-;;   (highlight-indent-guides-auto-enabled t)
-;;   (highlight-indent-guides-responsive t)
-;;   (highlight-indent-guides-method 'character)) ; column
 
-;; (use-package beacon
-;;   :ensure t
-;;   :custom
-;;   (beacon-color "yellow")
-;;   :config
-;;   (beacon-mode 1))
+(unless (file-exists-p "~/.emacs.d/elpa/evcxr-mode/")
+  (shell-command-to-string "git clone https://github.com/SerialDev/evcxr-mode && mv -f evcxr-mode ~/.emacs.d/elpa/"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/evcxr-mode/"))
+(require 'evcxr)
 
-;; (use-package minimap
-;;   :ensure t
-;;   :commands
-;;   (minimap-bufname minimap-create minimap-kill)
-;;   :custom
-;;   (minimap-major-modes '(prog-mode))
-
-;;   (minimap-window-location 'right)
-;;   (minimap-update-delay 0.2)
-;;   (minimap-minimum-width 20)
-;;   :bind
-;;   ("C-c m" . ladicle/toggle-minimap)
-;;   :preface
-;;   (defun ladicle/toggle-minimap ()
-;;     "Toggle minimap for current buffer."
-;;     (interactive)
-;;     (if (null minimap-bufname)
-;; 		(minimap-create)
-;;       (minimap-kill)))
-;;   :config
-;;   (custom-set-faces
-;;    '(minimap-active-region-background
-;;      ((((background dark)) (:background "#555555555555"))
-;;       (t (:background "#C847D8FEFFFF"))) :group 'minimap)))
-
+(use-package emmet-mode
+  :ensure t)
 
 (use-package rustic
   :ensure t
@@ -1262,7 +1119,6 @@ Start `ielm' if it's not already running."
   :init
   (setq rustic-rls-pkg 'eglot)
   :config
-  (add-to-list 'exec-path(expand-file-name "~/.cargo/bin/"))
   (add-to-list 'auto-mode-alist '("\\.rs\\'"  . rust-mode))
   (add-hook 'rust-mode-hook #'racer-mode)
   (add-hook 'racer-mode-hook #'eldoc-mode))
@@ -1273,3 +1129,9 @@ Start `ielm' if it's not already running."
 (use-package racer
 	:defer t
 	:ensure t)
+
+(use-package typescript-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode)))

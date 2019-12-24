@@ -824,6 +824,8 @@ Start `ielm' if it's not already running."
 ;;; java settings
 (setenv "JDK_HOME" "/usr/lib/jvm/java-8-openjdk/")
 (setenv "JAVA_HOME" "/usr/lib/jvm/java-8-openjdk/")
+;;; go settings
+(setenv "GOPATH" "/Users/takedamasaru/develop/go")
 
 (put 'upcase-region 'disabled nil)
 
@@ -1090,6 +1092,9 @@ Start `ielm' if it's not already running."
 									  (interactive)
 									  (insert "\\")))
 
+(define-key global-map (kbd "C-c C-e m") 'emmet-expand-line)
+(define-key global-map (kbd "C-c m") 'emmet-expand-line)
+
 (use-package rjsx-mode
   :ensure t
   :config
@@ -1135,3 +1140,71 @@ Start `ielm' if it's not already running."
   :config
   (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode)))
+
+(use-package ensime
+  :ensure t
+  :config
+  ;; (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+  (add-hook 'java-mode-hook 'ensime-mode)
+  :hook (java-mode . ensime-mode))
+
+(use-package company-lsp
+  :ensure t)
+
+(use-package lsp-scala
+  :ensure t
+  :after scala-mode
+  :demand t
+  :hook (scala-mode . lsp)
+  :config (setq lsp-prefer-flymake nil)
+  :init (setq lsp-scala-server-command "/usr/local/bin/metals-emacs"))
+
+(add-to-list 'load-path "~/.emacs.d/scala-bootstrap-el/")
+(require 'scala-bootstrap)
+
+(add-hook 'scala-mode-hook
+          '(lambda ()
+             (scala-bootstrap:with-metals-installed
+              (scala-bootstrap:with-bloop-server-started
+               (lsp)))
+			 ))
+
+(use-package sbt-mode
+  :ensure t
+  :commands sbt-start sbt-command)
+
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map))
+
+(use-package vue-mode
+  :ensure t
+  :config (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
+
+(use-package ace-window
+  :ensure t
+  :config
+  (global-set-key (kbd "C-x o") '(lambda ()
+								   (interactive)
+								   (ace-window 0)
+								   (golden-ratio)))
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+
+(use-package ace-jump
+  :ensure t
+  :config
+  (setq ace-jump-mode-move-keys
+		(append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil))
+    (setq ace-jump-word-mode-use-query-char nil)
+  (global-set-key (kbd "C-:") 'ace-jump-char-mode)
+  (global-set-key (kbd "C-c C-;") 'ace-jump-word-mode)
+  (global-set-key (kbd "C-M-;") 'ace-jump-line-mode))
+
+(put 'downcase-region 'disabled nil)
+(toggle-frame-maximized)

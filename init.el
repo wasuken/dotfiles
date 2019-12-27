@@ -412,6 +412,22 @@ Start `ielm' if it's not already running."
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
   :bind (("C-c C-l" . 'cider-repl-clear-buffer)))
 
+(use-package sayid :ensure t
+  :config
+  (eval-after-load 'clojure-mode
+  '(sayid-setup-package)))
+
+(defun my-clojure-mode-hook ()
+    (clj-refactor-mode 1)
+    (yas-minor-mode 1) ; for adding require/use/import statements
+    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+    (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+(use-package clj-refactor
+  :ensure t
+  :config
+  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook))
+
 (use-package cider
   :ensure t
   :config
@@ -847,6 +863,7 @@ Start `ielm' if it's not already running."
   :init (global-flycheck-mode))
 
 (use-package lsp-mode
+  :ensure t
   ;; Optional - enable lsp-mode automatically in scala files
   :hook (scala-mode . lsp)
   :config (setq lsp-prefer-flymake nil))
@@ -974,9 +991,6 @@ Start `ielm' if it's not already running."
   :config)
 
 (use-package intero
-  :ensure t)
-
-(use-package lsp-mode
   :ensure t)
 
 ;;; lsp-mode用
@@ -1196,7 +1210,7 @@ Start `ielm' if it's not already running."
 								   (golden-ratio)))
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
-(use-package ace-jump
+(use-package ace-jump-mode
   :ensure t
   :config
   (setq ace-jump-mode-move-keys
@@ -1206,5 +1220,48 @@ Start `ielm' if it's not already running."
   (global-set-key (kbd "C-c C-;") 'ace-jump-word-mode)
   (global-set-key (kbd "C-M-;") 'ace-jump-line-mode))
 
+(global-set-key (kbd "C-c C-s") '(lambda ()
+								   (interactive)
+								   (split-window-right)
+								   (split-window-right)))
+
 (put 'downcase-region 'disabled nil)
 (toggle-frame-maximized)
+
+(defun fsharp-fantomas-format-region (start end)
+  (interactive "r")
+  (let ((source (shell-quote-argument (buffer-substring-no-properties start end)))
+        (ok-buffer "*fantomas*")
+        (error-buffer "*fantomas-errors*"))
+    (save-window-excursion
+      (shell-command-on-region
+       start end (format "fantomas --indent 2 --pageWidth 99 --stdin %s --stdout" source)
+       ok-buffer nil error-buffer)
+      (if (get-buffer error-buffer)
+          (progn
+            (kill-buffer error-buffer)
+            (message "Can't format region."))
+        (delete-region start end)
+        (insert (with-current-buffer ok-buffer
+                  (s-chomp (buffer-string))))
+        (delete-trailing-whitespace)
+        (message "Region formatted.")))))
+
+(defun fsharp-fantomas-format-buffer ()
+  (interactive)
+  (let ((origin (point)))
+    (fsharp-fantomas-format-region (point-min) (point-max))
+    (goto-char origin)))
+
+(use-package fsharp-mode
+  :ensure t
+  :config
+  (setq-default fsharp-indent-offset 2)
+  (setq inferior-fsharp-program "/usr/local/share/dotnet/dotnet fsi")
+  (add-hook 'fsharp-mode-hook '(lambda () (lsp)))
+  (define-key fsharp-mode-map (kbd "C-c C-M-f") #'fsharp-fantomas-format-buffer))
+
+(use-package dotnet
+  :ensure t
+  :config
+  (add-hook 'fsharp-mode-hook #'dotnet-mode))

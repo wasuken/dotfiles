@@ -1220,7 +1220,7 @@ Start `ielm' if it's not already running."
   (global-set-key (kbd "C-c C-;") 'ace-jump-word-mode)
   (global-set-key (kbd "C-M-;") 'ace-jump-line-mode))
 
-(global-set-key (kbd "C-c C-s") '(lambda ()
+(global-set-key (kbd "C-c C-M-s") '(lambda ()
 								   (interactive)
 								   (split-window-right)
 								   (split-window-right)))

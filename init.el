@@ -415,13 +415,13 @@ Start `ielm' if it's not already running."
 (use-package sayid :ensure t
   :config
   (eval-after-load 'clojure-mode
-  '(sayid-setup-package)))
+	'(sayid-setup-package)))
 
 (defun my-clojure-mode-hook ()
-    (clj-refactor-mode 1)
-    (yas-minor-mode 1) ; for adding require/use/import statements
-    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-    (cljr-add-keybindings-with-prefix "C-c C-m"))
+  (clj-refactor-mode 1)
+  (yas-minor-mode 1) ; for adding require/use/import statements
+  ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+  (cljr-add-keybindings-with-prefix "C-c C-m"))
 
 (use-package clj-refactor
   :ensure t
@@ -805,7 +805,7 @@ Start `ielm' if it's not already running."
 										  "-gocodecompletion"
 										  "-diagnostics"
 										  "-lint-tool=golint"))
-  :hook (go-mode . lsp-go-enable)
+  :hook (go-mode . lsp)
   :commands lsp-go-enable)
 
 ;;; golang setting
@@ -1115,14 +1115,15 @@ Start `ielm' if it's not already running."
   (add-to-list 'auto-mode-alist '(".*\\.js\\'" . rjsx-mode)))
 
 (use-package rust-mode
-  :ensure t)
+  :ensure t
+  :config
+  (add-hook 'rust-mode-hook #'eglot))
 
 (use-package parsec
   :ensure t)
 
 (use-package hydra
   :ensure t)
-
 
 (unless (file-exists-p "~/.emacs.d/elpa/evcxr-mode/")
   (shell-command-to-string "git clone https://github.com/SerialDev/evcxr-mode && mv -f evcxr-mode ~/.emacs.d/elpa/"))
@@ -1143,11 +1144,11 @@ Start `ielm' if it's not already running."
   (add-hook 'racer-mode-hook #'eldoc-mode))
 
 (use-package quickrun
-	:defer t
-	:ensure t)
+  :defer t
+  :ensure t)
 (use-package racer
-	:defer t
-	:ensure t)
+  :defer t
+  :ensure t)
 
 (use-package typescript-mode
   :ensure t
@@ -1215,15 +1216,15 @@ Start `ielm' if it's not already running."
   :config
   (setq ace-jump-mode-move-keys
 		(append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil))
-    (setq ace-jump-word-mode-use-query-char nil)
+  (setq ace-jump-word-mode-use-query-char nil)
   (global-set-key (kbd "C-:") 'ace-jump-char-mode)
   (global-set-key (kbd "C-c C-;") 'ace-jump-word-mode)
   (global-set-key (kbd "C-M-;") 'ace-jump-line-mode))
 
 (global-set-key (kbd "C-c C-M-s") '(lambda ()
-								   (interactive)
-								   (split-window-right)
-								   (split-window-right)))
+									 (interactive)
+									 (split-window-right)
+									 (split-window-right)))
 
 (put 'downcase-region 'disabled nil)
 (toggle-frame-maximized)
@@ -1253,15 +1254,45 @@ Start `ielm' if it's not already running."
     (fsharp-fantomas-format-region (point-min) (point-max))
     (goto-char origin)))
 
+(defun fsharp-save ()
+  (interactive)
+  (when (string= major-mode "fsharp-mode")
+	(fsharp-fantomas-format-buffer))
+  (save-buffers))
+
 (use-package fsharp-mode
   :ensure t
   :config
   (setq-default fsharp-indent-offset 2)
   (setq inferior-fsharp-program "/usr/local/share/dotnet/dotnet fsi")
-  (add-hook 'fsharp-mode-hook '(lambda () (lsp)))
-  (define-key fsharp-mode-map (kbd "C-c C-M-f") #'fsharp-fantomas-format-buffer))
+  (add-hook 'fsharp-mode-hook '(lambda () (eglot)))
+  (define-key fsharp-mode-map (kbd "C-c C-M-f") #'fsharp-fantomas-format-buffer)
+  (require 'eglot-fsharp))
 
 (use-package dotnet
   :ensure t
   :config
   (add-hook 'fsharp-mode-hook #'dotnet-mode))
+
+(defun eshell-clear ()
+  "Clear the eshell buffer."
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+
+(defvar *create-md-link-url* "")
+
+(defun create-md-link ()
+  (interactive)
+  (setq *create-md-link-url* (read-string "url: "))
+  (request
+	  *create-md-link-url*
+	  :parser 'buffer-string
+	  :error (function* (lambda (&key error-thrown &allow-other-keys&rest _)
+						  (message "Got error: %S" error-thrown)))
+	  :success (function*
+				(lambda (&key data &allow-other-keys)
+				  (string-match "<title>\\(.*?\\)</title>" data)
+				  (insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
+
+(global-set-key (kbd "C-c C-x l") #'create-md-link)

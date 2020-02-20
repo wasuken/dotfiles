@@ -729,7 +729,7 @@ Start `ielm' if it's not already running."
         w3m-input-coding-system 'utf-8
         w3m-output-coding-system 'utf-8
         w3m-terminal-coding-system 'utf-8)
-  (setq w3m-command "/usr/bin/w3m"))
+  (setq w3m-command "/usr/local/bin/w3m"))
 
 ;;; use-package では駄目だったり、後から追加したもの
 (setq inferior-lisp-program "sbcl")
@@ -1069,10 +1069,7 @@ Start `ielm' if it's not already running."
 (require 'slime)
 (slime-setup)
 
-(let ((ros-path "~/.roswell/helper.el"))
-  (cond ((file-exists-p ros-path)
-		 (load (expand-file-name ros-path)))))
-
+(load (expand-file-name "~/.roswell/helper.el"))
 
 ;;; OSX用の設定
 (cond ((not (equal system-type 'darwin))
@@ -1295,4 +1292,15 @@ Start `ielm' if it's not already running."
 				  (string-match "<title>\\(.*?\\)</title>" data)
 				  (insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
 
-(global-set-key (kbd "C-c C-x l") #'create-md-link)
+(global-set-key (kbd "C-c l") #'create-md-link)
+
+(defun jq-format (beg end)
+  (interactive "r")
+  (shell-command-on-region beg end "jq ." nil t))
+
+(use-package helm-fish-completion
+  :ensure t)
+
+(when (require 'helm-fish-completion nil 'noerror)
+  (define-key shell-mode-map (kbd "<tab>") 'helm-fish-completion)
+  (setq helm-esh-pcomplete-build-source-fn #'helm-fish-completion-make-eshell-source))

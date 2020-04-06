@@ -612,6 +612,16 @@ Start `ielm' if it's not already running."
 
 (use-package google-translate)
 
+(defun google-translate-json-suggestion (json)
+  "Retrieve from JSON (which returns by the
+`google-translate-request' function) suggestion. This function
+does matter when translating misspelled word. So instead of
+translation it is possible to get suggestion."
+  (let ((info (aref json 7)))
+    (if (and info (> (length info) 0))
+        (aref info 1)
+      nil)))
+
 (defun google-translate-enja-or-jaen (&optional string)
   "Translate words in region or current position. Can also specify query with C-u"
   (interactive)
@@ -1069,7 +1079,7 @@ Start `ielm' if it's not already running."
 (require 'slime)
 (slime-setup)
 
-(load (expand-file-name "~/.roswell/helper.el"))
+(load (expand-file-name "~/.Roswell/helper.el"))
 
 ;;; OSX用の設定
 (cond ((not (equal system-type 'darwin))
@@ -1262,7 +1272,7 @@ Start `ielm' if it's not already running."
   :config
   (setq-default fsharp-indent-offset 2)
   (setq inferior-fsharp-program "/usr/local/share/dotnet/dotnet fsi")
-  (add-hook 'fsharp-mode-hook '(lambda () (eglot)))
+  (add-hook 'fsharp-mode-hook '(lambda () (lsp)))
   (define-key fsharp-mode-map (kbd "C-c C-M-f") #'fsharp-fantomas-format-buffer)
   (require 'eglot-fsharp))
 
@@ -1304,3 +1314,29 @@ Start `ielm' if it's not already running."
 (when (require 'helm-fish-completion nil 'noerror)
   (define-key shell-mode-map (kbd "<tab>") 'helm-fish-completion)
   (setq helm-esh-pcomplete-build-source-fn #'helm-fish-completion-make-eshell-source))
+
+(use-package twittering-mode
+  :ensure t)
+
+(use-package dired-subtree
+  :ensure t
+  :config
+  (define-key dired-mode-map "i" 'dired-subtree-insert)
+  (define-key dired-mode-map ";" 'dired-subtree-remove))
+
+(use-package elm-mode
+  :ensure t
+  :config
+  (add-hook 'elm-mode-hook
+			(lambda ()
+			  (local-set-key (kbd "C-c C-l") 'elm-repl-load-back)))
+  (require 'lsp-elm)
+  (add-hook 'elm-mode-hook
+			(lambda ()
+              (setq-local company-backends '(company-lsp))
+              (company-mode 1)
+			  (eglot)))
+  (with-eval-after-load 'flycheck
+    '(add-hook 'flycheck-mode-hook #'flycheck-elm-setup))
+  (add-hook 'after-init-hook 'global-company-mode)
+  (add-hook 'elm-mode-hook 'company-mode))

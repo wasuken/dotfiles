@@ -70,7 +70,6 @@
         ("melpa2" . "http://melpa.milkbox.net/packages/") ;なぜ二つあるんだ
         ("org" . "http://orgmode.org/elpa/")))
 
-
 ;; keep the installed packages in .emacs.d
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 (package-initialize)
@@ -192,395 +191,431 @@
 ;; smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
 
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
+;; (unless (package-installed-p 'use-package)
+;;   (package-install 'use-package))
 
-(require 'use-package)
-(setq use-package-verbose t)
+(unless (package-installed-p 'leaf)
+  (package-install 'leaf))
 
-(use-package lisp-mode
+(unless (package-installed-p 'leaf)
+  (package-install 'leaf-convert))
+
+(require 'leaf)
+(require 'leaf-convert)
+
+(leaf leaf-convert
   :config
-  (defun bozhidar-visit-ielm ()
-    "Switch to default `ielm' buffer.
-Start `ielm' if it's not already running."
-    (interactive)
-    (crux-start-or-switch-to 'ielm "*ielm*"))
+  (leaf lisp-mode
+	:bind ((emacs-lisp-mode-map
+			("C-c C-z" . bozhidar-visit-ielm))
+		   (emacs-lisp-mode-map
+			("C-c C-c" . eval-defun))
+		   (emacs-lisp-mode-map
+			("C-c C-b" . eval-buffer))
+		   (lisp-mode-map
+			("C-c M-s" . hyperspec-lookup)))
+	:hook ((emacs-lisp-mode-hook . eldoc-mode)
+		   (emacs-lisp-mode-hook . rainbow-delimiters-mode)
+		   (lisp-interaction-mode-hook . eldoc-mode)
+		   (eval-expression-minibuffer-setup-hook . eldoc-mode))
+	:require t
+	:config
+	(defun bozhidar-visit-ielm nil
+	  "Switch to default `ielm' buffer.\nStart `ielm' if it's not already running."
+	  (interactive)
+	  (crux-start-or-switch-to 'ielm "*ielm*")))
 
-  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'bozhidar-visit-ielm)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
-  (define-key lisp-mode-map (kbd "C-c M-s") 'hyperspec-lookup)
-  (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
+  (leaf ielm
+	:hook ((ielm-mode-hook . eldoc-mode)
+		   (ielm-mode-hook . rainbow-delimiters-mode))
+	:require t)
 
-(use-package ielm
-  :config
-  (add-hook 'ielm-mode-hook #'eldoc-mode)
-  (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode))
-
-(use-package zenburn-theme
-  :ensure t
-  :config
-  (load-theme 'zenburn t))
+  (leaf zenburn-theme
+	:ensure t
+	:require t
+	:config
+	(load-theme 'zenburn t)))
 
 ;; highlight the current line
 (global-hl-line-mode +1)
 
-(use-package avy
-  :ensure t
-  :bind (("s-." . avy-goto-word-or-subword-1)
-         ("s-," . avy-goto-char))
+(leaf leaf-convert
   :config
-  (setq avy-background t))
+  (leaf avy
+	:ensure t
+	:bind (("s-." . avy-goto-word-or-subword-1)
+		   ("s-," . avy-goto-char))
+	:config
+	(with-eval-after-load 'avy
+	  (setq avy-background t)))
 
-(use-package magit
-  :ensure t
-  :bind (("C-x g" . magit-status)))
+  (leaf magit
+	:ensure t
+	:bind (("C-x g" . magit-status)))
 
-(use-package ag
-  :ensure t)
+  (leaf ag
+	:ensure t
+	:require t)
 
-(use-package projectile
-  :ensure t
-  :bind ("s-p" . projectile-command-map)
-  :config
-  (setq projectile-completion-system 'ivy)
-  (projectile-global-mode +1))
+  (leaf projectile
+	:ensure t
+	:bind (("s-p" . projectile-command-map))
+	:config
+	(with-eval-after-load 'projectile
+	  (setq projectile-completion-system 'ivy)
+	  (projectile-global-mode 1)))
 
-(use-package pt
-  :ensure t)
+  (leaf pt
+	:ensure t
+	:require t)
 
-(use-package expand-region
-  :ensure t
-  :bind ("C-=" . er/expand-region))
+  (leaf expand-region
+	:ensure t
+	:bind (("C-=" . er/expand-region)))
 
-(use-package elisp-slime-nav
-  :ensure t
-  :config
-  (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
-    (add-hook hook #'elisp-slime-nav-mode)))
+  (leaf elisp-slime-nav
+	:ensure t
+	:require t
+	:config
+	(dolist (hook
+			 '(emacs-lisp-mode-hook ielm-mode-hook))
+	  (add-hook hook #'elisp-slime-nav-mode)))
 
-(use-package paredit
-  :ensure t
-  :config
-  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-  ;; enable in the *scratch* buffer
-  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-  (add-hook 'ielm-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode))
+  (leaf paredit
+	:ensure t
+	:hook (emacs-lisp-mode-hook lisp-interaction-mode-hook ielm-mode-hook lisp-mode-hook eval-expression-minibuffer-setup-hook)
+	:require t)
 
-(use-package paren
-  :config
-  (show-paren-mode +1))
+  (leaf paren
+	:require t
+	:config
+	(show-paren-mode 1))
 
-(use-package abbrev
-  :config
-  (setq save-abbrevs 'silently)
-  (setq-default abbrev-mode t))
+  (leaf abbrev
+	:require t
+	:setq ((save-abbrevs quote silently))
+	:setq-default ((abbrev-mode . t)))
 
-(use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-separator "/")
-  ;; rename after killing uniquified
-  (setq uniquify-after-kill-buffer-p t)
-  ;; don't muck with special buffers
-  (setq uniquify-ignore-buffers-re "^\\*"))
+  (leaf uniquify
+	:require t
+	:setq ((uniquify-buffer-name-style quote forward)
+		   (uniquify-separator . "/")
+		   (uniquify-after-kill-buffer-p . t)
+		   (uniquify-ignore-buffers-re . "^\\*"))))
 
 ;; saveplace remembers your location in a file when saving files
 (require 'saveplace)
-(use-package saveplace
+(leaf leaf-convert
+  :commands run-ruby inf-ruby-keys
   :config
-  (setq save-place-file (expand-file-name "saveplace" bozhidar-savefile-dir))
-  ;; activate it for all buffers
-  (setq-default save-place t))
+  (leaf saveplace
+	:require t
+	:setq-default ((save-place . t))
+	:config
+	(setq save-place-file (expand-file-name "saveplace" bozhidar-savefile-dir)))
 
-(use-package savehist
-  :config
-  (setq savehist-additional-variables
-        ;; search entries
-        '(search-ring regexp-search-ring)
-        ;; save every minute
-        savehist-autosave-interval 60
-        ;; keep the home clean
-        savehist-file (expand-file-name "savehist" bozhidar-savefile-dir))
-  (savehist-mode +1))
+  (leaf savehist
+	:require t
+	:config
+	(setq savehist-additional-variables '(search-ring regexp-search-ring)
+		  savehist-autosave-interval 60
+		  savehist-file (expand-file-name "savehist" bozhidar-savefile-dir))
+	(savehist-mode 1))
 
-(use-package recentf
-  :config
-  (setq recentf-save-file (expand-file-name "recentf" bozhidar-savefile-dir)
-        recentf-max-saved-items 500
-        recentf-max-menu-items 15
-        ;; disable recentf-cleanup on Emacs start, because it can cause
-        ;; problems with remote files
-        recentf-auto-cleanup 'never)
-  (recentf-mode +1))
+  (leaf recentf
+	:require t
+	:config
+	(setq recentf-save-file (expand-file-name "recentf" bozhidar-savefile-dir)
+		  recentf-max-saved-items 500
+		  recentf-max-menu-items 15
+		  recentf-auto-cleanup 'never)
+	(recentf-mode 1))
 
-(use-package windmove
-  :config
-  ;; use shift + arrow keys to switch between visible buffers
-  (windmove-default-keybindings))
+  (leaf windmove
+	:require t
+	:config
+	(windmove-default-keybindings))
 
-(use-package dired
-  :config
-  ;; dired - reuse current buffer by pressing 'a'
-  (put 'dired-find-alternate-file 'disabled nil)
+  (leaf dired
+	:pre-setq ((dired-recursive-deletes quote always)
+			   (dired-recursive-copies quote always)
+			   (dired-dwim-target . t))
+	:init
+	(put 'dired-find-alternate-file 'disabled nil)
+	:require t dired-x)
 
-  ;; always delete and copy recursively
-  (setq dired-recursive-deletes 'always)
-  (setq dired-recursive-copies 'always)
+  (leaf anzu
+	:ensure t
+	:bind (("M-%" . anzu-query-replace)
+		   ("C-M-%" . anzu-query-replace-regexp))
+	:config
+	(with-eval-after-load 'anzu
+	  (global-anzu-mode)))
 
-  ;; if there is a dired buffer displayed in the next window, use its
-  ;; current subdir, instead of the current subdir of this dired buffer
-  (setq dired-dwim-target t)
+  (leaf easy-kill
+	:ensure t
+	:bind (([remap kill-ring-save]
+			. easy-kill))
+	:require t)
 
-  ;; enable some really cool extensions like C-x C-j(dired-jump)
-  (require 'dired-x))
+  (leaf exec-path-from-shell
+	:ensure t
+	:require t
+	:config
+	(when (memq window-system
+				'(mac ns))
+	  (exec-path-from-shell-initialize)))
 
-(use-package anzu
-  :ensure t
-  :bind (("M-%" . anzu-query-replace)
-         ("C-M-%" . anzu-query-replace-regexp))
-  :config
-  (global-anzu-mode))
+  (leaf move-text
+	:ensure t
+	:bind (([(meta shift up)]
+			. move-text-up)
+		   ([(meta shift down)]
+			. move-text-down)))
 
-(use-package easy-kill
-  :ensure t
-  :config
-  (global-set-key [remap kill-ring-save] 'easy-kill))
+  (leaf rainbow-delimiters
+	:ensure t
+	:require t)
 
-(use-package exec-path-from-shell
-  :ensure t
-  :config
-  (when (memq window-system '(mac ns))
-    (exec-path-from-shell-initialize)))
+  (leaf rainbow-mode
+	:ensure t
+	:hook (prog-mode-hook)
+	:require t)
 
-(use-package move-text
-  :ensure t
-  :bind
-  (([(meta shift up)] . move-text-up)
-   ([(meta shift down)] . move-text-down)))
+  (leaf whitespace
+	:hook ((before-save-hook . whitespace-cleanup))
+	:init
+	(dolist (hook
+			 '(prog-mode-hook text-mode-hook))
+	  (add-hook hook #'whitespace-mode))
+	:require t
+	:setq ((whitespace-line-column . 80)
+		   (whitespace-style quote
+							 (face tabs empty trailing lines-tail))))
 
-(use-package rainbow-delimiters
-  :ensure t)
+  (leaf inf-ruby
+	:ensure t
+	:hook ((ruby-mode-hook . inf-ruby-minor-mode))
+	:require t)
 
-(use-package rainbow-mode
-  :ensure t
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-mode))
-
-(use-package whitespace
-  :init
-  (dolist (hook '(prog-mode-hook text-mode-hook))
-    (add-hook hook #'whitespace-mode))
-  (add-hook 'before-save-hook #'whitespace-cleanup)
-  :config
-  (setq whitespace-line-column 80) ;; limit line length
-  (setq whitespace-style '(face tabs empty trailing lines-tail)))
-
-(use-package inf-ruby
-  :ensure t
-  :config
-  (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
-
-(autoload 'run-ruby "inf-ruby"
-  "Run an inferior Ruby process")
-(autoload 'inf-ruby-keys "inf-ruby"
-  "Set local key defs for inf-ruby in ruby-mode")
-(add-hook 'ruby-mode-hook
-          '(lambda ()
-             (inf-ruby-keys)))
-
-(use-package ruby-mode
-  :config
-  (add-hook 'ruby-mode-hook #'subword-mode)
-  (electric-pair-mode t)
   (add-hook 'ruby-mode-hook
-			'(lambda ()
-               (robe-mode)
-               (robe-ac-setup)
-               (inf-ruby-keys))))
-
-(use-package clojure-mode
-  :ensure t
+			'(lambda nil
+			   (inf-ruby-keys))))
+(leaf leaf-convert
   :config
-  (add-hook 'clojure-mode-hook #'paredit-mode)
-  (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
-  :bind (("C-c C-l" . 'cider-repl-clear-buffer)))
+  (leaf ruby-mode
+	:hook ((ruby-mode-hook . subword-mode))
+	:require t
+	:config
+	(electric-pair-mode t)
+	(add-hook 'ruby-mode-hook
+			  '(lambda nil
+				 (robe-mode)
+				 (robe-ac-setup)
+				 (inf-ruby-keys))))
 
-(use-package sayid :ensure t
+  (leaf clojure-mode
+	:ensure t
+	:bind (("C-c C-l" . cider-repl-clear-buffer))
+	:hook ((clojure-mode-hook . paredit-mode)
+		   (clojure-mode-hook . subword-mode)
+		   (clojure-mode-hook . rainbow-delimiters-mode))
+	:require t)
+
+  (leaf sayid
+	:ensure t
+	:require t
+	:config
+	(with-eval-after-load 'clojure-mode
+	  (sayid-setup-package))))
+
+(leaf leaf-convert
   :config
-  (eval-after-load 'clojure-mode
-	'(sayid-setup-package)))
+  (defun my-clojure-mode-hook nil
+	(clj-refactor-mode 1)
+	(yas-minor-mode 1)
+	(cljr-add-keybindings-with-prefix "C-c C-m"))
 
-(defun my-clojure-mode-hook ()
-  (clj-refactor-mode 1)
-  (yas-minor-mode 1) ; for adding require/use/import statements
-  ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-  (cljr-add-keybindings-with-prefix "C-c C-m"))
+  (leaf clj-refactor
+	:ensure t
+	:hook ((clojure-mode-hook . my-clojure-mode-hook))
+	:require t)
 
-(use-package clj-refactor
-  :ensure t
-  :config
-  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook))
+  (leaf cider
+	:ensure t
+	:hook ((cider-mode-hook . eldoc-mode)
+		   (cider-repl-mode-hook . eldoc-mode)
+		   (cider-repl-mode-hook . paredit-mode)
+		   (cider-repl-mode-hook . rainbow-delimiters-mode))
+	:require t)
 
-(use-package cider
-  :ensure t
-  :config
-  (add-hook 'cider-mode-hook #'eldoc-mode)
-  (add-hook 'cider-repl-mode-hook #'eldoc-mode)
-  (add-hook 'cider-repl-mode-hook #'paredit-mode)
-  (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
+  (leaf markdown-mode
+	:ensure t
+	:require t
+	:setq ((markdown-command . "pandoc")))
 
-(use-package markdown-mode
-  :ensure t
-  :config
-  (setq markdown-command "pandoc"))
+  (leaf yaml-mode
+	:ensure t
+	:require t)
 
-(use-package yaml-mode
-  :ensure t)
+  (leaf cask-mode
+	:ensure t
+	:require t)
 
-(use-package cask-mode
-  :ensure t)
+  (leaf company
+	:ensure t
+	:require t
+	:config
+	(global-company-mode)
+	(push 'company-lsp company-backends)
+	(add-hook 'go-mode-hook
+			  (lambda nil
+				(company-mode)
+				(setq company-transformers '(company-sort-by-backend-importance))
+				(setq company-idle-delay 0)
+				(setq company-minimum-prefix-length 3)
+				(setq company-selection-wrap-around t)
+				(setq completion-ignore-case t)
+				(setq company-dabbrev-downcase nil)
+				(global-set-key
+				 (kbd "C-M-i")
+				 'company-complete)
+				(define-key company-active-map
+				  (kbd "C-n")
+				  'company-select-next)
+				(define-key company-active-map
+				  (kbd "C-p")
+				  'company-select-previous)
+				(define-key company-active-map
+				  (kbd "C-s")
+				  'company-filter-candidates)
+				(define-key company-active-map
+				  [tab]
+				  'company-complete-selection)
+				(define-key emacs-lisp-mode-map
+				  (kbd "C-M-i")
+				  'company-complete))))
 
+  (global-company-mode 1)
+  (leaf zop-to-char
+	:ensure t
+	:bind (("M-z" . zop-up-to-char)
+		   ("M-Z" . zop-to-char)))
 
-(use-package company
-  :ensure t
-  :config
-  (global-company-mode)
-  (push 'company-lsp company-backends)
-  (add-hook 'go-mode-hook (lambda()
-                            (company-mode)
-                            (setq company-transformers '(company-sort-by-backend-importance)) ;; ソート順
-                            (setq company-idle-delay 0) ; 遅延なしにすぐ表示
-                            (setq company-minimum-prefix-length 3) ; デフォルトは4
-                            (setq company-selection-wrap-around t) ; 候補の最後の次は先頭に戻る
-                            (setq completion-ignore-case t)
-                            (setq company-dabbrev-downcase nil)
-                            (global-set-key (kbd "C-M-i") 'company-complete)
-                            ;; C-n, C-pで補完候補を次/前の候補を選択
-                            (define-key company-active-map (kbd "C-n") 'company-select-next)
-                            (define-key company-active-map (kbd "C-p") 'company-select-previous)
-                            (define-key company-active-map (kbd "C-s") 'company-filter-candidates) ;; C-sで絞り込む
-                            (define-key company-active-map [tab] 'company-complete-selection) ;; TABで候補を設定
-                            (define-key emacs-lisp-mode-map (kbd "C-M-i") 'company-complete) ;; 各種メジャーモードでも C-M-iで company-modeの補完を使う
-                            )))
+  (leaf imenu-anywhere
+	:ensure t
+	:bind (("C-c i" . imenu-anywhere)
+		   ("s-i" . imenu-anywhere)))
 
-(global-company-mode +1)
+  (leaf flyspell
+	:hook (text-mode-hook
+		   (prog-mode-hook . flyspell-prog-mode))
+	:require t
+	:config
+	(when (eq system-type 'windows-nt)
+	  (add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/"))
+	(setq ispell-program-name "aspell"
+		  ispell-extra-args '("--sug-mode=ultra")))
 
-(use-package zop-to-char
-  :ensure t
-  :bind (("M-z" . zop-up-to-char)
-         ("M-Z" . zop-to-char)))
+  (leaf flycheck
+	:ensure t
+	:hook ((after-init-hook . global-flycheck-mode))
+	:require t)
 
-(use-package imenu-anywhere
-  :ensure t
-  :bind (("C-c i" . imenu-anywhere)
-         ("s-i" . imenu-anywhere)))
+  (leaf super-save
+	:ensure t
+	:require t
+	:config
+	(super-save-mode 1))
 
-(use-package flyspell
-  :config
-  (when (eq system-type 'windows-nt)
-    (add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/"))
-  (setq ispell-program-name "aspell" ; use aspell instead of ispell
-        ispell-extra-args '("--sug-mode=ultra"))
-  (add-hook 'text-mode-hook #'flyspell-mode)
-  (add-hook 'prog-mode-hook #'flyspell-prog-mode))
+  (leaf crux
+	:ensure t
+	:bind (("C-c o" . crux-open-with)
+		   ("M-o" . crux-smart-open-line)
+		   ("C-c n" . crux-cleanup-buffer-or-region)
+		   ("C-c f" . crux-recentf-ido-find-file)
+		   ("C-M-z" . crux-indent-defun)
+		   ("C-c u" . crux-view-url)
+		   ("C-c e" . crux-eval-and-replace)
+		   ("C-c w" . crux-swap-windows)
+		   ("C-c D" . crux-delete-file-and-buffer)
+		   ("C-c r" . crux-rename-buffer-and-file)
+		   ("C-c t" . crux-visit-term-buffer)
+		   ("C-c k" . crux-kill-other-buffers)
+		   ("C-c TAB" . crux-indent-rigidly-and-copy-to-clipboard)
+		   ("C-c I" . crux-find-user-init-file)
+		   ("C-c S" . crux-find-shell-init-file)
+		   ("s-r" . crux-recentf-ido-find-file)
+		   ("s-j" . crux-top-join-line)
+		   ("C-^" . crux-top-join-line)
+		   ("s-k" . crux-kill-whole-line)
+		   ("C-<backspace>" . crux-kill-line-backwards)
+		   ("s-o" . crux-smart-open-line-above)
+		   ([remap move-beginning-of-line]
+			. crux-move-beginning-of-line)
+		   ([(shift return)]
+			. crux-smart-open-line)
+		   ([(control shift return)]
+			. crux-smart-open-line-above)
+		   ([remap kill-whole-line]
+			. crux-kill-whole-line)
+		   ("C-c s" . crux-ispell-word-then-abbrev)))
 
-(use-package flycheck
-  :ensure t
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
+  (leaf diff-hl
+	:ensure t
+	:hook ((dired-mode-hook . diff-hl-dired-mode)
+		   (magit-post-refresh-hook . diff-hl-magit-post-refresh))
+	:require t
+	:config
+	(global-diff-hl-mode 1))
 
-(use-package super-save
-  :ensure t
-  :config
-  (super-save-mode +1))
+  (leaf which-key
+	:ensure t
+	:require t
+	:config
+	(which-key-mode 1))
 
-(use-package crux
-  :ensure t
-  :bind (("C-c o" . crux-open-with)
-         ("M-o" . crux-smart-open-line)
-         ("C-c n" . crux-cleanup-buffer-or-region)
-         ("C-c f" . crux-recentf-ido-find-file)
-         ("C-M-z" . crux-indent-defun)
-         ("C-c u" . crux-view-url)
-         ("C-c e" . crux-eval-and-replace)
-         ("C-c w" . crux-swap-windows)
-         ("C-c D" . crux-delete-file-and-buffer)
-         ("C-c r" . crux-rename-buffer-and-file)
-         ("C-c t" . crux-visit-term-buffer)
-         ("C-c k" . crux-kill-other-buffers)
-         ("C-c TAB" . crux-indent-rigidly-and-copy-to-clipboard)
-         ("C-c I" . crux-find-user-init-file)
-         ("C-c S" . crux-find-shell-init-file)
-         ("s-r" . crux-recentf-ido-find-file)
-         ("s-j" . crux-top-join-line)
-         ("C-^" . crux-top-join-line)
-         ("s-k" . crux-kill-whole-line)
-         ("C-<backspace>" . crux-kill-line-backwards)
-         ("s-o" . crux-smart-open-line-above)
-         ([remap move-beginning-of-line] . crux-move-beginning-of-line)
-         ([(shift return)] . crux-smart-open-line)
-         ([(control shift return)] . crux-smart-open-line-above)
-         ([remap kill-whole-line] . crux-kill-whole-line)
-         ("C-c s" . crux-ispell-word-then-abbrev)))
+  (leaf undo-tree
+	:ensure t
+	:bind (("M-/" . undo-tree-redo))
+	:require t
+	:setq ((undo-tree-auto-save-history . t))
+	:config
+	(setq undo-tree-history-directory-alist `((".*" \, temporary-file-directory)))
+	(global-undo-tree-mode t))
 
-(use-package diff-hl
-  :ensure t
-  :config
-  (global-diff-hl-mode +1)
-  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+  (leaf ivy
+	:ensure t
+	:bind (("C-c C-r" . ivy-resume)
+		   ("<f6>" . ivy-resume))
+	:require t
+	:setq ((ivy-use-virtual-buffers . t)
+		   (enable-recursive-minibuffers . t))
+	:config
+	(ivy-mode 1))
 
-(use-package which-key
-  :ensure t
-  :config
-  (which-key-mode +1))
+  (leaf swiper
+	:ensure t
+	:require t
+	:config
+	(global-set-key "" 'swiper))
 
-(use-package undo-tree
-  :ensure t
-  :config
-  ;; autosave the undo-tree history
-  (setq undo-tree-history-directory-alist
-        `((".*" . ,temporary-file-directory)))
-  (setq undo-tree-auto-save-history t)
-  (global-undo-tree-mode t)
-  (global-set-key (kbd "M-/") 'undo-tree-redo))
-
-(use-package ivy
-  :ensure t
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "<f6>") 'ivy-resume))
-
-(use-package swiper
-  :ensure t
-  :config
-  (global-set-key "\C-s" 'swiper))
-
-(use-package counsel
-  :ensure t
-  :config
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-  (global-set-key (kbd "<f1> l") 'counsel-find-library)
-  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-  (global-set-key (kbd "C-c g") 'counsel-git)
-  (global-set-key (kbd "C-c j") 'counsel-git-grep)
-  (global-set-key (kbd "C-c k") 'counsel-ag)
-  (global-set-key (kbd "C-x l") 'counsel-locate)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+  (leaf counsel
+	:ensure t
+	:bind (("M-x" . counsel-M-x)
+		   ("C-x C-f" . counsel-find-file)
+		   ("<f1> f" . counsel-describe-function)
+		   ("<f1> v" . counsel-describe-variable)
+		   ("<f1> l" . counsel-find-library)
+		   ("<f2> i" . counsel-info-lookup-symbol)
+		   ("<f2> u" . counsel-unicode-char)
+		   ("C-c g" . counsel-git)
+		   ("C-c j" . counsel-git-grep)
+		   ("C-c k" . counsel-ag)
+		   ("C-x l" . counsel-locate)
+		   (minibuffer-local-map
+			("C-r" . counsel-minibuffer-history)))
+	:require t))
 
 (when (eq system-type 'windows-nt)
   (setq w32-pass-lwindow-to-system nil)
@@ -605,12 +640,13 @@ Start `ielm' if it's not already running."
 (when (file-exists-p custom-file)
   (load custom-file))
 
-(use-package google-translate
+(leaf google-translate
   :ensure t
-  :config
-  (global-set-key (kbd "C-c f") 'google-translate-enja-or-jaen))
+  :bind (("C-c f" . google-translate-enja-or-jaen))
+  :require t)
 
-(use-package google-translate)
+(leaf google-translate
+  :require t)
 
 (defun google-translate-json-suggestion (json)
   "Retrieve from JSON (which returns by the
@@ -649,103 +685,107 @@ translation it is possible to get suggestion."
   ;; TKK='427110.1469889687'
   (list 427110 1469889687))
 
-(use-package neotree
-  :ensure t
+(leaf leaf-convert
+  :setq ((default-input-method . "japanese-mozc"))
   :config
-  (setq neo-show-hidden-files t)
-  (global-set-key (kbd "C-c t") 'neotree))
+  (leaf neotree
+	:ensure t
+	:bind (("C-c t" . neotree))
+	:require t
+	:setq ((neo-show-hidden-files . t)))
 
-(use-package elscreen
-  :ensure t
-  :config
-  (setq elscreen-prefix-key (kbd "C-z"))
-  (elscreen-start)
-;;; タブの先頭に[X]を表示しない
-  (setq elscreen-tab-display-kill-screen nil)
-;;; header-lineの先頭に[<->]を表示しない
-  (setq elscreen-tab-display-control nil)
-;;; バッファ名・モード名からタブに表示させる内容を決定する(デフォルト設定)
-  (setq elscreen-buffer-to-nickname-alist
-        '(("^dired-mode$" .
-           (lambda ()
-             (format "Dired(%s)" dired-directory)))
-          ("^Info-mode$" .
-           (lambda ()
-             (format "Info(%s)" (file-name-nondirectory Info-current-file))))
-          ("^mew-draft-mode$" .
-           (lambda ()
-             (format "Mew(%s)" (buffer-name (current-buffer)))))
-          ("^mew-" . "Mew")
-          ("^irchat-" . "IRChat")
-          ("^liece-" . "Liece")
-          ("^lookup-" . "Lookup")))
-  (setq elscreen-mode-to-nickname-alist
-        '(("[Ss]hell" . "shell")
-          ("compilation" . "compile")
-          ("-telnet" . "telnet")
-          ("dict" . "OnlineDict")
-          ("*WL:Message*" . "Wanderlust"))))
+  (leaf elscreen
+	:ensure t
+	:require t
+	:setq ((elscreen-tab-display-kill-screen)
+		   (elscreen-tab-display-control)
+		   (elscreen-buffer-to-nickname-alist quote
+											  (("^dired-mode$" lambda nil
+												(format "Dired(%s)" dired-directory))
+											   ("^Info-mode$" lambda nil
+												(format "Info(%s)"
+														(file-name-nondirectory Info-current-file)))
+											   ("^mew-draft-mode$" lambda nil
+												(format "Mew(%s)"
+														(buffer-name
+														 (current-buffer))))
+											   ("^mew-" . "Mew")
+											   ("^irchat-" . "IRChat")
+											   ("^liece-" . "Liece")
+											   ("^lookup-" . "Lookup")))
+		   (elscreen-mode-to-nickname-alist quote
+											(("[Ss]hell" . "shell")
+											 ("compilation" . "compile")
+											 ("-telnet" . "telnet")
+											 ("dict" . "OnlineDict")
+											 ("*WL:Message*" . "Wanderlust"))))
+	:config
+	(setq elscreen-prefix-key (kbd "C-z"))
+	(elscreen-start))
 
+  (leaf mozc
+	:ensure t
+	:require t
+	:config
+	(prefer-coding-system 'utf-8))
 
-(use-package mozc
-  :ensure t
-  :config
-  (prefer-coding-system 'utf-8))
-(set-language-environment "Japanese")
-(setq default-input-method "japanese-mozc")
+  (set-language-environment "Japanese")
+  (leaf undo-tree
+	:ensure t
+	:require t)
 
-(use-package undo-tree
-  :ensure t
-  :config)
-
-(use-package helm
-  :ensure t
-  :bind (("M-x" . helm-M-x)
-         ("M-<f5>" . helm-find-files)
-         ([f10] . helm-buffers-list)
-         ([S-f10] . helm-recentf)
-         ("C-x b" . helm-for-files)
-         ("C-x C-f" . helm-find-files)
-         ("M-y" . helm-show-kill-ring))
-  :config
-  (require 'helm-config)
-  (helm-mode 1))
+  (leaf helm
+	:ensure t
+	:bind (("M-x" . helm-M-x)
+		   ("M-<f5>" . helm-find-files)
+		   ([f10]
+			. helm-buffers-list)
+		   ([S-f10]
+			. helm-recentf)
+		   ("C-x b" . helm-for-files)
+		   ("C-x C-f" . helm-find-files)
+		   ("M-y" . helm-show-kill-ring))
+	:config
+	(with-eval-after-load 'helm
+	  (require 'helm-config)
+	  (helm-mode 1))))
 
 ;;;多分先に変数いれとかないと駄目。辛い
 (defvar howm-view-title-header "#")
-(use-package howm
-  :ensure t
+(leaf leaf-convert
   :config
-  (setq howm-directory (concat user-emacs-directory "howm"))
-  (setq howm-menu-langage 'ja)
-  (setq howm-file-name-format "%Y/%m/%Y-%m-%d-%H%M%S.md")
-  (setq howm-menu-file "menu.md")
-  (define-key global-map (kbd "C-c ,,") 'howm-menu))
+  (leaf howm
+	:ensure t
+	:bind (("C-c ,," . howm-menu))
+	:require t
+	:setq ((howm-menu-langage quote ja)
+		   (howm-file-name-format . "%Y/%m/%Y-%m-%d-%H%M%S.md")
+		   (howm-menu-file . "menu.md"))
+	:config
+	(setq howm-directory (concat user-emacs-directory "howm")))
 
-(use-package elfeed
-  :ensure t
-  :config
-  (setf elfeed-feeds
-        '("http://b.hatena.ne.jp/hotentry/it.rss"
-          "http://elephant.2chblog.jp/index.rdf"
-          "http://openstandia.jp/oss_info/atom.xml"
-          "https://www.archlinux.org/feeds/packages/")))
-(use-package w3m
-  :ensure t
-  :config
-  (setq w3m-coding-system 'utf-8
-        w3m-file-coding-system 'utf-8
-        w3m-file-name-coding-system 'utf-8
-        w3m-input-coding-system 'utf-8
-        w3m-output-coding-system 'utf-8
-        w3m-terminal-coding-system 'utf-8)
-  (setq w3m-command "/usr/local/bin/w3m"))
+  (leaf elfeed
+	:ensure t
+	:require t
+	:config
+	(setf elfeed-feeds '("http://b.hatena.ne.jp/hotentry/it.rss" "http://elephant.2chblog.jp/index.rdf" "http://openstandia.jp/oss_info/atom.xml" "https://www.archlinux.org/feeds/packages/")))
 
-;;; use-package では駄目だったり、後から追加したもの
+  (leaf w3m
+	:ensure t
+	:require t
+	:setq ((w3m-command . "/usr/local/bin/w3m"))
+	:config
+	(setq w3m-coding-system 'utf-8
+		  w3m-file-coding-system 'utf-8
+		  w3m-file-name-coding-system 'utf-8
+		  w3m-input-coding-system 'utf-8
+		  w3m-output-coding-system 'utf-8
+		  w3m-terminal-coding-system 'utf-8)))
+
 (setq inferior-lisp-program "sbcl")
 ;; ~/.emacs.d/slimeをload-pathに追加
 (unless (file-exists-p "~/.emacs.d/slime/")
-  (shell-command-to-string "git clone https://github.com/slime/slime && mv -f evcxr-mode ~/.emacs.d/"))
+  (shell-command-to-string "git clone https://github.com/slime/slime && mv -f slime ~/.emacs.d/"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/slime"))
 (require 'slime)
 (slime-setup '(slime-repl slime-fancy slime-banner))
@@ -766,23 +806,19 @@ translation it is possible to get suggestion."
 	   (global-set-key (kbd "C->") 'other-window)
 	   (global-set-key (kbd "C-<") (lambda () (interactive) (other-window -1)))))
 
-(use-package golden-ratio
+(leaf golden-ratio
   :ensure t
+  :require t
+  :setq ((golden-ratio-exclude-modes quote
+									 (calendar-mode))
+		 (golden-ratio-exclude-buffer-names quote
+											(" *Org tags*" " *Org todo*"))
+		 (golden-ratio-exclude-buffer-regexp quote
+											 ("\\*anything" "\\*helm"))
+		 (golden-ratio-extra-commands quote
+									  (windmove-left windmove-right windmove-down windmove-up)))
   :config
-  ;;; use-packageでの設定がよくわからなかった
-  (golden-ratio-mode 1)
-;;; 条件に応じてウィンドウの大きさを変更しない
-  ;; ウィンドウの大きさを変更しないメジャーモード
-  (setq golden-ratio-exclude-modes '(calendar-mode))
-  ;; ウィンドウの大きさを変更しないバッファ名
-  (setq golden-ratio-exclude-buffer-names '(" *Org tags*" " *Org todo*"))
-  ;; ウィンドウの大きさを変更しないバッファ名の正規表現
-  (setq golden-ratio-exclude-buffer-regexp '("\\*anything" "\\*helm"))
-
-;;; ウィンドウ選択系のコマンドで作用させる
-  (setq golden-ratio-extra-commands
-		'(windmove-left windmove-right windmove-down windmove-up))
-  )
+  (golden-ratio-mode 1))
 
 
 (unless (file-exists-p "~/.emacs.d/Emacs-gosh-mode/")
@@ -809,34 +845,38 @@ translation it is possible to get suggestion."
 
 (define-key global-map (kbd "C-c g") 'gosh-run)
 
-(use-package lsp-go
-  :after (lsp-mode go-mode)
-  :custom (lsp-go-language-server-flags '(
-										  "-gocodecompletion"
-										  "-diagnostics"
-										  "-lint-tool=golint"))
-  :hook (go-mode . lsp)
-  :commands lsp-go-enable)
-
-;;; golang setting
-(use-package go-mode
-  :ensure t
+(leaf leaf-convert
   :config
-  ;; Goのパスを通す
-  (add-to-list 'exec-path (expand-file-name "/usr/lib/go/bin"))
-  ;; go get で入れたツールのパスを通す
-  (add-to-list 'exec-path (expand-file-name "~/develop/go/bin/"))
-  (add-hook 'go-mode-hook #'lsp-go-enable)
-  ;; flycheck-modeを有効化してシンタックスエラーを検知
-  (add-hook 'go-mode-hook 'flycheck-mode)
-  (add-hook 'go-mode-hook (lambda()
-                            (add-hook 'before-save-hook' 'gofmt-before-save)
-                            (local-set-key (kbd "M-.") 'godef-jump)
-                            (set (make-local-variable 'company-backends) '(company-go))
-                            (setq indent-tabs-mode nil)    ; タブを利用
-                            (setq c-basic-offset 4)    ; tabサイズを4にする
-                            (setq tab-width 4)
-							(add-hook 'before-save-hook 'gofmt-before-save))))
+  (leaf lsp-go
+	:after go-mode lsp-mode
+	:commands lsp lsp-go-enable
+	:hook ((go-mode-hook . lsp))
+	:custom ((lsp-go-language-server-flags quote
+										   ("-gocodecompletion" "-diagnostics" "-lint-tool=golint"))))
+
+  (leaf go-mode
+	:ensure t
+	:hook ((go-mode-hook . lsp-go-enable)
+		   (go-mode-hook . flycheck-mode))
+	:require t
+	:config
+	(add-to-list 'exec-path
+				 (expand-file-name "/usr/lib/go/bin"))
+	(add-to-list 'exec-path
+				 (expand-file-name "~/develop/go/bin/"))
+	(add-hook 'go-mode-hook
+			  (lambda nil
+				(add-hook 'before-save-hook ''gofmt-before-save)
+				(local-set-key
+				 (kbd "M-.")
+				 'godef-jump)
+				(set
+				 (make-local-variable 'company-backends)
+				 '(company-go))
+				(setq indent-tabs-mode nil)
+				(setq c-basic-offset 4)
+				(setq tab-width 4)
+				(add-hook 'before-save-hook 'gofmt-before-save)))))
 
 (defun godoc-get-buffer (query)
   "Get an empty buffer for a godoc QUERY."
@@ -855,48 +895,51 @@ translation it is possible to get suggestion."
 
 (put 'upcase-region 'disabled nil)
 
-(use-package scala-mode
-  :mode "\\.s\\(cala\\|bt\\)$")
-
-(use-package sbt-mode
-  :commands sbt-start sbt-command
+(leaf leaf-convert
   :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map))
+  (leaf scala-mode
+	:mode ("\\.s\\(cala\\|bt\\)$"))
 
-;; Enable nice rendering of diagnostics like compile errors.
-(use-package flycheck
-  :init (global-flycheck-mode))
+  (leaf sbt-mode
+	:commands sbt-start sbt-command
+	:config
+	(with-eval-after-load 'sbt-mode
+	  (substitute-key-definition 'minibuffer-complete-word 'self-insert-command minibuffer-local-completion-map)))
 
-(use-package lsp-mode
-  :ensure t
-  ;; Optional - enable lsp-mode automatically in scala files
-  :hook (scala-mode . lsp)
-  :config (setq lsp-prefer-flymake nil))
+  (leaf flycheck
+	:init
+	(global-flycheck-mode)
+	:require t)
 
-(use-package lsp-ui)
+  (leaf lsp-mode
+	:ensure t
+	:commands lsp
+	:hook (scala-mode-hook)
+	:config
+	(with-eval-after-load 'lsp-mode
+	  (setq lsp-prefer-flymake nil)))
 
-;; Add company-lsp backend for metals
-(use-package company-lsp)
+  (leaf lsp-ui
+	:require t)
+
+  (leaf company-lsp
+	:require t))
 
 ;; Timeoutの変更
 (if (>= emacs-major-version 22)
     (setq anthy-accept-timeout 1))
 
-(use-package java-imports
-  :ensure t
+(leaf leaf-convert
   :config
-  ;; (define-key java-mode-map (kbd "M-I") 'java-imports-add-import-dwim)
-  (setq java-imports-find-block-function 'java-imports-find-place-sorted-block))
+  (leaf java-imports
+	:ensure t
+	:require t
+	:setq ((java-imports-find-block-function quote java-imports-find-place-sorted-block)))
 
-(use-package javadoc-lookup
-  :ensure t
-  :config
-  (global-set-key (kbd "C-c C-j") 'javadoc-lookup))
+  (leaf javadoc-lookup
+	:ensure t
+	:bind (("C-c C-j" . javadoc-lookup))
+	:require t))
 
 (add-hook 'shell-mode-hook
           (lambda ()
@@ -979,16 +1022,19 @@ translation it is possible to get suggestion."
 
 ;; R-mode 起動直後の処理
 (add-hook 'R-mode-hook 'ess-load-hook)
-(use-package ess-R-data-view
-  :ensure t)
-
+(leaf ess-R-data-view
+  :ensure t
+  :require t)
 (add-to-list 'auto-mode-alist '("\\.erb$" . html-mode))
 (prefer-coding-system 'utf-8)
 
-(use-package python
+(leaf python
   :ensure t
+  :require t
   :config
-  (setq auto-mode-alist (cons '("\\.py$'" . python-mode) auto-mode-alist)))
+  (setq auto-mode-alist (cons
+						 '("\\.py$'" . python-mode)
+						 auto-mode-alist)))
 
 (defun insert-current-time()
   (interactive)
@@ -996,53 +1042,59 @@ translation it is possible to get suggestion."
 
 (define-key global-map (kbd "C-c d") `insert-current-time)
 
-(use-package php-mode
-  :ensure t
-  :config)
-
-(use-package intero
-  :ensure t)
-
-;;; lsp-mode用
-(use-package f
-  :ensure t)
-;;; lsp-mode用
-(use-package ht
-  :ensure t)
-
-(use-package eglot
-  :ensure t)
-(use-package lsp-ui
-  :ensure t)
-(use-package lsp-haskell
-  :ensure t)
-(use-package haskell-mode
-  :ensure t
+(leaf leaf-convert
   :config
-  (add-hook 'haskell-mode-hook 'intero-mode)
-  (add-to-list 'load-path "~/.emacs.d/elpa/lsp-ui")
-  (add-to-list 'load-path "~/.emacs.d/elpa/lsp-haskell")
-  (require 'lsp-mode)
-  (require 'lsp-ui)
-  (require 'lsp-haskell)
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-  (add-hook 'haskell-mode-hook #'lsp)
-  (add-hook 'haskell-mode-hook 'flycheck-mode)
-  (flycheck-add-next-checker 'intero '(warning . haskell-hlint))
-  ;; (add-hook 'haskell-mode-hook 'eglot-ensure)
-  (setf flymake-allowed-file-name-masks
-		(delete '("\\.l?hs\\'" haskell-flymake-init)
-				flymake-allowed-file-name-masks))
-  )
+  (leaf php-mode
+	:ensure t
+	:require t)
 
+  (leaf intero
+	:ensure t
+	:require t)
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode))
+  (leaf f
+	:ensure t
+	:require t)
 
-(use-package company
-  :config
-  (global-company-mode)
-  (push 'company-lsp company-backends))
+  (leaf ht
+	:ensure t
+	:require t)
+
+  (leaf eglot
+	:ensure t
+	:require t)
+
+  (leaf lsp-ui
+	:ensure t
+	:require t)
+
+  (leaf lsp-haskell
+	:ensure t
+	:require t)
+
+  (leaf haskell-mode
+	:load-path* "elpa/lsp-ui" "elpa/lsp-haskell"
+	:ensure t
+	:hook ((haskell-mode-hook . intero-mode)
+		   (lsp-mode-hook . lsp-ui-mode)
+		   (haskell-mode-hook . lsp)
+		   (haskell-mode-hook . flycheck-mode))
+	:require t lsp-mode lsp-ui lsp-haskell
+	:config
+	(flycheck-add-next-checker 'intero
+							   '(warning . haskell-hlint))
+	(setf flymake-allowed-file-name-masks (delete
+										   '("\\.l?hs\\'" haskell-flymake-init)
+										   flymake-allowed-file-name-masks)))
+
+  (leaf lsp-ui
+	:hook (lsp-mode-hook))
+
+  (leaf company
+	:require t
+	:config
+	(global-company-mode)
+	(push 'company-lsp company-backends)))
 
 (define-key haskell-mode-map (kbd "C-c C->") 'insert->)
 (define-key haskell-mode-map (kbd "C-c C-<") 'insert<-)
@@ -1066,13 +1118,15 @@ translation it is possible to get suggestion."
 
 (define-key global-map (kbd "C-, SPC") 'rep-comma-to-commaspace)
 
-(use-package python-pytest
-  :ensure t
-  :config)
+(leaf leaf-convert
+  :config
+  (leaf python-pytest
+	:ensure t
+	:require t)
 
-(use-package robe
-  :ensure t
-  :config)
+  (leaf robe
+	:ensure t
+	:require t))
 
 (setq inferior-lisp-program "sbcl")
 (add-to-list 'load-path "~/.emacs.d/slime/")
@@ -1116,117 +1170,98 @@ translation it is possible to get suggestion."
 (define-key global-map (kbd "C-c C-e m") 'emmet-expand-line)
 (define-key global-map (kbd "C-c m") 'emmet-expand-line)
 
-(use-package rjsx-mode
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '(".*\\.js\\'" . rjsx-mode)))
-
-(use-package rust-mode
-  :ensure t
-  :config
-  (add-hook 'rust-mode-hook #'eglot))
-
-(use-package parsec
-  :ensure t)
-
-(use-package hydra
-  :ensure t)
-
-(unless (file-exists-p "~/.emacs.d/elpa/evcxr-mode/")
-  (shell-command-to-string "git clone https://github.com/SerialDev/evcxr-mode && mv -f evcxr-mode ~/.emacs.d/elpa/"))
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/evcxr-mode/"))
-(require 'evcxr)
-
-(use-package emmet-mode
-  :ensure t)
-
-(use-package rustic
-  :ensure t
-  :defer t
+(leaf leaf-convert
+  :load-path* "scala-bootstrap-el/"
   :init
-  (setq rustic-rls-pkg 'eglot)
+  (leaf emmet-mode
+	:ensure t
+	:require t)
+
+  (leaf rustic
+	:ensure t
+	:setq ((rustic-rls-pkg quote eglot))
+	:config
+	(with-eval-after-load 'rustic
+	  (add-to-list 'auto-mode-alist
+				   '("\\.rs\\'" . rust-mode))
+	  (add-hook 'rust-mode-hook #'racer-mode)
+	  (add-hook 'racer-mode-hook #'eldoc-mode)))
+
+  (leaf quickrun
+	:ensure t)
+
+  (leaf racer
+	:ensure t)
+
+  (leaf typescript-mode
+	:ensure t
+	:mode ("\\.ts\\'" "\\.tsx\\'")
+	:require t)
+
+  (leaf ensime
+	:ensure t
+	:hook (java-mode-hook)
+	:config
+	(with-eval-after-load 'ensime
+	  (add-hook 'java-mode-hook 'ensime-mode)))
+
+  (leaf company-lsp
+	:ensure t
+	:require t)
+
+  (leaf lsp-scala
+	:config
+	;; (use-package-ensure-elpa 'lsp-scala
+	;; 						 '(t)
+	;; 						 '(:demand t))
+	(with-eval-after-load 'scala-mode
+	  (setq lsp-scala-server-command "/usr/local/bin/metals-emacs")
+	  (require 'lsp-scala nil nil)
+	  (setq lsp-prefer-flymake nil)
+	  (add-hook 'scala-mode-hook #'lsp)))
+
+  ;; :require evcxr scala-bootstrap
   :config
-  (add-to-list 'auto-mode-alist '("\\.rs\\'"  . rust-mode))
-  (add-hook 'rust-mode-hook #'racer-mode)
-  (add-hook 'racer-mode-hook #'eldoc-mode))
+  (add-hook 'scala-mode-hook
+			'(lambda nil
+			   (scala-bootstrap:with-metals-installed
+				(scala-bootstrap:with-bloop-server-started
+				 (lsp)))))
+  (leaf sbt-mode
+	:ensure t
+	:commands sbt-start sbt-command)
 
-(use-package quickrun
-  :defer t
-  :ensure t)
-(use-package racer
-  :defer t
-  :ensure t)
+  (leaf sbt-mode
+	:commands sbt-start sbt-command
+	:config
+	(with-eval-after-load 'sbt-mode
+	  (substitute-key-definition 'minibuffer-complete-word 'self-insert-command minibuffer-local-completion-map)))
 
-(use-package typescript-mode
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode)))
+  (leaf vue-mode
+	:ensure t
+	:mode ("\\.vue\\'")
+	:require t)
 
-(use-package ensime
-  :ensure t
-  :config
-  ;; (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
-  (add-hook 'java-mode-hook 'ensime-mode)
-  :hook (java-mode . ensime-mode))
+  (leaf ace-window
+	:ensure t
+	:config
+	(global-set-key (kbd "C-x o") '(lambda ()
+									 (interactive)
+									 (ace-window 0)
+									 (golden-ratio)))
+	:require t
+	:setq ((aw-keys quote
+					(97 115 100 102 103 104 106 107 108))))
 
-(use-package company-lsp
-  :ensure t)
-
-(use-package lsp-scala
-  :ensure t
-  :after scala-mode
-  :demand t
-  :hook (scala-mode . lsp)
-  :config (setq lsp-prefer-flymake nil)
-  :init (setq lsp-scala-server-command "/usr/local/bin/metals-emacs"))
-
-(add-to-list 'load-path "~/.emacs.d/scala-bootstrap-el/")
-(require 'scala-bootstrap)
-
-(add-hook 'scala-mode-hook
-          '(lambda ()
-             (scala-bootstrap:with-metals-installed
-              (scala-bootstrap:with-bloop-server-started
-               (lsp)))
-			 ))
-
-(use-package sbt-mode
-  :ensure t
-  :commands sbt-start sbt-command)
-
-(use-package sbt-mode
-  :commands sbt-start sbt-command
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map))
-
-(use-package vue-mode
-  :ensure t
-  :config (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
-
-(use-package ace-window
-  :ensure t
-  :config
-  (global-set-key (kbd "C-x o") '(lambda ()
-								   (interactive)
-								   (ace-window 0)
-								   (golden-ratio)))
-  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
-
-(use-package ace-jump-mode
-  :ensure t
-  :config
-  (setq ace-jump-mode-move-keys
-		(append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil))
-  (setq ace-jump-word-mode-use-query-char nil)
-  (global-set-key (kbd "C-:") 'ace-jump-char-mode)
-  (global-set-key (kbd "C-c C-;") 'ace-jump-word-mode)
-  (global-set-key (kbd "C-M-;") 'ace-jump-line-mode))
+  (leaf ace-jump-mode
+	:ensure t
+	:bind (("C-:" . ace-jump-char-mode)
+		   ("C-c C-;" . ace-jump-word-mode)
+		   ("C-M-;" . ace-jump-line-mode))
+	:require t
+	:setq ((ace-jump-word-mode-use-query-char))
+	:config
+	(setq ace-jump-mode-move-keys (append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil))))
 
 (global-set-key (kbd "C-c C-M-s") '(lambda ()
 									 (interactive)
@@ -1267,19 +1302,22 @@ translation it is possible to get suggestion."
 	(fsharp-fantomas-format-buffer))
   (save-buffers))
 
-(use-package fsharp-mode
+(leaf fsharp-mode
   :ensure t
-  :config
-  (setq-default fsharp-indent-offset 2)
-  (setq inferior-fsharp-program "/usr/local/share/dotnet/dotnet fsi")
-  (add-hook 'fsharp-mode-hook '(lambda () (lsp)))
-  (define-key fsharp-mode-map (kbd "C-c C-M-f") #'fsharp-fantomas-format-buffer)
-  (require 'eglot-fsharp))
+  :bind ((fsharp-mode-map
+		  ("C-c C-M-f" . fsharp-fantomas-format-buffer)))
+  :pre-setq ((inferior-fsharp-program . "/usr/local/share/dotnet/dotnet fsi"))
+  :init
+  (add-hook 'fsharp-mode-hook
+			'(lambda nil
+			   (lsp)))
+  :require t eglot-fsharp
+  :setq-default ((fsharp-indent-offset . 2)))
 
-(use-package dotnet
+(leaf dotnet
   :ensure t
-  :config
-  (add-hook 'fsharp-mode-hook #'dotnet-mode))
+  :hook (fsharp-mode-hook)
+  :require t)
 
 (defun eshell-clear ()
   "Clear the eshell buffer."
@@ -1308,35 +1346,46 @@ translation it is possible to get suggestion."
   (interactive "r")
   (shell-command-on-region beg end "jq ." nil t))
 
-(use-package helm-fish-completion
-  :ensure t)
+(leaf helm-fish-completion
+  :ensure t
+  :require t)
 
 (when (require 'helm-fish-completion nil 'noerror)
   (define-key shell-mode-map (kbd "<tab>") 'helm-fish-completion)
   (setq helm-esh-pcomplete-build-source-fn #'helm-fish-completion-make-eshell-source))
 
-(use-package twittering-mode
-  :ensure t)
-
-(use-package dired-subtree
-  :ensure t
+(leaf leaf-convert
   :config
-  (define-key dired-mode-map "i" 'dired-subtree-insert)
-  (define-key dired-mode-map ";" 'dired-subtree-remove))
+  (leaf twittering-mode
+	:ensure t
+	:require t)
 
-(use-package elm-mode
-  :ensure t
-  :config
-  (add-hook 'elm-mode-hook
-			(lambda ()
-			  (local-set-key (kbd "C-c C-l") 'elm-repl-load-back)))
-  (require 'lsp-elm)
-  (add-hook 'elm-mode-hook
-			(lambda ()
-              (setq-local company-backends '(company-lsp))
-              (company-mode 1)
-			  (eglot)))
-  (with-eval-after-load 'flycheck
-    '(add-hook 'flycheck-mode-hook #'flycheck-elm-setup))
-  (add-hook 'after-init-hook 'global-company-mode)
-  (add-hook 'elm-mode-hook 'company-mode))
+  (leaf dired-subtree
+	:ensure t
+	:require t
+	:config
+	(define-key dired-mode-map "i" 'dired-subtree-insert)
+	(define-key dired-mode-map ";" 'dired-subtree-remove))
+
+  (leaf elm-mode
+	:ensure t
+	:hook ((after-init-hook . global-company-mode)
+		   (elm-mode-hook . company-mode))
+	:init
+	(add-hook 'elm-mode-hook
+			  (lambda nil
+				(local-set-key
+				 (kbd "C-c C-l")
+				 'elm-repl-load-back)))
+	:require t lsp-elm
+	:config
+	(add-hook 'elm-mode-hook
+			  (lambda nil
+				(setq-local company-backends
+							'(company-lsp))
+				(company-mode 1)
+				(eglot)))
+	(with-eval-after-load 'flycheck
+	  '(add-hook 'flycheck-mode-hook #'flycheck-elm-setup))))
+
+(global-set-key (kbd "C-c C->") #'leaf-convert-region-replace)

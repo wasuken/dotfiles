@@ -773,7 +773,7 @@ translation it is possible to get suggestion."
   (leaf w3m
 	:ensure t
 	:require t
-	:setq ((w3m-command . "/usr/local/bin/w3m"))
+	:setq ((w3m-command . "/usr/bin/w3m"))
 	:config
 	(setq w3m-coding-system 'utf-8
 		  w3m-file-coding-system 'utf-8
@@ -1042,6 +1042,26 @@ translation it is possible to get suggestion."
 
 (define-key global-map (kbd "C-c d") `insert-current-time)
 
+(leaf ac-php
+  :ensure t
+  :require t)
+
+(leaf company-php
+  :ensure t
+  :require t)
+
+(defun php-company-hook ()
+  (company-mode t)
+  (ac-php-core-eldoc-setup) ;; enable eldoc
+  (make-local-variable 'company-backends)
+  (add-to-list 'company-backends 'company-ac-php-backend)
+										; 定義にジャンプ
+  (define-key php-mode-map  (kbd "M-.") 'ac-php-find-symbol-at-point)
+										; ジャンプ先から戻る
+  (define-key php-mode-map  (kbd "M-,") 'ac-php-location-stack-back))
+
+(add-hook 'php-mode-hook 'php-company-hook)
+
 (leaf leaf-convert
   :config
   (leaf php-mode
@@ -1133,7 +1153,7 @@ translation it is possible to get suggestion."
 (require 'slime)
 (slime-setup)
 
-(load (expand-file-name "~/.Roswell/helper.el"))
+(load (expand-file-name "~/.roswell/helper.el"))
 
 ;;; OSX用の設定
 (cond ((not (equal system-type 'darwin))
@@ -1198,12 +1218,12 @@ translation it is possible to get suggestion."
 	:mode ("\\.ts\\'" "\\.tsx\\'")
 	:require t)
 
-  (leaf ensime
-	:ensure t
-	:hook (java-mode-hook)
-	:config
-	(with-eval-after-load 'ensime
-	  (add-hook 'java-mode-hook 'ensime-mode)))
+  ;; (leaf ensime
+  ;; 	:ensure t
+  ;; 	:hook (java-mode-hook)
+  ;; 	:config
+  ;; 	(with-eval-after-load 'ensime
+  ;; 	  (add-hook 'java-mode-hook 'ensime-mode)))
 
   (leaf company-lsp
 	:ensure t
@@ -1389,3 +1409,28 @@ translation it is possible to get suggestion."
 	  '(add-hook 'flycheck-mode-hook #'flycheck-elm-setup))))
 
 (global-set-key (kbd "C-c C->") #'leaf-convert-region-replace)
+;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
+(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
+;; ## end of OPAM user-setup addition for emacs / base ## keep this line
+(with-eval-after-load 'company
+  (add-to-list 'company-backends 'merlin-company-backend))
+
+;;; バッファ全体を読み取して、パースしたものを解釈し、出力する。
+;; (defun nippo-scoring-print ()
+;;   )
+;;; #ごとに階層化する。
+;; (defun md->sharp-tree (text)
+;;   )
+;;; オリジナル記法を探し出す。
+;;; オリジナル記法をパースする。
+;;; [[1,2]]
+;; (defun md-scoring-text->score (s-text)
+;;   )
+
+(setq *default-exclude-lst* '("*scratch*" "*Messages*"))
+
+(defun all-buffer-close ()
+  (interactive)
+  (loop for x in (buffer-list)
+		do (unless (find (buffer-name x) *default-exclude-lst* :test #'string=)
+			 (kill-buffer x))))

@@ -12,7 +12,9 @@
 																","
 																left)
 												   cur-strs)
-						 right))  (print right)))
+						 right))
+	(print right)))
+
 (defun replace-dc ()
   (interactive)
   (replace-sepa "\""))
@@ -67,8 +69,10 @@
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
         ("melpa" . "http://melpa.org/packages/")
-        ("melpa2" . "http://melpa.milkbox.net/packages/") ;なぜ二つあるんだ
         ("org" . "http://orgmode.org/elpa/")))
+
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
 
 ;; keep the installed packages in .emacs.d
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
@@ -202,6 +206,27 @@
 
 (require 'leaf)
 (require 'leaf-convert)
+
+(leaf request
+  :ensure t
+  :require t)
+
+(setq elmo-imap4-default-server "imap.mail.yahoo.co.jp"
+	  elmo-imap4-default-user "abkt_god@yahoo.co.jp"
+	  elmo-imap4-default-authenticate-type 'clear
+	  elmo-imap4-default-port '993
+	  elmo-imap4-default-stream-type 'ssl)
+
+(if (boundp 'mail-user-agent)
+    (setq mail-user-agent 'wl-user-agent))
+(if (fboundp 'define-mail-user-agent)
+    (define-mail-user-agent
+      'wl-user-agent
+      'wl-user-agent-compose
+      'wl-draft-send
+      'wl-draft-kill
+      'mail-send-hook))
+
 
 (leaf leaf-convert
   :config
@@ -926,8 +951,8 @@ translation it is possible to get suggestion."
 	:require t))
 
 ;; Timeoutの変更
-(if (>= emacs-major-version 22)
-    (setq anthy-accept-timeout 1))
+;; (if (>= emacs-major-version 22)
+;;     (setq anthy-accept-timeout 1))
 
 (leaf leaf-convert
   :config
@@ -1032,6 +1057,7 @@ translation it is possible to get suggestion."
   :ensure t
   :require t
   :config
+  (setq python-shell-interpreter "python")
   (setq auto-mode-alist (cons
 						 '("\\.py$'" . python-mode)
 						 auto-mode-alist)))
@@ -1156,14 +1182,14 @@ translation it is possible to get suggestion."
 (load (expand-file-name "~/.roswell/helper.el"))
 
 ;;; OSX用の設定
-(cond ((not (equal system-type 'darwin))
-	   ;; anthy.el をロードする
-	   (load-library "anthy")
-	   (setq default-input-method "japanese-anthy")
-	   (autoload 'boiling-rK-trans "boiling-anthy" "romaji-kanji conversion" t)
-	   (autoload 'boiling-rhkR-trans "boiling-anthy" "romaji-kana conversion" t)
-	   (global-set-key "\C-t" 'boiling-rK-trans)
-	   (global-set-key "\M-t" 'boiling-rhkR-trans)))
+;; (cond ((not (equal system-type 'darwin))
+;; 	   ;; anthy.el をロードする
+;; 	   (load-library "anthy")
+;; 	   (setq default-input-method "japanese-anthy")
+;; 	   (autoload 'boiling-rK-trans "boiling-anthy" "romaji-kanji conversion" t)
+;; 	   (autoload 'boiling-rhkR-trans "boiling-anthy" "romaji-kana conversion" t)
+;; 	   (global-set-key "\C-t" 'boiling-rK-trans)
+;; 	   (global-set-key "\M-t" 'boiling-rhkR-trans)))
 
 ;;; 演算子の左右に空白が一つ存在している状態にする
 (defun one-space-left-and-right-operator ()
@@ -1434,3 +1460,53 @@ translation it is possible to get suggestion."
   (loop for x in (buffer-list)
 		do (unless (find (buffer-name x) *default-exclude-lst* :test #'string=)
 			 (kill-buffer x))))
+
+(leaf migemo
+  :ensure t
+  :require t
+  :config
+  (when (and (executable-find "cmigemo")
+			 (require 'migemo nil t))
+	(setq migemo-command "cmigemo")
+	(setq migemo-options '("-q" "--emacs"))
+
+	(setq migemo-dictionary "/usr/share/migemo/utf-8/migemo-dict")
+
+	(setq migemo-user-dictionary nil)
+	(setq migemo-regex-dictionary nil)
+	(setq migemo-coding-system 'utf-8-unix)
+	(load-library "migemo")
+	(migemo-init)))
+
+;;; (buffer-substring (region-beginning) (region-end))
+(defun exchange-replace ()
+  (interactive)
+  (let ((replaced (exchange-replace-internal (read-string "exchange a: ")
+											 (read-string "exchange b: ")
+											 (buffer-substring (region-beginning) (region-end)))))
+	(print "replace finished")
+	(delete-region (region-beginning) (region-end))
+	(insert replaced)))
+
+(defun exchange-replace-internal (a b text)
+  (let ((a-search (string-match a text))
+		(b-search (string-match b text)))
+	(cond ((and (null a-search) (null b-search)) text)
+		  ((>= (if (< (length a) (length b))
+				  (length b)
+				(length a))
+			  (length text))
+		   text)
+		  ((and a-search (or (null b-search) (< a-search b-search)))
+		   ;; aをbで置き換える。
+		   (concat (substring text 0 a-search)
+				   b
+				   (exchange-replace-internal a b (substring text (+ a-search (length b)))))
+		   )
+		  ((and b-search (or (null a-search) (>= a-search b-search)))
+		   ;; bをaで置き換える。
+		   (concat (substring text 0 b-search)
+				   a
+				   (exchange-replace-internal a b (substring text (+ b-search (length a)))))
+		   )
+		  (t text))))

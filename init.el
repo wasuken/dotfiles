@@ -130,10 +130,12 @@
 
 ;; more useful frame title, that show either a file or a
 ;; buffer name (if the buffer isn't visiting a file)
-(setq frame-title-format
-      '((:eval (if (buffer-file-name)
-                   (abbreviate-file-name (buffer-file-name))
-                 "%b"))))
+;; (setq frame-title-format
+;;       '((:eval (if (buffer-file-name)
+;;                    (abbreviate-file-name (buffer-file-name))
+;;                  "%b"))))
+
+(setq frame-title-format "%f")
 
 ;; Emacs modes typically provide a standard means to change the
 ;; indentation width -- eg. c-basic-offset: use that to adjust your
@@ -157,10 +159,14 @@
 ;; revert buffers automatically when underlying files are changed externally
 (global-auto-revert-mode t)
 
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
+(set-locale-environment nil)
+(set-language-environment "Japanese")
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(prefer-coding-system 'utf-8)
 
 ;; hippie expand is dabbrev expand on steroids
 (setq hippie-expand-try-functions-list '(try-expand-dabbrev
@@ -255,11 +261,12 @@
 		   (ielm-mode-hook . rainbow-delimiters-mode))
 	:require t)
 
-  (leaf zenburn-theme
-	:ensure t
-	:require t
-	:config
-	(load-theme 'zenburn t)))
+  ;; (leaf zenburn-theme
+  ;; 	:ensure t
+  ;; 	:require t
+  ;; 	:config
+  ;; 	(load-theme 'zenburn t))
+  )
 
 ;; highlight the current line
 (global-hl-line-mode +1)
@@ -387,9 +394,7 @@
 	:ensure t
 	:require t
 	:config
-	(when (memq window-system
-				'(mac ns))
-	  (exec-path-from-shell-initialize)))
+	(exec-path-from-shell-initialize))
 
   (leaf move-text
 	:ensure t
@@ -617,7 +622,73 @@
 	:setq ((ivy-use-virtual-buffers . t)
 		   (enable-recursive-minibuffers . t))
 	:config
-	(ivy-mode 1))
+	(ivy-mode 1)
+	(setq ivy-use-virtual-buffers t)
+	(setq enable-recursive-minibuffers t)
+	(setq ivy-height 30)
+	(setq ivy-extra-directories nil)
+	(setq ivy-re-builders-alist
+		  '((t . ivy--regex-plus)))
+	(define-key ivy-minibuffer-map [tab] 'ivy-next-line)
+	(define-key ivy-minibuffer-map (kbd "C-g") 'minibuffer-keyboard-quit)
+	(define-key ivy-minibuffer-map (kbd "RET") 'ivy-alt-done)
+	(setq ivy-wrap t))
+
+  (leaf doom-themes
+	:ensure t neotree
+	:custom
+	(doom-themes-enable-italic . nil)
+	(doom-themes-enable-bold . nil)
+	:config
+	(add-to-list 'default-frame-alist '(font . "hackgen-11"))
+	(load-theme 'doom-tomorrow-night t)
+	(doom-themes-neotree-config)
+	(doom-themes-org-config)
+	)
+
+  (leaf doom-modeline
+	:ensure t
+	:custom
+	(doom-modeline-buffer-file-name-style . 'truncate-with-project)
+	(doom-modeline-icon . t)
+	(doom-modeline-major-mode-icon . nil)
+	(doom-modeline-minor-modes . nil)
+	:hook (after-init-hook . doom-modeline-mode)
+	:config
+	(line-number-mode 0)
+	(column-number-mode 0)
+	(doom-modeline-def-modeline 'main
+	  '(bar window-number matches buffer-info remote-host buffer-position parrot selection-info)
+	  '(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
+	)
+
+  (leaf ivy-rich
+	:ensure t all-the-icons-ivy all-the-icons
+	:hook (ivy-mode-hook . ivy-rich-mode)
+	:preface
+	(defun ivy-rich-switch-buffer-icon (candidate)
+      (with-current-buffer
+          (get-buffer candidate)
+		(let ((icon (all-the-icons-icon-for-mode major-mode)))
+          (if (symbolp icon)
+              (all-the-icons-icon-for-mode 'fundamental-mode)
+			icon))))
+	:config
+	(setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+	(setq ivy-rich--display-transformers-list
+          '(ivy-switch-buffer
+			(:columns
+			 ((ivy-rich-switch-buffer-icon :width 2)
+              (ivy-rich-candidate (:width 30))
+              (ivy-rich-switch-buffer-size (:width 7))
+              (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+              (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))
+              (ivy-rich-switch-buffer-project (:width 15 :face success))
+              (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))
+			 :predicate
+			 (lambda (cand) (get-buffer cand)))))
+	)
+
 
   (leaf swiper
 	:ensure t
@@ -642,6 +713,8 @@
 			("C-r" . counsel-minibuffer-history)))
 	:require t))
 
+(set-frame-font "hackgen-11")
+
 (when (eq system-type 'windows-nt)
   (setq w32-pass-lwindow-to-system nil)
   (setq w32-lwindow-modifier 'super) ; Left Windows key
@@ -652,7 +725,6 @@
   (setq w32-pass-apps-to-system nil)
   (setq w32-apps-modifier 'hyper) ; Menu/App key
 
-  (set-frame-font "Source Code Pro 12")
   (add-to-list 'exec-path "C:/Program Files/Git/bin")
   (add-to-list 'exec-path "C:/Program Files/Git/mingw64/bin")
   (setenv "PATH" (concat "C:/Program Files/Git/bin;" "C:/Program Files/Git/mingw64/bin;" (getenv "PATH")))
@@ -759,21 +831,22 @@ translation it is possible to get suggestion."
 	:ensure t
 	:require t)
 
-  (leaf helm
-	:ensure t
-	:bind (("M-x" . helm-M-x)
-		   ("M-<f5>" . helm-find-files)
-		   ([f10]
-			. helm-buffers-list)
-		   ([S-f10]
-			. helm-recentf)
-		   ("C-x b" . helm-for-files)
-		   ("C-x C-f" . helm-find-files)
-		   ("M-y" . helm-show-kill-ring))
-	:config
-	(with-eval-after-load 'helm
-	  (require 'helm-config)
-	  (helm-mode 1))))
+  ;; (leaf helm
+  ;; 	:ensure t
+  ;; 	:bind (("M-x" . helm-M-x)
+  ;; 		   ("M-<f5>" . helm-find-files)
+  ;; 		   ([f10]
+  ;; 			. helm-buffers-list)
+  ;; 		   ([S-f10]
+  ;; 			. helm-recentf)
+  ;; 		   ("C-x b" . helm-for-files)
+  ;; 		   ("C-x C-f" . helm-find-files)
+  ;; 		   ("M-y" . helm-show-kill-ring))
+  ;; 	:config
+  ;; 	(with-eval-after-load 'helm
+  ;; 	  (require 'helm-config)
+  ;; 	  (helm-mode 1)))
+  )
 
 ;;;多分先に変数いれとかないと駄目。辛い
 (defvar howm-view-title-header "#")
@@ -913,8 +986,8 @@ translation it is possible to get suggestion."
 
 
 ;;; java settings
-(setenv "JDK_HOME" "/usr/lib/jvm/java-8-openjdk/")
-(setenv "JAVA_HOME" "/usr/lib/jvm/java-8-openjdk/")
+(setenv "JDK_HOME" "/usr/lib/jvm/java-14-openjdk/")
+(setenv "JAVA_HOME" "/usr/lib/jvm/java-14-openjdk/")
 ;;; go settings
 (setenv "GOPATH" "/Users/takedamasaru/develop/go")
 
@@ -945,7 +1018,10 @@ translation it is possible to get suggestion."
 	  (setq lsp-prefer-flymake nil)))
 
   (leaf lsp-ui
-	:require t)
+	:ensure t
+	:hook ((lsp-mode-hook . lsp-ui-mode))
+	:require t
+	:commands lsp-ui-mode)
 
   (leaf company-lsp
 	:require t))
@@ -964,7 +1040,13 @@ translation it is possible to get suggestion."
   (leaf javadoc-lookup
 	:ensure t
 	:bind (("C-c C-j" . javadoc-lookup))
+	:require t)
+
+  (leaf lsp-java
+	:ensure t
 	:require t))
+
+(add-hook 'java-mode-hook #'lsp)
 
 (add-hook 'shell-mode-hook
           (lambda ()
@@ -1108,39 +1190,52 @@ translation it is possible to get suggestion."
 
   (leaf eglot
 	:ensure t
-	:require t)
-
-  (leaf lsp-ui
-	:ensure t
-	:require t)
+	:require t
+	:config
+	(add-to-list 'eglot-server-programs
+				 `(haskell-mode . ("/home/wasu/.local/bin/haskell-language-server-8.8.4" "--lsp")))
+	)
 
   (leaf lsp-haskell
 	:ensure t
-	:require t)
+	:require t
+	:config)
 
   (leaf haskell-mode
-	:load-path* "elpa/lsp-ui" "elpa/lsp-haskell"
 	:ensure t
-	:hook ((haskell-mode-hook . intero-mode)
-		   (lsp-mode-hook . lsp-ui-mode)
-		   (haskell-mode-hook . lsp)
-		   (haskell-mode-hook . flycheck-mode))
-	:require t lsp-mode lsp-ui lsp-haskell
+	:hook ((haskell-mode-hook . flycheck-mode)
+		   (haskell-mode-hook . eglot-ensure))
 	:config
-	(flycheck-add-next-checker 'intero
-							   '(warning . haskell-hlint))
+
+	(setf haskell-mode-stylish-haskell-path
+		  "stylish-haskell")
+	(custom-set-variables '(haskell-stylish-on-save t))
 	(setf flymake-allowed-file-name-masks (delete
 										   '("\\.l?hs\\'" haskell-flymake-init)
 										   flymake-allowed-file-name-masks)))
 
-  (leaf lsp-ui
-	:hook (lsp-mode-hook))
+  (leaf haskell-mode
+	:ensure t
+	:hook ((haskell-mode-hook . flycheck-mode)
+		   (haskell-mode-hook . eglot-ensure))
+	:config
+	;; (require 'lsp-haskell)
+	;; (setq lsp-haskell-process-path-hie "/home/wasu/.local/bin/haskell-language-server-wrapper")
+	;; (add-hook 'haskell-literate-mode-hook #'lsp)
+	(setf haskell-mode-stylish-haskell-path
+		  "/home/wasu/.local/bin/stylish-haskell")
+	(custom-set-variables '(haskell-stylish-on-save t))
+	(setf flymake-allowed-file-name-masks (delete
+										   '("\\.l?hs\\'" haskell-flymake-init)
+										   flymake-allowed-file-name-masks)))
 
   (leaf company
 	:require t
 	:config
 	(global-company-mode)
-	(push 'company-lsp company-backends)))
+	;; (push '(company-capf company-dabbrev) company-backends)
+	(push 'company-lsp company-backends)
+	))
 
 (define-key haskell-mode-map (kbd "C-c C->") 'insert->)
 (define-key haskell-mode-map (kbd "C-c C-<") 'insert<-)
@@ -1299,6 +1394,14 @@ translation it is possible to get suggestion."
 	:setq ((aw-keys quote
 					(97 115 100 102 103 104 106 107 108))))
 
+  (leaf dumb-jump
+	:ensure t
+	:config
+	(setq dumb-jump-mode t)
+	(setq dumb-jump-selector 'ivy)
+	(setq dumb-jump-use-visible-window nil)
+	(global-set-key (kbd "C-j") 'dumb-jump))
+
   (leaf ace-jump-mode
 	:ensure t
 	:bind (("C-:" . ace-jump-char-mode)
@@ -1352,12 +1455,11 @@ translation it is possible to get suggestion."
   :ensure t
   :bind ((fsharp-mode-map
 		  ("C-c C-M-f" . fsharp-fantomas-format-buffer)))
-  :pre-setq ((inferior-fsharp-program . "/usr/local/share/dotnet/dotnet fsi"))
-  :init
-  (add-hook 'fsharp-mode-hook
-			'(lambda nil
-			   (lsp)))
-  :require t eglot-fsharp
+  :pre-setq ((inferior-fsharp-program . "/usr/bin/dotnet fsi"))
+  :config
+  (require 'eglot-fsharp)
+  (setq fsharp2-lsp-executable "/home/wasu/fsharp-language-server/src/FSharpLanguageServer/bin/Release/netcoreapp3.0/linux-x64/publish/FSharpLanguageServer.dll")
+  (add-hook 'fsharp-mode-hook 'eglot-ensure)
   :setq-default ((fsharp-indent-offset . 2)))
 
 (leaf dotnet
@@ -1377,14 +1479,14 @@ translation it is possible to get suggestion."
   (interactive)
   (setq *create-md-link-url* (read-string "url: "))
   (request
-	  *create-md-link-url*
-	  :parser 'buffer-string
-	  :error (function* (lambda (&key error-thrown &allow-other-keys&rest _)
-						  (message "Got error: %S" error-thrown)))
-	  :success (function*
-				(lambda (&key data &allow-other-keys)
-				  (string-match "<title>\\(.*?\\)</title>" data)
-				  (insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
+	*create-md-link-url*
+	:parser 'buffer-string
+	:error (function* (lambda (&key error-thrown &allow-other-keys&rest _)
+						(message "Got error: %S" error-thrown)))
+	:success (function*
+			  (lambda (&key data &allow-other-keys)
+				(string-match "<title>\\(.*?\\)</title>" data)
+				(insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
 
 (global-set-key (kbd "C-c l") #'create-md-link)
 
@@ -1392,13 +1494,13 @@ translation it is possible to get suggestion."
   (interactive "r")
   (shell-command-on-region beg end "jq ." nil t))
 
-(leaf helm-fish-completion
-  :ensure t
-  :require t)
+;; (leaf helm-fish-completion
+;;   :ensure t
+;;   :require t)
 
-(when (require 'helm-fish-completion nil 'noerror)
-  (define-key shell-mode-map (kbd "<tab>") 'helm-fish-completion)
-  (setq helm-esh-pcomplete-build-source-fn #'helm-fish-completion-make-eshell-source))
+;; (when (require 'helm-fish-completion nil 'noerror)
+;;   (define-key shell-mode-map (kbd "<tab>") 'helm-fish-completion)
+;;   (setq helm-esh-pcomplete-build-source-fn #'helm-fish-completion-make-eshell-source))
 
 (leaf leaf-convert
   :config
@@ -1461,6 +1563,19 @@ translation it is possible to get suggestion."
 		do (unless (find (buffer-name x) *default-exclude-lst* :test #'string=)
 			 (kill-buffer x))))
 
+(leaf yasnippet
+  :ensure t
+  :require t
+  :bind (("C-x y i" . yas-insert-snippet)
+         ("C-x y n" . yas-new-snippet)
+         ("C-x y v" . yas-visit-snippet-file)
+         ("C-x y l" . yas-describe-tables)
+         ("C-x y g" . yas-reload-all))
+  :config
+  (yas-global-mode 1)
+  (setq yas-prompt-functions '(yas-ido-prompt))
+  )
+
 (leaf migemo
   :ensure t
   :require t
@@ -1493,9 +1608,9 @@ translation it is possible to get suggestion."
 		(b-search (string-match b text)))
 	(cond ((and (null a-search) (null b-search)) text)
 		  ((>= (if (< (length a) (length b))
-				  (length b)
-				(length a))
-			  (length text))
+				   (length b)
+				 (length a))
+			   (length text))
 		   text)
 		  ((and a-search (or (null b-search) (< a-search b-search)))
 		   ;; aをbで置き換える。

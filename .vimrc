@@ -18,11 +18,22 @@ endif
 set linebreak
 set display+=lastline
 set laststatus=2
+set autochdir
 
 call plug#begin()
 
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch' : 'next',
+    \ 'tag' : '0.1.155',
+    \ 'do': 'bash install.sh',
+    \ }
+Plug 'ionide/Ionide-vim', {
+    \ 'do': 'make fsautocomplete',
+    \}
+Plug 'fatih/vim-go'
 Plug 'davidhalter/jedi-vim'
 Plug 'hynek/vim-python-pep8-indent'
+Plug 'sillybun/vim-repl'"
 Plug 'Townk/vim-autoclose'
 Plug 'scrooloose/syntastic'
 Plug 'scrooloose/nerdtree'
@@ -30,6 +41,8 @@ Plug 'tpope/vim-vinegar'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'mileszs/ack.vim'
 Plug 'easymotion/vim-easymotion'
+Plug 'Shougo/vimproc', {'do' : 'make'}
+Plug 'eagletmt/ghcmod-Vim'
 let g:plug_timeout = 300
 Plug 'ycm-core/YouCompleteMe', { 'do': './install.py' }
 Plug 'mbbill/undotree'
@@ -45,18 +58,19 @@ silent! helptags ALL
 set foldmethod=indent
 set wildmenu
 set wildmode=list:longest,full
-let NERDTreeShowBookmarks = 1
-autocmd VimEnter * NERDTree
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") &&
-            \ b:NERDTree.isTabTree()) |q | endif  
+"let NERDTreeShowBookmarks = 1
+"autocmd VimEnter * NERDTree
+"autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") &&
+"            \ b:NERDTree.isTabTree()) |q | endif  
 nnoremap <C-b> :CtrlPBuffer<cr>
 
 let g:PyFlakeOnWrite = 1
 let g:PyFlakeCheckers = 'pep8,mccabe,pyflakes'
 let g:PyFlakeDefaultComplexity=10
 
-let g:syntastic_python_checkers = ['pyflakes', 'pep8']
+let g:syntastic_python_checkers = ['pyflakes', 'pep8', 'hlint']
 
+nnoremap <leader>r :REPLToggle<Cr>
 
 " ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
 let s:opam_share_dir = system("opam config var share")

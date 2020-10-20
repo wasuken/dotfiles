@@ -81,7 +81,7 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-(setq user-full-name "wasuken"
+(setq user-full-name "wasu ken"
       user-mail-address "wevorence@gmail.com")
 
 ;; Always load newest byte code
@@ -1193,7 +1193,7 @@ translation it is possible to get suggestion."
 	:require t
 	:config
 	(add-to-list 'eglot-server-programs
-				 `(haskell-mode . ("haskell-language-server-8.8.4" "--lsp")))
+				 `(haskell-mode . ("/home/wasu/.local/bin/haskell-language-server-8.8.4" "--lsp")))
 	)
 
   (leaf lsp-haskell
@@ -1219,9 +1219,11 @@ translation it is possible to get suggestion."
 	:hook ((haskell-mode-hook . flycheck-mode)
 		   (haskell-mode-hook . eglot-ensure))
 	:config
-	;; 補完が発生しなかったらpathがおかしいかのうせいがあるのでfull pathで指定する。
+	;; (require 'lsp-haskell)
+	;; (setq lsp-haskell-process-path-hie "/home/wasu/.local/bin/haskell-language-server-wrapper")
+	;; (add-hook 'haskell-literate-mode-hook #'lsp)
 	(setf haskell-mode-stylish-haskell-path
-		  "stylish-haskell")
+		  "/home/wasu/.local/bin/stylish-haskell")
 	(custom-set-variables '(haskell-stylish-on-save t))
 	(setf flymake-allowed-file-name-masks (delete
 										   '("\\.l?hs\\'" haskell-flymake-init)
@@ -1456,7 +1458,6 @@ translation it is possible to get suggestion."
   :pre-setq ((inferior-fsharp-program . "/usr/bin/dotnet fsi"))
   :config
   (require 'eglot-fsharp)
-  ;; full pathで指定する。
   (setq fsharp2-lsp-executable "/home/wasu/fsharp-language-server/src/FSharpLanguageServer/bin/Release/netcoreapp3.0/linux-x64/publish/FSharpLanguageServer.dll")
   (add-hook 'fsharp-mode-hook 'eglot-ensure)
   :setq-default ((fsharp-indent-offset . 2)))

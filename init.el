@@ -848,6 +848,8 @@ translation it is possible to get suggestion."
   ;; 	  (helm-mode 1)))
   )
 
+(global-set-key (kbd "M-y") 'counsel-yank-pop)
+
 ;;;多分先に変数いれとかないと駄目。辛い
 (defvar howm-view-title-header "#")
 (leaf leaf-convert
@@ -1625,3 +1627,23 @@ translation it is possible to get suggestion."
 				   (exchange-replace-internal a b (substring text (+ b-search (length a)))))
 		   )
 		  (t text))))
+
+(defun md-head-add ()
+  (interactive)
+  (goto-char (point-at-bol))
+  (insert "#"))
+
+(defun md-list-add ()
+  (interactive)
+  (let ((start (point-at-bol))
+		(end (point-at-eol))
+		(flg nil))
+	(loop for i from start to end
+		  until flg
+		  do (unless (string= (buffer-substring-no-properties i (i + 1)) "	")
+			   (setf flg t)))
+	(goto-char start)
+	(insert "*")))
+
+(define-key markdown-mode-map "C-#" 'md-head-add)
+(define-key markdown-mode-map "C-*" 'md-list-add)

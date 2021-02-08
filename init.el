@@ -186,7 +186,8 @@
 
 (leaf magit
   :ensure t
-  :bind (("C-x g" . magit-status)))
+  :bind (("C-x g" . magit-status)
+		 ("C-c p" . magit-push-to-remote)))
 
 (leaf ag
   :ensure t

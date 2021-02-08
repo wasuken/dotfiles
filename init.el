@@ -623,6 +623,7 @@
 		   (enable-recursive-minibuffers . t))
 	:config
 	(ivy-mode 1)
+	(setq ivy-virtual-abbreviate 'full)
 	(setq ivy-use-virtual-buffers t)
 	(setq enable-recursive-minibuffers t)
 	(setq ivy-height 30)
@@ -950,7 +951,7 @@ translation it is possible to get suggestion."
   (leaf lsp-go
 	:after go-mode lsp-mode
 	:commands lsp lsp-go-enable
-	:hook ((go-mode-hook . lsp))
+	:hook ((go-mode-hook . ensure))
 	:custom ((lsp-go-language-server-flags quote
 										   ("-gocodecompletion" "-diagnostics" "-lint-tool=golint"))))
 
@@ -1178,9 +1179,9 @@ translation it is possible to get suggestion."
 	:ensure t
 	:require t)
 
-  (leaf intero
-	:ensure t
-	:require t)
+  ;; (leaf intero
+  ;; 	:ensure t
+  ;; 	:require t)
 
   (leaf f
 	:ensure t
@@ -1194,9 +1195,18 @@ translation it is possible to get suggestion."
 	:ensure t
 	:require t
 	:config
+	;; koko
 	(add-to-list 'eglot-server-programs
 				 `(haskell-mode . ("/home/wasu/.local/bin/haskell-language-server-8.8.4" "--lsp")))
 	)
+
+  (leaf company-ghci
+	:ensure t
+	:require t
+	:config
+	(push 'company-ghci company-backends)
+	(add-hook 'haskell-mode-hook 'company-mode)
+	(add-hook 'haskell-interactive-mode-hook 'company-mode))
 
   (leaf lsp-haskell
 	:ensure t
@@ -1205,32 +1215,34 @@ translation it is possible to get suggestion."
 
   (leaf haskell-mode
 	:ensure t
-	:hook ((haskell-mode-hook . flycheck-mode)
-		   (haskell-mode-hook . eglot-ensure))
+	:hook ((haskell-mode-hook . lsp)
+		   (haskell-mode-hook . (lambda ()
+								  (flycheck-mode -1))))
 	:config
-
 	(setf haskell-mode-stylish-haskell-path
 		  "stylish-haskell")
+	(setq haskell-process-type 'stack-ghci)
 	(custom-set-variables '(haskell-stylish-on-save t))
-	(setf flymake-allowed-file-name-masks (delete
-										   '("\\.l?hs\\'" haskell-flymake-init)
-										   flymake-allowed-file-name-masks)))
+	(add-hook 'haskell-mode-hook 'haskell-doc-mode)
+	(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+	(add-hook 'haskell-mode-hook 'linum-mode)
+	(add-to-list 'exec-path "~/.local/bin")
+	(setq haskell-hoogle-command "hoogle")
+	(eval-after-load 'haskell-mode '(progn
+									  (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
+									  (define-key haskell-mode-map (kbd "C-c C-n C-t") 'haskell-process-do-type)
+									  (define-key haskell-mode-map (kbd "C-c C-n C-i") 'haskell-process-do-info)
+									  (define-key haskell-mode-map "\C-oh" 'haskell-hoogle)
+									  ))
+	(eval-after-load 'haskell-cabal '(progn
+									   (define-key haskell-cabal-mode-map (kbd "C-c C-k") 'haskell-interactive-ode-clear)
+									   (define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
+									   (define-key haskell-cabal-mode-map (kbd "C-c c") 'haskell-process-cabal)))
 
-  (leaf haskell-mode
-	:ensure t
-	:hook ((haskell-mode-hook . flycheck-mode)
-		   (haskell-mode-hook . eglot-ensure))
-	:config
-	;; (require 'lsp-haskell)
-	;; (setq lsp-haskell-process-path-hie "/home/wasu/.local/bin/haskell-language-server-wrapper")
-	;; (add-hook 'haskell-literate-mode-hook #'lsp)
-	(setf haskell-mode-stylish-haskell-path
-		  "/home/wasu/.local/bin/stylish-haskell")
-	(custom-set-variables '(haskell-stylish-on-save t))
-	(setf flymake-allowed-file-name-masks (delete
-										   '("\\.l?hs\\'" haskell-flymake-init)
-										   flymake-allowed-file-name-masks)))
-
+	;; (setf flymake-allowed-file-name-masks (delete
+	;; 									   '("\\.l?hs\\'" haskell-flymake-init)
+	;; 									   flymake-allowed-file-name-masks))
+	)
   (leaf company
 	:require t
 	:config
@@ -1545,18 +1557,6 @@ translation it is possible to get suggestion."
 (with-eval-after-load 'company
   (add-to-list 'company-backends 'merlin-company-backend))
 
-;;; バッファ全体を読み取して、パースしたものを解釈し、出力する。
-;; (defun nippo-scoring-print ()
-;;   )
-;;; #ごとに階層化する。
-;; (defun md->sharp-tree (text)
-;;   )
-;;; オリジナル記法を探し出す。
-;;; オリジナル記法をパースする。
-;;; [[1,2]]
-;; (defun md-scoring-text->score (s-text)
-;;   )
-
 (setq *default-exclude-lst* '("*scratch*" "*Messages*"))
 
 (defun all-buffer-close ()
@@ -1628,22 +1628,102 @@ translation it is possible to get suggestion."
 		   )
 		  (t text))))
 
+(defun md-head-adj ()
+  (interactive)
+  (when (string= (buffer-substring-no-properties i (+ i 1)) "#")
+	(let ((cur 0))
+	  (loop for i from (point-at-bol) to (point-at-eol)
+			until (not (string= (buffer-substring-no-properties i (+ i 1)) "#"))
+			do (progn
+				 (cur i)
+				 (goto-char i))))
+	))
+
 (defun md-head-add ()
   (interactive)
-  (goto-char (point-at-bol))
-  (insert "#"))
+  (let ((cur-point (point))
+		(flg nil))
+	(cond ((= (point-at-bol) (point-max))
+		   (insert "#"))
+		  (t
+		   (goto-char (point-at-bol))
+		   (loop for i from (point-at-bol) to (point-at-eol)
+				 until flg
+				 do (cond ((string= (buffer-substring-no-properties i (+ i 1)) "#")
+						   (goto-char i))
+						  (t (setf flg t))))
+		   (insert "#")))
+	(goto-char (1+ cur-point))))
 
 (defun md-list-add ()
   (interactive)
   (let ((start (point-at-bol))
 		(end (point-at-eol))
 		(flg nil))
-	(loop for i from start to end
-		  until flg
-		  do (unless (string= (buffer-substring-no-properties i (i + 1)) "	")
-			   (setf flg t)))
-	(goto-char start)
-	(insert "*")))
+	(if (= (point) (point-max))
+		(insert "*")
+	  (progn
+		(loop for i from start to end
+			  until flg
+			  do (unless (string= (buffer-substring-no-properties i (+ i 1)) "	")
+				   (setf flg t)))
+		(goto-char start)
+		(insert "*")))
+	))
 
-(define-key markdown-mode-map "C-#" 'md-head-add)
-(define-key markdown-mode-map "C-*" 'md-list-add)
+(define-key markdown-mode-map (kbd "C-#") 'md-head-add)
+(define-key markdown-mode-map (kbd "C-*") 'md-list-add)
+
+(leaf prettier-js
+  :ensure t
+  :require t
+  :config
+  (setq prettier-js-args '("--trailing-comma" "all"
+						   "--bracket-spacing" "false")))
+
+(leaf svelte-mode
+  :ensure t
+  :require t
+  :config
+  (add-hook 'svelte-mode-hook 'prettier-js-mode))
+
+(leaf merlin
+  :ensure t
+  :require t)
+
+(leaf tuareg
+  :ensure t
+  :require t)
+
+(leaf ocamlformat
+  :ensure t
+  :require t
+  :config
+  (add-hook 'before-save-hook #'ocamlformat-before-save)
+  (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat))
+
+(leaf caml
+  :ensure t
+  :require t
+  :config
+  (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
+    (when (and opam-share (file-directory-p opam-share))
+      (autoload 'merlin-mode "merlin" nil t nil)
+      (add-hook 'tuareg-mode-hook 'merlin-mode t)
+      (add-hook 'caml-mode-hook 'merlin-mode t)
+      (setq merlin-command 'opam)
+	  )))
+
+(lsp-register-client
+ (make-lsp-client
+  :new-connection (lsp-stdio-connection
+                   '("opam" "exec" "--" "ocamlmerlin-lsp"))
+  :major-modes '(caml-mode tuareg-mode)
+  :server-id 'ocamlmerlin-lsp))
+
+(setq org-todo-keywords
+  '((sequence "TODO(t)" "SOMEDAY(s)" "WAITING(w)" "DOING(i)" "|" "CANCEL(c)" "FAILED(f)" "DONE(d)")))
+
+(leaf dockerfile-mode
+  :ensure t
+  :require t)

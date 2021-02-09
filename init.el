@@ -1,25 +1,30 @@
 (require 'package)
 
 (eval-and-compile
-  (prog1 "leaf"
-    (prog1 "install leaf"
-      (custom-set-variables
-       '(package-archives '(("org" . "https://orgmode.org/elpa/")
-                            ("melpa" . "https://melpa.org/packages/")
-                            ("gnu" . "https://elpa.gnu.org/packages/"))))
-      (package-initialize)
-      (unless (package-installed-p 'leaf)
-        (package-refresh-contents)
-        (package-install 'leaf))))
+  (customize-set-variable
+   'package-archives '(("org" . "https://orgmode.org/elpa/")
+                       ("melpa" . "https://melpa.org/packages/")
+                       ("gnu" . "https://elpa.gnu.org/packages/")))
+  (package-initialize)
+  (unless (package-installed-p 'leaf)
+    (package-refresh-contents)
+    (package-install 'leaf))
+
   (leaf leaf-keywords
-	:ensure t
-	:config
-	(leaf hydra :ensure t)
-	(leaf el-get
-	  :ensure t
-	  :custom ((el-get-git-shallow-clone . t)))
-	(leaf-keywords-init)
-	))
+    :ensure t
+    :init
+    ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
+    (leaf hydra :ensure t)
+    (leaf el-get :ensure t)
+    (leaf blackout :ensure t)
+
+    :config
+    ;; initialize leaf-keywords.el
+    (leaf-keywords-init)))
+
+(unless (package-installed-p 'bind-key)
+  (package-refresh-contents)
+  (package-install 'bind-key))
 
 (require 'bind-key)
 
@@ -30,7 +35,7 @@
 (column-number-mode t)
 
 (global-linum-mode t)
-(setq linum-format "%d ")
+(defvar linum-format "%d ")
 (set-face-attribute 'linum nil
 					:foreground "#6272a4"
 					:height 0.9)
@@ -128,6 +133,18 @@
 ;;; タブで補完までしてくれるやつ
 (setq tab-always-indent 'complete)
 
+(defun g-set-keys (a-lst)
+  (cl-loop for x in a-lst
+		   do (global-set-key (kbd (car x)) (cdr x))))
+
+(defun set-map-keys (a-lst)
+  (cl-loop for x in a-lst
+		   do (let* ((map (car x))
+					 (key-f (cadr x))
+					 (key (car key-f))
+					 (f (cdr key-f)))
+				(define-key map (kbd key) f))))
+
 (leaf request
   :ensure t
   :require t)
@@ -150,8 +167,12 @@
       'wl-draft-kill
       'mail-send-hook))
 
+(defun set-hooks (a-lst)
+  (cl-loop for x in a-lst
+		   do (add-hook (car x) (cdr x))))
 
 (leaf lisp-mode
+  :defvar emacs-lisp-mode-map
   :bind ((emacs-lisp-mode-map
 		  ("C-c C-z" . bozhidar-visit-ielm))
 		 (emacs-lisp-mode-map
@@ -174,8 +195,9 @@
 ;;; Emacs Lispの対話環境
 (leaf ielm
   :ensure t
-  :hook ((ielm-mode-hook . eldoc-mode)
-		 (ielm-mode-hook . rainbow-delimiters-mode))
+  :config
+  (set-hooks '((ielm-mode-hook . eldoc-mode)
+			   (ielm-mode-hook . rainbow-delimiters-mode)))
   :require t)
 
 ;; highlight the current line
@@ -183,16 +205,18 @@
 
 (leaf avy
   :ensure t
-  :hook (("C-c a w" . avy-goto-word-1)
-		 ("C-c a c" . avy-goto-char))
   :config
   (with-eval-after-load 'avy
-	(setq avy-background t)))
+	(setq avy-background t))
+  (g-set-keys '(("C-c a w" . avy-goto-word-1)
+				("C-c a c" . avy-goto-char)))
+  )
 
 (leaf magit
   :ensure t
-  :hook (("C-x g" . magit-status)
-		 ("C-c p" . magit-push-to-remote)))
+  :config
+  (g-set-keys '(("C-x g" . magit-status)
+				("C-c p" . magit-push-to-remote))))
 
 (leaf ag
   :ensure t
@@ -200,11 +224,11 @@
 
 (leaf projectile
   :ensure t
-  :hook (("M-p" . projectile-command-map))
   :config
   (with-eval-after-load 'projectile
 	(setq projectile-completion-system 'ivy)
-	(projectile-global-mode 1)))
+	(projectile-global-mode 1))
+  (g-set-keys '(("M-p" . projectile-command-map))))
 
 (leaf pt
   :ensure t
@@ -212,7 +236,7 @@
 
 (leaf expand-region
   :ensure t
-  :hook (("C-=" . er/expand-region)))
+  :config (g-set-keys '(("C-=" . er/expand-region))))
 
 (leaf elisp-slime-nav
   :ensure t
@@ -285,16 +309,17 @@
 
 (leaf anzu
   :ensure t
-  :hook (("M-%" . anzu-query-replace)
-		 ("C-M-%" . anzu-query-replace-regexp))
   :config
+  (g-set-keys '(("M-%" . anzu-query-replace)
+				("C-M-%" . anzu-query-replace-regexp)))
   (with-eval-after-load 'anzu
 	(global-anzu-mode)))
 
 (leaf easy-kill
   :ensure t
-  :hook (([remap kill-ring-save]
-		  . easy-kill))
+  ;; なんこれ
+  ;; :hook (([remap kill-ring-save]
+  ;; 		  . easy-kill))
   :require t)
 
 (leaf exec-path-from-shell
@@ -305,10 +330,11 @@
 
 (leaf move-text
   :ensure t
-  :hook (([(meta shift up)]
-		  . move-text-up)
-		 ([(meta shift down)]
-		  . move-text-down)))
+  ;; :hook (([(meta shift up)]
+  ;; 		  . move-text-up)
+  ;; 		 ([(meta shift down)]
+  ;; 		  . move-text-down))
+  )
 
 (leaf rainbow-delimiters
   :ensure t
@@ -336,9 +362,6 @@
   :hook ((ruby-mode-hook . inf-ruby-minor-mode))
   :require t)
 
-
-
-
 (leaf ruby-mode
   :hook ((ruby-mode-hook . subword-mode))
   :require t
@@ -352,11 +375,12 @@
 
 (leaf clojure-mode
   :ensure t
-  :hook (("C-c C-l" . cider-repl-clear-buffer))
-  :hook ((clojure-mode-hook . paredit-mode)
-		 (clojure-mode-hook . subword-mode)
-		 (clojure-mode-hook . rainbow-delimiters-mode))
-  :require t)
+  :require t
+  :config
+  (set-hooks '((clojure-mode-hook . paredit-mode)
+			   (clojure-mode-hook . subword-mode)
+			   (clojure-mode-hook . rainbow-delimiters-mode)))
+  (g-set-keys '(("C-c C-l" . cider-repl-clear-buffer))))
 
 (leaf sayid
   :ensure t
@@ -367,9 +391,10 @@
 
 (leaf neotree
   :ensure t
-  :hook (("C-c t" . neotree))
   :require t
-  :setq ((neo-show-hidden-files . t)))
+  :setq ((neo-show-hidden-files . t))
+  :config
+  (g-set-keys '(("C-c t" . neotree))))
 
 (leaf elscreen
   :ensure t
@@ -422,10 +447,10 @@
 
 (leaf cider
   :ensure t
-  :hook ((cider-mode-hook . eldoc-mode)
-		 (cider-repl-mode-hook . eldoc-mode)
-		 (cider-repl-mode-hook . paredit-mode)
-		 (cider-repl-mode-hook . rainbow-delimiters-mode))
+  :config (set-hooks '((cider-mode-hook . eldoc-mode)
+					   (cider-repl-mode-hook . eldoc-mode)
+					   (cider-repl-mode-hook . paredit-mode)
+					   (cider-repl-mode-hook . rainbow-delimiters-mode)))
   :require t)
 
 (leaf markdown-mode
@@ -476,15 +501,16 @@
 				'company-complete))))
 
 (global-company-mode 1)
+
 (leaf zop-to-char
   :ensure t
-  :hook (("M-z" . zop-up-to-char)
-		 ("M-Z" . zop-to-char)))
+  :config (g-set-keys '(("M-z" . zop-up-to-char)
+						("M-Z" . zop-to-char))))
 
 (leaf imenu-anywhere
   :ensure t
-  :hook (("C-c i" . imenu-anywhere)
-		 ("s-i" . imenu-anywhere)))
+  :config (g-set-keys '(("C-c i" . imenu-anywhere)
+						("s-i" . imenu-anywhere))))
 
 (leaf flyspell
   :hook '(text-mode-hook
@@ -509,43 +535,44 @@
 
 (leaf crux
   :ensure t
-  :hook (("C-c o" . crux-open-with)
-		 ("M-o" . crux-smart-open-line)
-		 ("C-c n" . crux-cleanup-buffer-or-region)
-		 ("C-c f" . crux-recentf-ido-find-file)
-		 ("C-M-z" . crux-indent-defun)
-		 ("C-c u" . crux-view-url)
-		 ("C-c e" . crux-eval-and-replace)
-		 ("C-c w" . crux-swap-windows)
-		 ("C-c D" . crux-delete-file-and-buffer)
-		 ("C-c r" . crux-rename-buffer-and-file)
-		 ("C-c t" . crux-visit-term-buffer)
-		 ("C-c k" . crux-kill-other-buffers)
-		 ("C-c TAB" . crux-indent-rigidly-and-copy-to-clipboard)
-		 ("C-c I" . crux-find-user-init-file)
-		 ("C-c S" . crux-find-shell-init-file)
-		 ("s-r" . crux-recentf-ido-find-file)
-		 ("s-j" . crux-top-join-line)
-		 ("C-^" . crux-top-join-line)
-		 ("s-k" . crux-kill-whole-line)
-		 ("C-<backspace>" . crux-kill-line-backwards)
-		 ("s-o" . crux-smart-open-line-above)
-		 ([remap move-beginning-of-line]
-		  . crux-move-beginning-of-line)
-		 ([(shift return)]
-		  . crux-smart-open-line)
-		 ([(control shift return)]
-		  . crux-smart-open-line-above)
-		 ([remap kill-whole-line]
-		  . crux-kill-whole-line)
-		 ("C-c s" . crux-ispell-word-then-abbrev)))
+  :config
+  (g-set-keys '(("C-c o" . crux-open-with)
+				("M-o" . crux-smart-open-line)
+				("C-c n" . crux-cleanup-buffer-or-region)
+				("C-c f" . crux-recentf-ido-find-file)
+				("C-M-z" . crux-indent-defun)
+				("C-c u" . crux-view-url)
+				("C-c e" . crux-eval-and-replace)
+				("C-c w" . crux-swap-windows)
+				("C-c D" . crux-delete-file-and-buffer)
+				("C-c r" . crux-rename-buffer-and-file)
+				("C-c t" . crux-visit-term-buffer)
+				("C-c k" . crux-kill-other-buffers)
+				("C-c TAB" . crux-indent-rigidly-and-copy-to-clipboard)
+				("C-c I" . crux-find-user-init-file)
+				("C-c S" . crux-find-shell-init-file)
+				("s-r" . crux-recentf-ido-find-file)
+				("s-j" . crux-top-join-line)
+				("C-^" . crux-top-join-line)
+				("s-k" . crux-kill-whole-line)
+				("C-<backspace>" . crux-kill-line-backwards)
+				("s-o" . crux-smart-open-line-above)
+				;; ([remap move-beginning-of-line]
+				;;  . crux-move-beginning-of-line)
+				;; ([(shift return)]
+				;;  . crux-smart-open-line)
+				;; ([(control shift return)]
+				;;  . crux-smart-open-line-above)
+				;; ([remap kill-whole-line]
+				;;  . crux-kill-whole-line)
+				("C-c s" . crux-ispell-word-then-abbrev))))
 
 (leaf diff-hl
   :ensure t
-  :hook ((dired-mode-hook . diff-hl-dired-mode)
-		 (magit-post-refresh-hook . diff-hl-magit-post-refresh))
   :require t
   :config
+  (set-hooks '((dired-mode-hook . diff-hl-dired-mode)
+			   (magit-post-refresh-hook . diff-hl-magit-post-refresh)))
   (global-diff-hl-mode 1))
 
 (leaf which-key
@@ -556,21 +583,21 @@
 
 (leaf undo-tree
   :ensure t
-  :hook (("M-/" . undo-tree-redo))
   :require t
   :setq ((undo-tree-auto-save-history . t))
   :config
+  (g-set-keys '(("M-/" . undo-tree-redo)))
   (setq undo-tree-history-directory-alist `((".*" \, temporary-file-directory)))
   (global-undo-tree-mode t))
 
 (leaf ivy
   :ensure t
-  :hook (("C-c C-r" . ivy-resume)
-		 ("<f6>" . ivy-resume))
   :require t
   :setq '((ivy-use-virtual-buffers . t)
 		  (enable-recursive-minibuffers . t))
   :config
+  (g-set-keys '(("C-c C-r" . ivy-resume)
+				("<f6>" . ivy-resume)))
   (ivy-mode 1)
   (setq ivy-virtual-abbreviate 'full)
   (setq ivy-use-virtual-buffers t)
@@ -584,33 +611,7 @@
   (define-key ivy-minibuffer-map (kbd "RET") 'ivy-alt-done)
   (setq ivy-wrap t))
 
-(leaf doom-themes
-  :ensure t neotree
-  :custom
-  '(doom-themes-enable-italic . nil)
-  '(doom-themes-enable-bold . nil)
-  :config
-  (add-to-list 'default-frame-alist '(font . "hackgen-11"))
-  (load-theme 'doom-tomorrow-night t)
-  (doom-themes-neotree-config)
-  (doom-themes-org-config)
-  )
-
-(leaf doom-modeline
-  :ensure t
-  :hook (after-init-hook . doom-modeline-mode)
-  :config
-  (line-number-mode 0)
-  (column-number-mode 0)
-  (doom-modeline-def-modeline 'main
-	'(bar window-number matches buffer-info remote-host buffer-position parrot selection-info)
-	'(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
-  :custom
-  ;; (doom-modeline-buffer-file-name-style . truncate-with-project)
-  (doom-modeline-icon . t)
-  (doom-modeline-major-mode-icon . nil)
-  (doom-modeline-minor-modes . nil)
-  )
+(load (expand-file-name "~/.emacs.d/doom/load.el"))
 
 (leaf ivy-rich
   :ensure t 'all-the-icons-ivy 'all-the-icons
@@ -648,17 +649,18 @@
 
 (leaf counsel
   :ensure t
-  :hook (("M-x" . counsel-M-x)
-		 ("C-x C-f" . counsel-find-file)
-		 ("<f1> f" . counsel-describe-function)
-		 ("<f1> v" . counsel-describe-variable)
-		 ("<f1> l" . counsel-find-library)
-		 ("<f2> i" . counsel-info-lookup-symbol)
-		 ("<f2> u" . counsel-unicode-char)
-		 ("C-c g" . counsel-git)
-		 ("C-c j" . counsel-git-grep)
-		 ("C-c k" . counsel-ag)
-		 ("C-x l" . counsel-locate))
+  :config
+  (g-set-keys '(("M-x" . counsel-M-x)
+				("C-x C-f" . counsel-find-file)
+				("<f1> f" . counsel-describe-function)
+				("<f1> v" . counsel-describe-variable)
+				("<f1> l" . counsel-find-library)
+				("<f2> i" . counsel-info-lookup-symbol)
+				("<f2> u" . counsel-unicode-char)
+				("C-c g" . counsel-git)
+				("C-c j" . counsel-git-grep)
+				("C-c k" . counsel-ag)
+				("C-x l" . counsel-locate)))
   :require t)
 
 
@@ -689,47 +691,47 @@
 (when (file-exists-p custom-file)
   (load custom-file))
 
-;; (defun google-translate-enja-or-jaen (&optional string)
-;;   "Translate words in region or current position. Can also specify query with C-u"
-;;   (interactive)
-;;   (setq string
-;;         (cond ((stringp string) string)
-;; 			  (current-prefix-arg
-;; 			   (read-string "Google Translate: "))
-;; 			  ((use-region-p)
-;; 			   (buffer-substring (region-beginning) (region-end)))
-;; 			  (t
-;; 			   (thing-at-point 'word))))
-;;   (let* ((asciip (string-match
-;; 				  (format "\\`[%s]+\\'" "[:ascii:]’“”–")
-;; 				  string)))
-;;     (run-at-time 0.1 nil 'deactivate-mark)
-;;     (google-translate-translate
-;;      (if asciip "en" "ja")
-;;      (if asciip "ja" "en")
-;;      string)))
+(defun google-translate-enja-or-jaen (&optional string)
+  "Translate words in region or current position. Can also specify query with C-u"
+  (interactive)
+  (setq string
+        (cond ((stringp string) string)
+			  (current-prefix-arg
+			   (read-string "Google Translate: "))
+			  ((use-region-p)
+			   (buffer-substring (region-beginning) (region-end)))
+			  (t
+			   (thing-at-point 'word))))
+  (let* ((asciip (string-match
+				  (format "\\`[%s]+\\'" "[:ascii:]’“”–")
+				  string)))
+    (run-at-time 0.1 nil 'deactivate-mark)
+    (google-translate-translate
+     (if asciip "en" "ja")
+     (if asciip "ja" "en")
+     string)))
 
-;; (bind-key "C-t" 'google-translate-enja-or-jaen)
+(bind-key "C-t" 'google-translate-enja-or-jaen)
 
-;; (leaf google-translate
-;;   :ensure t
-;;   :hook (("C-c f" . google-translate-enja-or-jaen))
-;;   :require t)
+(leaf google-translate
+  :ensure t
+  :config (g-set-keys '(("C-c f" . google-translate-enja-or-jaen)))
+  :require t)
 
-;; (defun google-translate-json-suggestion (json)
-;;   "Retrieve from JSON (which returns by the
-;; `google-translate-request' function) suggestion. This function
-;; does matter when translating misspelled word. So instead of
-;; translation it is possible to get suggestion."
-;;   (let ((info (aref json 7)))
-;;     (if (and info (> (length info) 0))
-;;         (aref info 1)
-;; 	  nil)))
+(defun google-translate-json-suggestion (json)
+  "Retrieve from JSON (which returns by the
+`google-translate-request' function) suggestion. This function
+does matter when translating misspelled word. So instead of
+translation it is possible to get suggestion."
+  (let ((info (aref json 7)))
+    (if (and info (> (length info) 0))
+        (aref info 1)
+	  nil)))
 
-;; ;; Fix error of "Failed to search TKK"
-;; (defun google-translate--get-b-d1 ()
-;;   ;; TKK='427110.1469889687'
-;;   (list 427110 1469889687))
+;; Fix error of "Failed to search TKK"
+(defun google-translate--get-b-d1 ()
+  ;; TKK='427110.1469889687'
+  (list 427110 1469889687))
 
 (global-set-key (kbd "M-y") 'counsel-yank-pop)
 
@@ -900,7 +902,7 @@
 
 (leaf javadoc-lookup
   :ensure t
-  :hook (("C-c C-j" . javadoc-lookup))
+  :config (g-set-keys '(("C-c C-j" . javadoc-lookup)))
   :require t)
 
 (leaf lsp-java
@@ -1085,12 +1087,12 @@
 
 (leaf ace-jump-mode
   :ensure t
-  :hook (("C-:" . ace-jump-char-mode)
-		 ("C-c C-;" . ace-jump-word-mode)
-		 ("C-M-;" . ace-jump-line-mode))
   :require t
   :setq ((ace-jump-word-mode-use-query-char))
   :config
+  (g-set-keys '(("C-:" . ace-jump-char-mode)
+				("C-c C-;" . ace-jump-word-mode)
+				("C-M-;" . ace-jump-line-mode)))
   (setq ace-jump-mode-move-keys (append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil)))
 
 
@@ -1134,11 +1136,12 @@
   (save-buffers))
 
 (leaf fsharp-mode
+  :after t
+  :defvar fsharp-mode-map
   :ensure t
-  :hook ((fsharp-mode-map
-		  ("C-c C-M-f" . fsharp-fantomas-format-buffer)))
   :pre-setq ((inferior-fsharp-program . "/usr/bin/dotnet fsi"))
   :config
+  (define-key fsharp-mode-map "C-c C-M-f" #'fsharp-fantomas-format-buffer)
   (require 'eglot-fsharp)
   (setq fsharp2-lsp-executable "/home/wasu/fsharp-language-server/src/FSharpLanguageServer/bin/Release/netcoreapp3.0/linux-x64/publish/FSharpLanguageServer.dll")
   (add-hook 'fsharp-mode-hook 'eglot-ensure)
@@ -1233,12 +1236,12 @@
 (leaf yasnippet
   :ensure t
   :require t
-  :hook (("C-x y i" . yas-insert-snippet)
-         ("C-x y n" . yas-new-snippet)
-         ("C-x y v" . yas-visit-snippet-file)
-         ("C-x y l" . yas-describe-tables)
-         ("C-x y g" . yas-reload-all))
   :config
+  (g-set-keys '(("C-x y i" . yas-insert-snippet)
+				("C-x y n" . yas-new-snippet)
+				("C-x y v" . yas-visit-snippet-file)
+				("C-x y l" . yas-describe-tables)
+				("C-x y g" . yas-reload-all)))
   (yas-global-mode 1)
   (setq yas-prompt-functions '(yas-ido-prompt))
   )

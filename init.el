@@ -1,6 +1,27 @@
 (require 'package)
 
-(add-to-list 'load-path "./my-el")
+(eval-and-compile
+  (prog1 "leaf"
+    (prog1 "install leaf"
+      (custom-set-variables
+       '(package-archives '(("org" . "https://orgmode.org/elpa/")
+                            ("melpa" . "https://melpa.org/packages/")
+                            ("gnu" . "https://elpa.gnu.org/packages/"))))
+      (package-initialize)
+      (unless (package-installed-p 'leaf)
+        (package-refresh-contents)
+        (package-install 'leaf))))
+  (leaf leaf-keywords
+	:ensure t
+	:config
+	(leaf hydra :ensure t)
+	(leaf el-get
+	  :ensure t
+	  :custom ((el-get-git-shallow-clone . t)))
+	(leaf-keywords-init)
+	))
+
+(require 'bind-key)
 
 (add-to-list 'default-frame-alist '(alpha . (0.85 0.85)))
 
@@ -19,19 +40,6 @@
 (global-hl-line-mode t)
 
 (show-paren-mode 1)
-
-(setq package-archives
-      '(("gnu" . "http://elpa.gnu.org/packages/")
-        ("melpa" . "http://melpa.org/packages/")
-        ("org" . "http://orgmode.org/elpa/")))
-
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-
-
-(setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
 
 (setq user-full-name "wasu ken"
       user-mail-address "wevorence@gmail.com")
@@ -120,14 +128,11 @@
 ;;; タブで補完までしてくれるやつ
 (setq tab-always-indent 'complete)
 
-(unless (package-installed-p 'leaf)
-  (package-install 'leaf))
-
-(require 'leaf)
-
 (leaf request
   :ensure t
   :require t)
+
+(add-hook 'load-path (expand-file-name "~/.emacs.d/myel"))
 
 (setq elmo-imap4-default-server "imap.mail.yahoo.co.jp"
 	  elmo-imap4-default-user "abkt_god@yahoo.co.jp"
@@ -178,7 +183,7 @@
 
 (leaf avy
   :ensure t
-  :bind (("C-c a w" . avy-goto-word-1)
+  :hook (("C-c a w" . avy-goto-word-1)
 		 ("C-c a c" . avy-goto-char))
   :config
   (with-eval-after-load 'avy
@@ -186,7 +191,7 @@
 
 (leaf magit
   :ensure t
-  :bind (("C-x g" . magit-status)
+  :hook (("C-x g" . magit-status)
 		 ("C-c p" . magit-push-to-remote)))
 
 (leaf ag
@@ -195,7 +200,7 @@
 
 (leaf projectile
   :ensure t
-  :bind (("M-p" . projectile-command-map))
+  :hook (("M-p" . projectile-command-map))
   :config
   (with-eval-after-load 'projectile
 	(setq projectile-completion-system 'ivy)
@@ -207,7 +212,7 @@
 
 (leaf expand-region
   :ensure t
-  :bind (("C-=" . er/expand-region)))
+  :hook (("C-=" . er/expand-region)))
 
 (leaf elisp-slime-nav
   :ensure t
@@ -231,10 +236,10 @@
 ;;; 同じ名前の別階層のファイルをわかりやすくするやつ
 (leaf uniquify
   :require t
-  :setq ((uniquify-buffer-name-style quote forward)
-		 (uniquify-separator . "/")
-		 (uniquify-after-kill-buffer-p . t)
-		 (uniquify-ignore-buffers-re . "^\\*")))
+  :setq '((uniquify-buffer-name-style quote forward)
+		  (uniquify-separator . "/")
+		  (uniquify-after-kill-buffer-p . t)
+		  (uniquify-ignore-buffers-re . "^\\*")))
 
 ;;; 以前開いた位置でスタートしてくれるやつ
 (leaf saveplace
@@ -271,16 +276,16 @@
   (windmove-default-keybindings))
 
 (leaf dired
-  :pre-setq ((dired-recursive-deletes quote always)
-			 (dired-recursive-copies quote always)
-			 (dired-dwim-target . t))
+  :pre-setq '((dired-recursive-deletes quote always)
+			  (dired-recursive-copies quote always)
+			  (dired-dwim-target . t))
   :init
   (put 'dired-find-alternate-file 'disabled nil)
   :require t dired-x)
 
 (leaf anzu
   :ensure t
-  :bind (("M-%" . anzu-query-replace)
+  :hook (("M-%" . anzu-query-replace)
 		 ("C-M-%" . anzu-query-replace-regexp))
   :config
   (with-eval-after-load 'anzu
@@ -288,7 +293,7 @@
 
 (leaf easy-kill
   :ensure t
-  :bind (([remap kill-ring-save]
+  :hook (([remap kill-ring-save]
 		  . easy-kill))
   :require t)
 
@@ -300,7 +305,7 @@
 
 (leaf move-text
   :ensure t
-  :bind (([(meta shift up)]
+  :hook (([(meta shift up)]
 		  . move-text-up)
 		 ([(meta shift down)]
 		  . move-text-down)))
@@ -347,7 +352,7 @@
 
 (leaf clojure-mode
   :ensure t
-  :bind (("C-c C-l" . cider-repl-clear-buffer))
+  :hook (("C-c C-l" . cider-repl-clear-buffer))
   :hook ((clojure-mode-hook . paredit-mode)
 		 (clojure-mode-hook . subword-mode)
 		 (clojure-mode-hook . rainbow-delimiters-mode))
@@ -362,7 +367,7 @@
 
 (leaf neotree
   :ensure t
-  :bind (("C-c t" . neotree))
+  :hook (("C-c t" . neotree))
   :require t
   :setq ((neo-show-hidden-files . t)))
 
@@ -473,17 +478,17 @@
 (global-company-mode 1)
 (leaf zop-to-char
   :ensure t
-  :bind (("M-z" . zop-up-to-char)
+  :hook (("M-z" . zop-up-to-char)
 		 ("M-Z" . zop-to-char)))
 
 (leaf imenu-anywhere
   :ensure t
-  :bind (("C-c i" . imenu-anywhere)
+  :hook (("C-c i" . imenu-anywhere)
 		 ("s-i" . imenu-anywhere)))
 
 (leaf flyspell
-  :hook (text-mode-hook
-		 (prog-mode-hook . flyspell-prog-mode))
+  :hook '(text-mode-hook
+		  (prog-mode-hook . flyspell-prog-mode))
   :require t
   :config
   (when (eq system-type 'windows-nt)
@@ -504,7 +509,7 @@
 
 (leaf crux
   :ensure t
-  :bind (("C-c o" . crux-open-with)
+  :hook (("C-c o" . crux-open-with)
 		 ("M-o" . crux-smart-open-line)
 		 ("C-c n" . crux-cleanup-buffer-or-region)
 		 ("C-c f" . crux-recentf-ido-find-file)
@@ -551,7 +556,7 @@
 
 (leaf undo-tree
   :ensure t
-  :bind (("M-/" . undo-tree-redo))
+  :hook (("M-/" . undo-tree-redo))
   :require t
   :setq ((undo-tree-auto-save-history . t))
   :config
@@ -560,11 +565,11 @@
 
 (leaf ivy
   :ensure t
-  :bind (("C-c C-r" . ivy-resume)
+  :hook (("C-c C-r" . ivy-resume)
 		 ("<f6>" . ivy-resume))
   :require t
-  :setq ((ivy-use-virtual-buffers . t)
-		 (enable-recursive-minibuffers . t))
+  :setq '((ivy-use-virtual-buffers . t)
+		  (enable-recursive-minibuffers . t))
   :config
   (ivy-mode 1)
   (setq ivy-virtual-abbreviate 'full)
@@ -582,8 +587,8 @@
 (leaf doom-themes
   :ensure t neotree
   :custom
-  (doom-themes-enable-italic . nil)
-  (doom-themes-enable-bold . nil)
+  '(doom-themes-enable-italic . nil)
+  '(doom-themes-enable-bold . nil)
   :config
   (add-to-list 'default-frame-alist '(font . "hackgen-11"))
   (load-theme 'doom-tomorrow-night t)
@@ -593,11 +598,6 @@
 
 (leaf doom-modeline
   :ensure t
-  :custom
-  (doom-modeline-buffer-file-name-style . 'truncate-with-project)
-  (doom-modeline-icon . t)
-  (doom-modeline-major-mode-icon . nil)
-  (doom-modeline-minor-modes . nil)
   :hook (after-init-hook . doom-modeline-mode)
   :config
   (line-number-mode 0)
@@ -605,11 +605,16 @@
   (doom-modeline-def-modeline 'main
 	'(bar window-number matches buffer-info remote-host buffer-position parrot selection-info)
 	'(misc-info persp-name lsp github debug minor-modes input-method major-mode process vcs checker))
+  :custom
+  ;; (doom-modeline-buffer-file-name-style . truncate-with-project)
+  (doom-modeline-icon . t)
+  (doom-modeline-major-mode-icon . nil)
+  (doom-modeline-minor-modes . nil)
   )
 
 (leaf ivy-rich
-  :ensure t all-the-icons-ivy all-the-icons
-  :hook (ivy-mode-hook . ivy-rich-mode)
+  :ensure t 'all-the-icons-ivy 'all-the-icons
+  :hook '(ivy-mode-hook . ivy-rich-mode)
   :preface
   (defun ivy-rich-switch-buffer-icon (candidate)
     (with-current-buffer
@@ -643,7 +648,7 @@
 
 (leaf counsel
   :ensure t
-  :bind (("M-x" . counsel-M-x)
+  :hook (("M-x" . counsel-M-x)
 		 ("C-x C-f" . counsel-find-file)
 		 ("<f1> f" . counsel-describe-function)
 		 ("<f1> v" . counsel-describe-variable)
@@ -653,10 +658,12 @@
 		 ("C-c g" . counsel-git)
 		 ("C-c j" . counsel-git-grep)
 		 ("C-c k" . counsel-ag)
-		 ("C-x l" . counsel-locate)
-		 (minibuffer-local-map
-		  ("C-r" . counsel-minibuffer-history)))
+		 ("C-x l" . counsel-locate))
   :require t)
+
+
+;; (minibuffer-local-map
+;;  ("C-r" . counsel-minibuffer-history))
 
 (set-frame-font "hackgen-11")
 
@@ -682,58 +689,55 @@
 (when (file-exists-p custom-file)
   (load custom-file))
 
-(leaf google-translate
-  :ensure t
-  :bind (("C-c f" . google-translate-enja-or-jaen))
-  :require t)
+;; (defun google-translate-enja-or-jaen (&optional string)
+;;   "Translate words in region or current position. Can also specify query with C-u"
+;;   (interactive)
+;;   (setq string
+;;         (cond ((stringp string) string)
+;; 			  (current-prefix-arg
+;; 			   (read-string "Google Translate: "))
+;; 			  ((use-region-p)
+;; 			   (buffer-substring (region-beginning) (region-end)))
+;; 			  (t
+;; 			   (thing-at-point 'word))))
+;;   (let* ((asciip (string-match
+;; 				  (format "\\`[%s]+\\'" "[:ascii:]’“”–")
+;; 				  string)))
+;;     (run-at-time 0.1 nil 'deactivate-mark)
+;;     (google-translate-translate
+;;      (if asciip "en" "ja")
+;;      (if asciip "ja" "en")
+;;      string)))
 
-(leaf google-translate
-  :require t)
+;; (bind-key "C-t" 'google-translate-enja-or-jaen)
 
-(defun google-translate-json-suggestion (json)
-  "Retrieve from JSON (which returns by the
-`google-translate-request' function) suggestion. This function
-does matter when translating misspelled word. So instead of
-translation it is possible to get suggestion."
-  (let ((info (aref json 7)))
-    (if (and info (> (length info) 0))
-        (aref info 1)
-	  nil)))
+;; (leaf google-translate
+;;   :ensure t
+;;   :hook (("C-c f" . google-translate-enja-or-jaen))
+;;   :require t)
 
-(defun google-translate-enja-or-jaen (&optional string)
-  "Translate words in region or current position. Can also specify query with C-u"
-  (interactive)
-  (setq string
-        (cond ((stringp string) string)
-			  (current-prefix-arg
-			   (read-string "Google Translate: "))
-			  ((use-region-p)
-			   (buffer-substring (region-beginning) (region-end)))
-			  (t
-			   (thing-at-point 'word))))
-  (let* ((asciip (string-match
-				  (format "\\`[%s]+\\'" "[:ascii:]’“”–")
-				  string)))
-    (run-at-time 0.1 nil 'deactivate-mark)
-    (google-translate-translate
-     (if asciip "en" "ja")
-     (if asciip "ja" "en")
-     string)))
+;; (defun google-translate-json-suggestion (json)
+;;   "Retrieve from JSON (which returns by the
+;; `google-translate-request' function) suggestion. This function
+;; does matter when translating misspelled word. So instead of
+;; translation it is possible to get suggestion."
+;;   (let ((info (aref json 7)))
+;;     (if (and info (> (length info) 0))
+;;         (aref info 1)
+;; 	  nil)))
 
-(bind-key "C-t" 'google-translate-enja-or-jaen)
-
-;; Fix error of "Failed to search TKK"
-(defun google-translate--get-b-d1 ()
-  ;; TKK='427110.1469889687'
-  (list 427110 1469889687))
+;; ;; Fix error of "Failed to search TKK"
+;; (defun google-translate--get-b-d1 ()
+;;   ;; TKK='427110.1469889687'
+;;   (list 427110 1469889687))
 
 (global-set-key (kbd "M-y") 'counsel-yank-pop)
 
-(leaf elfeed
-  :ensure t
-  :require t
-  :config
-  (setf elfeed-feeds '("http://b.hatena.ne.jp/hotentry/it.rss" "http://elephant.2chblog.jp/index.rdf" "http://openstandia.jp/oss_info/atom.xml" "https://www.archlinux.org/feeds/packages/")))
+;; (leaf elfeed
+;;   :ensure t
+;;   :require t
+;;   :config
+;;   (setf elfeed-feeds '("http://b.hatena.ne.jp/hotentry/it.rss" "http://elephant.2chblog.jp/index.rdf" "http://openstandia.jp/oss_info/atom.xml" "https://www.archlinux.org/feeds/packages/")))
 
 (leaf w3m
   :ensure t
@@ -751,10 +755,12 @@ translation it is possible to get suggestion."
 ;; ~/.emacs.d/slimeをload-pathに追加
 (unless (file-exists-p "~/.emacs.d/slime/")
   (shell-command-to-string "git clone https://github.com/slime/slime && mv -f slime ~/.emacs.d/"))
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/slime"))
-(require 'slime)
-(slime-setup '(slime-repl slime-fancy slime-banner))
-(add-hook 'slime-repl-mode-hook #'paredit-mode)
+(cond ((file-exists-p "~/.emacs.d/slime")
+	   (add-to-list 'load-path (expand-file-name "~/.emacs.d/slime"))
+	   (require 'slime)
+	   (slime-setup '(slime-repl slime-fancy slime-banner))
+	   (add-hook 'slime-repl-mode-hook #'paredit-mode)
+	   (setq inferior-lisp-program "sbcl")))
 
 ;;backspace h
 (keyboard-translate ?\C-h ?\C-?)
@@ -787,28 +793,26 @@ translation it is possible to get suggestion."
 
 
 (unless (file-exists-p "~/.emacs.d/Emacs-gosh-mode/")
-  (shell-command-to-string "git clone https://github.com/mhayashi1120/Emacs-gosh-mode && mv -f Emacs-gosh-mode ~/.emacs.d/"))
+  (shell-command-to-string "git clone https://github.com/mhayashi1120/Emacs-gosh-mode && mv -f Emacs-gosh-mode ~/.emacs.d/")
+  (setq scheme-program-name "gosh -i")
+
+  (setq load-path (cons "~/.emacs.d/Emacs-gosh-mode/" load-path))
+  (require 'gosh-config)
+;;; こいつはgit cloneしてきて、sudo make installしていれたので
+;;; 最初は動かないので注意
+  (add-to-list 'auto-mode-alist '("\\.scm$'" . gosh-mode))
+
+  (add-hook 'gosh-mode-hook
+			'(lambda ()
+               (paredit-mode)
+               (electric-pair-mode t)))
+
+  (define-key global-map (kbd "C-c g") 'gosh-run)
+  )
 
 ;; UTF-8 に統一
 (setq process-coding-system-alist
 	  (cons '("gosh" utf-8 . utf-8) process-coding-system-alist))
-
-(setq scheme-program-name "gosh -i")
-;; (autoload 'scheme-mode "cmuscheme" "Major mode for Scheme." t)
-;; (autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
-
-(setq load-path (cons "~/.emacs.d/Emacs-gosh-mode/" load-path))
-(require 'gosh-config)
-;;; こいつはgit cloneしてきて、sudo make installしていれたので
-;;; 最初は動かないので注意
-(add-to-list 'auto-mode-alist '("\\.scm$'" . gosh-mode))
-
-(add-hook 'gosh-mode-hook
-		  '(lambda ()
-             (paredit-mode)
-             (electric-pair-mode t)))
-
-(define-key global-map (kbd "C-c g") 'gosh-run)
 
 (leaf lsp-go
   :after go-mode lsp-mode
@@ -896,7 +900,7 @@ translation it is possible to get suggestion."
 
 (leaf javadoc-lookup
   :ensure t
-  :bind (("C-c C-j" . javadoc-lookup))
+  :hook (("C-c C-j" . javadoc-lookup))
   :require t)
 
 (leaf lsp-java
@@ -1006,11 +1010,6 @@ translation it is possible to get suggestion."
 
   )
 
-(setq inferior-lisp-program "sbcl")
-(add-to-list 'load-path "~/.emacs.d/slime/")
-(require 'slime)
-(slime-setup)
-
 (load (expand-file-name "~/.roswell/helper.el"))
 
 (define-key global-map (kbd "C-c C-e m") 'emmet-expand-line)
@@ -1086,7 +1085,7 @@ translation it is possible to get suggestion."
 
 (leaf ace-jump-mode
   :ensure t
-  :bind (("C-:" . ace-jump-char-mode)
+  :hook (("C-:" . ace-jump-char-mode)
 		 ("C-c C-;" . ace-jump-word-mode)
 		 ("C-M-;" . ace-jump-line-mode))
   :require t
@@ -1136,7 +1135,7 @@ translation it is possible to get suggestion."
 
 (leaf fsharp-mode
   :ensure t
-  :bind ((fsharp-mode-map
+  :hook ((fsharp-mode-map
 		  ("C-c C-M-f" . fsharp-fantomas-format-buffer)))
   :pre-setq ((inferior-fsharp-program . "/usr/bin/dotnet fsi"))
   :config
@@ -1234,7 +1233,7 @@ translation it is possible to get suggestion."
 (leaf yasnippet
   :ensure t
   :require t
-  :bind (("C-x y i" . yas-insert-snippet)
+  :hook (("C-x y i" . yas-insert-snippet)
          ("C-x y n" . yas-new-snippet)
          ("C-x y v" . yas-visit-snippet-file)
          ("C-x y l" . yas-describe-tables)

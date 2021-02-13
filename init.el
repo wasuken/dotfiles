@@ -148,8 +148,6 @@
 					 (f (cdr key-f)))
 				(define-key map (kbd key) f))))
 
-(load (expand-file-name "~/.emacs.d/myel/me.el"))
-
 (leaf request
   :ensure t
   :require t)
@@ -1015,6 +1013,8 @@ translation it is possible to get suggestion."
 									 (define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
 									 (define-key haskell-cabal-mode-map (kbd "C-c c") 'haskell-process-cabal)))
   )
+
+(load (expand-file-name "~/.emacs.d/myel/me.el"))
 
 (load (expand-file-name "~/.roswell/helper.el"))
 

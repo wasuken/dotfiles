@@ -135,7 +135,10 @@
 
 (defun g-set-keys (a-lst)
   (cl-loop for x in a-lst
-		   do (global-set-key (kbd (car x)) (cdr x))))
+		   do (let ((key (if (stringp (car x))
+							 (kbd (car x))
+						   (car x))))
+				(global-set-key key (cdr x)))))
 
 (defun set-map-keys (a-lst)
   (cl-loop for x in a-lst
@@ -145,11 +148,11 @@
 					 (f (cdr key-f)))
 				(define-key map (kbd key) f))))
 
+(load (expand-file-name "~/.emacs.d/myel/me.el"))
+
 (leaf request
   :ensure t
   :require t)
-
-(add-hook 'load-path (expand-file-name "~/.emacs.d/myel"))
 
 (setq elmo-imap4-default-server "imap.mail.yahoo.co.jp"
 	  elmo-imap4-default-user "abkt_god@yahoo.co.jp"
@@ -318,8 +321,8 @@
 (leaf easy-kill
   :ensure t
   ;; なんこれ
-  ;; :hook (([remap kill-ring-save]
-  ;; 		  . easy-kill))
+  :config (g-set-keys ' (([remap kill-ring-save]
+						  . easy-kill)))
   :require t)
 
 (leaf exec-path-from-shell
@@ -330,10 +333,11 @@
 
 (leaf move-text
   :ensure t
-  ;; :hook (([(meta shift up)]
-  ;; 		  . move-text-up)
-  ;; 		 ([(meta shift down)]
-  ;; 		  . move-text-down))
+  :config
+  (g-set-keys '(([(meta shift up)]
+				 . move-text-up)
+				([(meta shift down)]
+				 . move-text-down)))
   )
 
 (leaf rainbow-delimiters
@@ -546,7 +550,7 @@
 				("C-c w" . crux-swap-windows)
 				("C-c D" . crux-delete-file-and-buffer)
 				("C-c r" . crux-rename-buffer-and-file)
-				("C-c t" . crux-visit-term-buffer)
+				;; ("C-c t" . crux-visit-term-buffer)
 				("C-c k" . crux-kill-other-buffers)
 				("C-c TAB" . crux-indent-rigidly-and-copy-to-clipboard)
 				("C-c I" . crux-find-user-init-file)
@@ -557,15 +561,16 @@
 				("s-k" . crux-kill-whole-line)
 				("C-<backspace>" . crux-kill-line-backwards)
 				("s-o" . crux-smart-open-line-above)
-				;; ([remap move-beginning-of-line]
-				;;  . crux-move-beginning-of-line)
-				;; ([(shift return)]
-				;;  . crux-smart-open-line)
-				;; ([(control shift return)]
-				;;  . crux-smart-open-line-above)
-				;; ([remap kill-whole-line]
-				;;  . crux-kill-whole-line)
-				("C-c s" . crux-ispell-word-then-abbrev))))
+				([remap move-beginning-of-line]
+				 . crux-move-beginning-of-line)
+				([(shift return)]
+				 . crux-smart-open-line)
+				([(control shift return)]
+				 . crux-smart-open-line-above)
+				([remap kill-whole-line]
+				 . crux-kill-whole-line)
+				("C-c s" . crux-ispell-word-then-abbrev)))
+)
 
 (leaf diff-hl
   :ensure t
@@ -1009,7 +1014,6 @@ translation it is possible to get suggestion."
 									 (define-key haskell-cabal-mode-map (kbd "C-c C-k") 'haskell-interactive-ode-clear)
 									 (define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
 									 (define-key haskell-cabal-mode-map (kbd "C-c c") 'haskell-process-cabal)))
-
   )
 
 (load (expand-file-name "~/.roswell/helper.el"))

@@ -1287,3 +1287,14 @@ translation it is possible to get suggestion."
 (leaf dockerfile-mode
   :ensure t
   :require t)
+
+(leaf emoji-cheat-sheet-plus
+  :ensure t
+  :require t
+  :config
+  (progn
+    (add-hook 'org-mode-hook 'emoji-cheat-sheet-plus-display-mode)
+    (add-hook 'markdown-mode-hook 'emoji-cheat-sheet-plus-display-mode)
+    (add-hook 'magit-log-mode-hook 'emoji-cheat-sheet-plus-display-mode)
+	(add-hook 'shell-mode-hook 'emoji-cheat-sheet-plus-display-mode)
+    (global-set-key (kbd "C-c C-e") 'emoji-cheat-sheet-plus-insert)))

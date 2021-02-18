@@ -375,6 +375,12 @@
 			   (robe-ac-setup)
 			   (inf-ruby-keys))))
 
+(leaf ruby-electric
+  :ensure t
+  :require t
+  :config
+  (set-hooks '((ruby-mode-hook . ruby-electric-mode))))
+
 (leaf clojure-mode
   :ensure t
   :require t

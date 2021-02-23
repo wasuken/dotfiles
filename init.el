@@ -1304,3 +1304,16 @@ translation it is possible to get suggestion."
     (add-hook 'magit-log-mode-hook 'emoji-cheat-sheet-plus-display-mode)
 	(add-hook 'shell-mode-hook 'emoji-cheat-sheet-plus-display-mode)
     (global-set-key (kbd "C-c C-e") 'emoji-cheat-sheet-plus-insert)))
+
+(defun random-alnum ()
+  (let* ((alnum "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+         (i (% (abs (random)) (length alnum))))
+    (substring alnum i (1+ i))))
+
+(defun random-n-letter-string ()
+  (interactive)
+  (let ((n (read-number "length: "))
+		(rst ""))
+	(loop for i from 1 to n
+		  do (setf rst (concatenate 'string rst (random-alnum))))
+	(insert rst)))

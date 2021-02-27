@@ -890,6 +890,7 @@ translation it is possible to get suggestion."
   :ensure t
   :commands lsp
   :hook (scala-mode-hook)
+  :custom (lsp-rust-server 'rust-analyzer)
   :config
   (with-eval-after-load 'lsp-mode
 	(setq lsp-prefer-flymake nil)))
@@ -1031,10 +1032,35 @@ translation it is possible to get suggestion."
   :ensure t
   :require t)
 
+(add-to-list 'exec-path (expand-file-name "~/.local/bin"))
+
+(leaf flycheck-rust
+  :ensure t
+  :require t)
+
+(leaf rust-mode
+  :ensure t
+  :require t
+  :config
+
+  (setf lsp-completion-provider 'company-capf)
+  (setf rust-format-on-save t)
+  (set-hooks '((rust-mode-hook . rustic-mode)
+			   ;; (rust-mode-hook . eglot)
+			   ;; (lsp-mode-hook  . company-mode)
+			   (flycheck-mode-hook . flycheck-rust-setup)
+			   )))
+
+(leaf cargo
+  :ensure t
+  :require t
+  :config
+  (set-hooks '((rust-mode . cargo-minor-mode))))
+
 (leaf rustic
   :ensure t
-  :setq ((rustic-rls-pkg quote eglot))
   :config
+  (setf lsp-rust-server 'rust-analyzer)
   (with-eval-after-load 'rustic
 	(add-to-list 'auto-mode-alist
 				 '("\\.rs\\'" . rust-mode))

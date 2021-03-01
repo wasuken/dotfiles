@@ -1,6 +1,13 @@
 (require 'package)
 
-;;; これはあかんやろ
+(setq org-agenda-files (list "~/todo/todo.org"))
+
+(global-set-key (kbd "C-c c") 'org-capture)
+
+(setq org-capture-templates
+      '(("t" "TODO" entry (file+headline "~/todo/todo.org" "Inbox")
+         "*** %?\n    CAPTURED_AT: %a\n    %i")))
+
 (defun replace-sepa (left &optional right)
   (setq right (or right left))
   (let ((cur-strs  (buffer-substring (region-beginning) (region-end))))
@@ -238,6 +245,10 @@
 
 ;; highlight the current line
 (global-hl-line-mode +1)
+
+(leaf request
+  :ensure t
+  :require t)
 
 (leaf leaf-convert
   :config
@@ -1036,11 +1047,27 @@ translation it is possible to get suggestion."
 						 '("\\.py$'" . python-mode)
 						 auto-mode-alist)))
 
+(defun format-date (cur)
+  (format-time-string "%Y-%m-%d(%a)" cur))
+
+(defun format-time (cur)
+  (format-time-string "%H:%M:%S" cur))
+
+(defun insert-current-date()
+  (interactive)
+  (insert (format-date (current-time))))
+
 (defun insert-current-time()
   (interactive)
-  (insert (format-time-string "%Y-%m-%d(%a) %H:%M:%S" (current-time))))
+  (insert (format-time (current-time))))
 
-(define-key global-map (kbd "C-c d") `insert-current-time)
+(defun insert-current-datetime()
+  (interactive)
+  (insert (format "%s %s" (format-date (current-time)) (format-time (current-time)))))
+
+(define-key global-map (kbd "C-c d a") `insert-current-datetime)
+(define-key global-map (kbd "C-c d t") `insert-current-time)
+(define-key global-map (kbd "C-c d d") `insert-current-date)
 
 (leaf leaf-convert
   :config
@@ -1388,4 +1415,65 @@ translation it is possible to get suggestion."
 	(with-eval-after-load 'flycheck
 	  '(add-hook 'flycheck-mode-hook #'flycheck-elm-setup))))
 
-(global-set-key (kbd "C-c C->") #'leaf-convert-region-replace)
+;; (global-set-key (kbd "C-c C->") #'leaf-convert-region-replace)
+
+(defun md-strs-list ()
+  (interactive)
+  (let* ((fs (read-string "Front string: "))
+		 (n (read-number "How many numbers?: "))
+		 (strs (loop repeat n
+					 collect (read-string "string: "))))
+	(insert (apply #'concat (mapcar #'(lambda (x) (format "%s %s\n\n" fs x))
+									strs)))
+	)
+  )
+
+;;; currentカーソルより前の#+1を出力する。
+;; (defun md-h-create ()
+;;   (interactive)
+;;   ())
+
+(leaf svelte-mode
+  :ensure t
+  :require t)
+
+
+(leaf merlin
+  :ensure t
+  :require t
+  :config
+  (with-eval-after-load 'company
+	(add-to-list 'company-backends 'merlin-company-backend)))
+
+(leaf tuareg
+  :ensure t
+  :require t)
+
+(leaf ocamlformat
+  :ensure t
+  :require t
+  :config
+  (add-hook 'before-save-hook #'ocamlformat-before-save)
+  (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat))
+
+(leaf caml
+  :ensure t
+  :require t
+  :config
+  (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
+    (when (and opam-share (file-directory-p opam-share))
+	  (autoload 'merlin-mode "merlin" nil t nil)
+	  (add-hook 'tuareg-mode-hook 'merlin-mode t)
+	  (add-hook 'caml-mode-hook 'merlin-mode t)
+	  (setq merlin-command 'opam)
+	  )))
+
+(lsp-register-client
+ (make-lsp-client
+  :new-connection (lsp-stdio-connection
+				   '("opam" "exec" "--" "ocamlmerlin-lsp"))
+  :major-modes '(caml-mode tuareg-mode)
+  :server-id 'ocamlmerlin-lsp))
+;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
+(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
+;; ## end of OPAM user-setup addition for emacs / base ## keep this line

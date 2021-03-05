@@ -744,11 +744,17 @@ translation it is possible to get suggestion."
 
 (global-set-key (kbd "M-y") 'counsel-yank-pop)
 
-;; (leaf elfeed
-;;   :ensure t
-;;   :require t
-;;   :config
-;;   (setf elfeed-feeds '("http://b.hatena.ne.jp/hotentry/it.rss" "http://elephant.2chblog.jp/index.rdf" "http://openstandia.jp/oss_info/atom.xml" "https://www.archlinux.org/feeds/packages/")))
+(leaf elfeed
+  :ensure t
+  :require t
+  :config
+  (setf elfeed-feeds '(
+					   "http://b.hatena.ne.jp/hotentry/it.rss"
+					   "https://news.ycombinator.com/rss"
+					   ;; "http://elephant.2chblog.jp/index.rdf"
+					   ;; "http://openstandia.jp/oss_info/atom.xml"
+					   ;; "https://www.archlinux.org/feeds/packages/"
+					   )))
 
 (leaf w3m
   :ensure t

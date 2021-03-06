@@ -744,6 +744,17 @@ translation it is possible to get suggestion."
 
 (global-set-key (kbd "M-y") 'counsel-yank-pop)
 
+(defun elfeed-w3m-open (&optional use-generic-p)
+  "open with w3m"
+  (interactive "P")
+  (let ((entries (elfeed-search-selected)))
+    (cl-loop for entry in entries
+             do (elfeed-untag entry 'unread)
+             when (elfeed-entry-link entry)
+             do (ffap-w3m-other-window it))
+    (mapc #'elfeed-search-update-entry entries)
+    (unless (use-region-p) (forward-line))))
+
 (leaf elfeed
   :ensure t
   :require t
@@ -754,7 +765,11 @@ translation it is possible to get suggestion."
 					   ;; "http://elephant.2chblog.jp/index.rdf"
 					   ;; "http://openstandia.jp/oss_info/atom.xml"
 					   ;; "https://www.archlinux.org/feeds/packages/"
-					   )))
+					   ))
+  (define-key elfeed-show-mode-map (kbd "o") 'elfeed-w3m-open)
+  (define-key elfeed-search-mode-map (kbd "t") 'elfeed-w3m-open)
+  (setq browse-url-browser-function 'w3m-browse-url)
+)
 
 (leaf w3m
   :ensure t

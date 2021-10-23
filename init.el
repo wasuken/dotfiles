@@ -72,10 +72,9 @@
 (show-paren-mode 1)
 
 (setq package-archives
-      '(("gnu" . "http://elpa.gnu.org/packages/")
-        ("melpa" . "http://melpa.org/packages/")
-        ("melpa2" . "http://melpa.milkbox.net/packages/") ;なぜ二つあるんだ
-        ("org" . "http://orgmode.org/elpa/")))
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ("org" . "https://orgmode.org/elpa/")))
 
 ;; keep the installed packages in .emacs.d
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
@@ -262,7 +261,9 @@
 
   (leaf magit
 	:ensure t
-	:bind (("C-x g" . magit-status)))
+	:bind (("C-x g" . magit-status))
+	:config
+	(define-key magit-mode-map (kbd "C-c p") #'magit-push-to-remote))
 
   (leaf ag
 	:ensure t

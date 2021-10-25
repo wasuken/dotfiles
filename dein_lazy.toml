@@ -1,0 +1,45 @@
+[[plugins]]
+repo = 'fatih/vim-go'
+on_ft = ['go']
+
+[[plugins]]
+repo = 'rcmdnk/vim-markdown'
+on_ft = ['md', 'markdown']
+
+[[plugins]]
+repo = 'godlygeek/tabular'
+on_ft = ['md', 'markdown']
+
+[[plugins]]
+repo = 'previm/previm'
+on_ft = ['md', 'markdown']
+
+[[plugins]]
+repo = 'evanleck/vim-svelte'
+on_ft = ['svelte']
+
+[[plugins]]
+repo = 'prettier/vim-prettier'
+on_ft = ['svelte']
+
+[[plugins]]
+repo = 'vim-ruby/vim-ruby'
+on_ft = ['rb']
+
+[[plugins]]
+repo = 'ruby-formatter/rufo-vim'
+on_ft = ['rb']
+
+[[plugins]]
+repo = 'pangloss/vim-javascript'
+on_ft = ['js']
+
+[[plugins]]
+repo = 'nvie/vim-flake8'
+on_ft = ['python']
+
+[[plugins]]
+repo = 'tell-k/vim-autopep8'
+on_ft = ['python']
+
+

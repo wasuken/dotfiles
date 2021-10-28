@@ -20,19 +20,19 @@ on_ft = ['svelte']
 
 [[plugins]]
 repo = 'prettier/vim-prettier'
-on_ft = ['svelte']
+on_ft = ['svelte', 'javascript', 'typescript', 'typescript.jsx', 'javascript.jsx']
 
 [[plugins]]
 repo = 'vim-ruby/vim-ruby'
-on_ft = ['rb']
+on_ft = ['ruby']
 
 [[plugins]]
 repo = 'ruby-formatter/rufo-vim'
-on_ft = ['rb']
+on_ft = ['ruby']
 
 [[plugins]]
 repo = 'pangloss/vim-javascript'
-on_ft = ['js']
+on_ft = ['javascript']
 
 [[plugins]]
 repo = 'nvie/vim-flake8'
@@ -42,4 +42,14 @@ on_ft = ['python']
 repo = 'tell-k/vim-autopep8'
 on_ft = ['python']
 
+[[plugins]]
+repo = 'leafgarland/typescript-vim'
+on_ft = ['typescript', 'typescript.jsx']
 
+[[plugins]]
+repo = 'peitalin/vim-jsx-typescript'
+on_ft = ['typescript.jsx']
+
+[[plugins]]
+repo = 'styled-components/vim-styled-components'
+on_ft = ['typescript.jsx', 'javascript.jsx']

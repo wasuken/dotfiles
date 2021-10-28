@@ -37,6 +37,7 @@ set clipboard=unnamed,autoselect
 let g:rufo_auto_formatting = 1
 
 nnoremap <Esc><Esc> :nohlsearch<CR><ESC>
+inoremap <silent> jj <ESC>
 
 syntax on
 filetype plugin indent on
@@ -44,10 +45,11 @@ set nrformats=
 set whichwrap=b,s,h,l,<,>,[,],~
 set mouse=a
 
-inoremap { {}<Left>
-inoremap {<Enter> {}<Left><CR><ESC><S-o>
-inoremap ( ()<ESC>i
-inoremap (<Enter> ()<Left><CR><ESC><S-o>
+inoremap { {}<LEFT>
+inoremap [ []<LEFT>
+inoremap ( ()<LEFT>
+inoremap " ""<LEFT>
+inoremap ' ''<LEFT>
 
 " vim-powerline start
 
@@ -217,7 +219,18 @@ augroup MyLsp
             \})
     autocmd FileType python call s:configure_lsp()
   endif
+  if executable('solargraph')
+      " gem install solargraph
+      au User lsp_setup call lsp#register_server({
+          \ 'name': 'solargraph',
+          \ 'cmd': {server_info->[&shell, &shellcmdflag, 'solargraph stdio']},
+          \ 'initialization_options': {"diagnostics": "true"},
+          \ 'whitelist': ['ruby'],
+          \ })
+  endif
+  autocmd FileType ruby call s:configure_lsp()
 augroup END
+
 " 言語ごとにServerが実行されたらする設定を関数化
 function! s:configure_lsp() abort
   setlocal omnifunc=lsp#complete   " オムニ補完を有効化

@@ -387,7 +387,8 @@
   :config
   (set-hooks '((clojure-mode-hook . paredit-mode)
 			   (clojure-mode-hook . subword-mode)
-			   (clojure-mode-hook . rainbow-delimiters-mode)))
+			   (clojure-mode-hook . rainbow-delimiters-mode)
+			   (clojure-mode-hook . lsp)))
   (g-set-keys '(("C-c C-l" . cider-repl-clear-buffer))))
 
 (leaf sayid
@@ -460,6 +461,16 @@
 					   (cider-repl-mode-hook . paredit-mode)
 					   (cider-repl-mode-hook . rainbow-delimiters-mode)))
   :require t)
+
+;;;
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-minimum-prefix-length 1
+      lsp-lens-enable t
+      lsp-signature-auto-activate nil
+      )
+;;;
 
 (leaf markdown-mode
   :ensure t
@@ -574,7 +585,7 @@
 				([remap kill-whole-line]
 				 . crux-kill-whole-line)
 				("C-c s" . crux-ispell-word-then-abbrev)))
-)
+  )
 
 (leaf diff-hl
   :ensure t
@@ -620,7 +631,7 @@
   (define-key ivy-minibuffer-map (kbd "RET") 'ivy-alt-done)
   (setq ivy-wrap t))
 
-(load (expand-file-name "~/.emacs.d/doom/load.el"))
+;; (load (expand-file-name "~/.emacs.d/doom/load.el"))
 
 (leaf ivy-rich
   :ensure t 'all-the-icons-ivy 'all-the-icons
@@ -671,7 +682,6 @@
 				("C-c k" . counsel-ag)
 				("C-x l" . counsel-locate)))
   :require t)
-
 
 ;; (minibuffer-local-map
 ;;  ("C-r" . counsel-minibuffer-history))
@@ -769,7 +779,7 @@ translation it is possible to get suggestion."
   (define-key elfeed-show-mode-map (kbd "o") 'elfeed-w3m-open)
   (define-key elfeed-search-mode-map (kbd "t") 'elfeed-w3m-open)
   (setq browse-url-browser-function 'w3m-browse-url)
-)
+  )
 
 (leaf w3m
   :ensure t
@@ -922,9 +932,9 @@ translation it is possible to get suggestion."
   :require t
   :commands lsp-ui-mode)
 
-(leaf company-lsp
-  :ensure t
-  :require t)
+;; (leaf company-lsp
+;;   :ensure t
+;;   :require t)
 
 (leaf java-imports
   :ensure t
@@ -998,51 +1008,59 @@ translation it is possible to get suggestion."
   :require t
   :config
   ;; koko
-  (add-to-list 'eglot-server-programs
-			   `(haskell-mode . ("/home/wasu/.local/bin/haskell-language-server-8.8.4" "--lsp")))
   )
 
-(leaf company-ghci
-  :ensure t
-  :require t
-  :config
-  (push 'company-ghci company-backends)
-  (add-hook 'haskell-mode-hook 'company-mode)
-  (add-hook 'haskell-interactive-mode-hook 'company-mode))
+;; (leaf company-ghci
+;;   :ensure t
+;;   :require t
+;;   :config
+;;   (push 'company-ghci company-backends)
+;;   (add-hook 'haskell-mode-hook 'company-mode)
+;;   (add-hook 'haskell-interactive-mode-hook 'company-mode))
 
-(leaf lsp-haskell
-  :ensure t
-  :require t
-  :config)
+;; (leaf lsp-haskell
+;;   :ensure t
+;;   :require t
+;;   :config)
+
+;; (leaf haskell-mode
+;;   :ensure t
+;;   :hook ((haskell-mode-hook . lsp)
+;; 		 (haskell-mode-hook . (lambda ()
+;; 								(flycheck-mode -1))))
+;;   :config
+;;   (setf haskell-mode-stylish-haskell-path
+;; 		"stylish-haskell")
+;;   (setq haskell-process-type 'stack-ghci)
+;;   (custom-set-variables '(haskell-stylish-on-save t))
+;;   (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+;;   (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+;;   (add-hook 'haskell-mode-hook 'linum-mode)
+;;   (add-to-list 'exec-path "~/.local/bin")
+;;   (setq haskell-hoogle-command "hoogle")
+;;   (eval-after-load 'haskell-mode '(progn
+;; 									(define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
+;; 									(define-key haskell-mode-map (kbd "C-c C-n C-t") 'haskell-process-do-type)
+;; 									(define-key haskell-mode-map (kbd "C-c C-n C-i") 'haskell-process-do-info)
+;; 									(define-key haskell-mode-map "\C-oh" 'haskell-hoogle)
+;; 									))
+;;   (eval-after-load 'haskell-cabal '(progn
+;; 									 (define-key haskell-cabal-mode-map (kbd "C-c C-k") 'haskell-interactive-ode-clear)
+;; 									 (define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
+;; 									 (define-key haskell-cabal-mode-map (kbd "C-c c") 'haskell-process-cabal)))
+;;   )
 
 (leaf haskell-mode
   :ensure t
-  :hook ((haskell-mode-hook . lsp)
-		 (haskell-mode-hook . (lambda ()
-								(flycheck-mode -1))))
+  :require t
   :config
-  (setf haskell-mode-stylish-haskell-path
-		"stylish-haskell")
-  (setq haskell-process-type 'stack-ghci)
-  (custom-set-variables '(haskell-stylish-on-save t))
-  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
-  (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-  (add-hook 'haskell-mode-hook 'linum-mode)
-  (add-to-list 'exec-path "~/.local/bin")
-  (setq haskell-hoogle-command "hoogle")
-  (eval-after-load 'haskell-mode '(progn
-									(define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
-									(define-key haskell-mode-map (kbd "C-c C-n C-t") 'haskell-process-do-type)
-									(define-key haskell-mode-map (kbd "C-c C-n C-i") 'haskell-process-do-info)
-									(define-key haskell-mode-map "\C-oh" 'haskell-hoogle)
-									))
-  (eval-after-load 'haskell-cabal '(progn
-									 (define-key haskell-cabal-mode-map (kbd "C-c C-k") 'haskell-interactive-ode-clear)
-									 (define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
-									 (define-key haskell-cabal-mode-map (kbd "C-c c") 'haskell-process-cabal)))
-  )
+  (setq haskell-stylish-on-save t))
 
-(load (expand-file-name "~/.emacs.d/myel/me.el"))
+(leaf lsp-haskell
+  :ensure t
+  :require t)
+
+;; (load (expand-file-name "~/.emacs.d/myel/me.el"))
 
 (load (expand-file-name "~/.roswell/helper.el"))
 
@@ -1364,3 +1382,108 @@ translation it is possible to get suggestion."
 	(loop for i from 1 to n
 		  do (setf rst (concatenate 'string rst (random-alnum))))
 	(insert rst)))
+
+(leaf doom-themes
+  :ensure t neotree
+  :custom
+  (doom-themes-enable-italic . nil)
+  (doom-themes-enable-bold . nil)
+  :config
+  (load-theme 'doom-tomorrow-night t)
+  (doom-themes-neotree-config)
+  (doom-themes-org-config)
+  )
+
+(defvar *create-md-link-url* "")
+
+(defun create-md-link ()
+  (interactive)
+  (setq *create-md-link-url* (read-string "url: "))
+  (request
+	  *create-md-link-url*
+	  :parser 'buffer-string
+	  :error (function* (lambda (&key error-thrown &allow-other-keys&rest _)
+						  (message "Got error: %S" error-thrown)))
+	  :success (function*
+				(lambda (&key data &allow-other-keys)
+				  (string-match "<title>\\(.*?\\)</title>" data)
+				  (insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
+
+(global-set-key (kbd "C-c l") #'create-md-link)
+
+(defun jq-format (beg end)
+  (interactive "r")
+  (shell-command-on-region beg end "jq ." nil t))
+;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
+(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
+;; ## end of OPAM user-setup addition for emacs / base ## keep this line
+
+;; for (xml-escape-string)
+(require 'xml)
+
+
+
+;; see http://developer.hatena.ne.jp/ja/documents/blog/apis/atom
+(setq my-hatena-id "saborin78")
+(setq my-hatena-blog-api-key  "fhv2c4ub8p")
+(setq my-hatena-blog-id "mintblog.hatenablog.com")
+(setq my-hatena-blog-file-path "~/blog/post.md")
+(setq my-hatena-blog-backup-dir "~/blog/bkup/")
+(setq my-hatena-blog-xml-template "<?xml version='1.0' encoding='utf-8'?>
+<entry xmlns='http://www.w3.org/2005/Atom'
+       xmlns:app='http://www.w3.org/2007/app'>
+  <title>%s</title>
+  <author><name>%s</name></author>
+  <content type='text/plain'>%s</content>
+  <updated>%s</updated>
+  <category term='%s' />
+  <app:control>
+    <app:draft>%s</app:draft>
+  </app:control>
+</entry>")
+
+(defun my-hatena-blog-build-xml ()
+  (interactive)
+  (let ((blog-title (read-string "Title: "
+                                 (save-excursion (beginning-of-buffer)
+                                                 (search-forward-regexp "#* \\(.*\\)" nil t)
+                                                 (match-string 1))))
+        (blog-category (read-string "Category: "))
+        (blog-is-draft (if (y-or-n-p "Send as draft? ") "yes" "no")))
+    (princ (format my-hatena-blog-xml-template
+                   (xml-escape-string blog-title)
+                   my-hatena-id
+                   (xml-escape-string (buffer-string))
+                   (format-time-string "%Y-%m-%dT%H:%M:%S")
+                   (xml-escape-string blog-category)
+                   blog-is-draft))))
+
+(defun my-hatena-blog-post2 ()
+  (interactive)
+  (let* ((url-request-method "POST")
+         (url-request-extra-headers
+          `(("Content-Type" . "application/x-www-form-urlencoded")
+            ("Authorization" . ,(concat "Basic " (base64-encode-string (concat my-hatena-id ":" my-hatena-blog-api-key))))))
+         (url-request-data
+          (encode-coding-string (my-hatena-blog-build-xml) 'utf-8))
+         (post-url (format "https://blog.hatena.ne.jp/%s/%s/atom/entry" my-hatena-id my-hatena-blog-id)))
+
+    (url-retrieve post-url (lambda (data)
+                             (with-current-buffer (current-buffer)
+                               (if (search-forward-regexp "HTTP/1.1 201 Created" nil t)
+                                   (message "Entry created.")
+                               (progn
+                                 (message "failed!"))))))));
+
+(defun my-hatena-blog-write ()
+  (interactive)
+  (find-file my-hatena-blog-file-path))
+
+(defun my-hatena-blog-post ()
+  (interactive)
+  (my-hatena-blog-post2)
+  (write-file (concat my-hatena-blog-backup-dir (format-time-string "%Y-%m-%d-%H-%M-%S") ".md"))
+  (move-file-to-trash my-hatena-blog-file-path))
+
+(global-set-key (kbd "C-c b w") #'my-hatena-blog-write)
+(define-key markdown-mode-map (kbd "C-c b p") #'my-hatena-blog-post)

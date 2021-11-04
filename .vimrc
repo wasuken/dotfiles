@@ -50,6 +50,8 @@ Plug 'tpope/vim-fugitive'
 Plug 'vim-airline/vim-airline'
 Plug 'EinfachToll/DidYouMean'
 Plug 'ervandew/supertab'
+Plug 'justmao945/vim-clang'
+Plug 'vim-scripts/SingleCompile'
 
 call plug#end()
 

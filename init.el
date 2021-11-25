@@ -956,6 +956,13 @@ translation it is possible to get suggestion."
 		  (lambda ()
             (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix)))
 
+(leaf eglot
+  :ensure t
+  :require t
+  :config
+  ;; koko
+  )
+
 (leaf python
   :ensure t
   :require t
@@ -963,7 +970,17 @@ translation it is possible to get suggestion."
   (setq python-shell-interpreter "python")
   (setq auto-mode-alist (cons
 						 '("\\.py$'" . python-mode)
-						 auto-mode-alist)))
+						 auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.py$" . python-mode) auto-mode-alist))
+  (setq interpreter-mode-alist (cons '("python" . python-mode)
+									 interpreter-mode-alist))
+
+  (add-hook 'python-mode-hook 'eglot-ensure)
+
+  (add-to-list 'eglot-server-programs
+               `(python-mode . ("pyls" "-v" "--tcp" "--host"
+								"localhost" "--port" :autoport))))
+
 
 (defun insert-current-time()
   (interactive)
@@ -1002,13 +1019,6 @@ translation it is possible to get suggestion."
 (leaf ht
   :ensure t
   :require t)
-
-(leaf eglot
-  :ensure t
-  :require t
-  :config
-  ;; koko
-  )
 
 ;; (leaf company-ghci
 ;;   :ensure t
@@ -1370,6 +1380,12 @@ translation it is possible to get suggestion."
 	(add-hook 'shell-mode-hook 'emoji-cheat-sheet-plus-display-mode)
     (global-set-key (kbd "C-c C-e") 'emoji-cheat-sheet-plus-insert)))
 
+(leaf yapfify
+  :ensure t
+  :require t
+  :config
+  (add-hook 'python-mode-hook 'yapf-mode))
+
 (defun random-alnum ()
   (let* ((alnum "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
          (i (% (abs (random)) (length alnum))))
@@ -1400,14 +1416,14 @@ translation it is possible to get suggestion."
   (interactive)
   (setq *create-md-link-url* (read-string "url: "))
   (request
-	  *create-md-link-url*
-	  :parser 'buffer-string
-	  :error (function* (lambda (&key error-thrown &allow-other-keys&rest _)
-						  (message "Got error: %S" error-thrown)))
-	  :success (function*
-				(lambda (&key data &allow-other-keys)
-				  (string-match "<title>\\(.*?\\)</title>" data)
-				  (insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
+	*create-md-link-url*
+	:parser 'buffer-string
+	:error (function* (lambda (&key error-thrown &allow-other-keys&rest _)
+						(message "Got error: %S" error-thrown)))
+	:success (function*
+			  (lambda (&key data &allow-other-keys)
+				(string-match "<title>\\(.*?\\)</title>" data)
+				(insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
 
 (global-set-key (kbd "C-c l") #'create-md-link)
 
@@ -1472,8 +1488,8 @@ translation it is possible to get suggestion."
                              (with-current-buffer (current-buffer)
                                (if (search-forward-regexp "HTTP/1.1 201 Created" nil t)
                                    (message "Entry created.")
-                               (progn
-                                 (message "failed!"))))))));
+								 (progn
+                                   (message "failed!"))))))));
 
 (defun my-hatena-blog-write ()
   (interactive)

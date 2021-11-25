@@ -1,0 +1,57 @@
+[[plugins]]
+repo = 'fatih/vim-go'
+on_ft = ['go']
+
+[[plugins]]
+repo = 'rcmdnk/vim-markdown'
+on_ft = ['md', 'markdown']
+
+[[plugins]]
+repo = 'godlygeek/tabular'
+on_ft = ['md', 'markdown']
+
+[[plugins]]
+repo = 'previm/previm'
+on_ft = ['md', 'markdown']
+
+[[plugins]]
+repo = 'evanleck/vim-svelte'
+on_ft = ['svelte']
+
+[[plugins]]
+repo = 'vim-ruby/vim-ruby'
+on_ft = ['ruby']
+
+[[plugins]]
+repo = 'ruby-formatter/rufo-vim'
+on_ft = ['ruby']
+
+[[plugins]]
+repo = 'pangloss/vim-javascript'
+on_ft = ['javascript']
+
+[[plugins]]
+repo = 'nvie/vim-flake8'
+on_ft = ['python']
+
+[[plugins]]
+repo = 'tell-k/vim-autopep8'
+on_ft = ['python']
+
+[[plugins]]
+repo = 'leafgarland/typescript-vim'
+on_ft = ['typescript', 'typescript.jsx']
+
+[[plugins]]
+repo = 'peitalin/vim-jsx-typescript'
+on_ft = ['typescript.jsx']
+
+[[plugins]]
+repo = 'styled-components/vim-styled-components'
+on_ft = ['typescript.jsx', 'javascript.jsx']
+
+[[plugins]]
+repo = 'prettier/vim-prettier'
+on_ft = ['jsx', 'tsx', 'javascript.jsx', 'typescript.jsx', 'css', 'scss', 'json', 'markdown']
+build = 'npm install'
+

@@ -38,6 +38,9 @@ let g:rufo_auto_formatting = 1
 
 nnoremap <Esc><Esc> :nohlsearch<CR><ESC>
 inoremap <silent> jj <ESC>
+nmap <C-l> :tabnext<CR>
+
+nnoremap <silent> gf :e .<CR><ESC>
 
 syntax on
 filetype plugin indent on
@@ -50,6 +53,17 @@ inoremap [ []<LEFT>
 inoremap ( ()<LEFT>
 inoremap " ""<LEFT>
 inoremap ' ''<LEFT>
+
+inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
+nnoremap <C-P> :call PhpDocSingle()<CR>
+vnoremap <C-P> :call PhpDocRange()<CR>
+
+let g:pdv_cfg_Type = "mixed"
+let g:pdv_cfg_Package = ""
+let g:pdv_cfg_Version = ""
+let g:pdv_cfg_Author = "wasuken <wasuken1@gmail.com>"
+let g:pdv_cfg_Copyright = ""
+let g:pdv_cfg_License = "mit"
 
 " vim-powerline start
 

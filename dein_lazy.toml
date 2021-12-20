@@ -19,10 +19,6 @@ repo = 'evanleck/vim-svelte'
 on_ft = ['svelte']
 
 [[plugins]]
-repo = 'prettier/vim-prettier'
-on_ft = ['svelte', 'javascript', 'typescript', 'typescript.jsx', 'javascript.jsx']
-
-[[plugins]]
 repo = 'vim-ruby/vim-ruby'
 on_ft = ['ruby']
 
@@ -53,3 +49,11 @@ on_ft = ['typescript.jsx']
 [[plugins]]
 repo = 'styled-components/vim-styled-components'
 on_ft = ['typescript.jsx', 'javascript.jsx']
+
+[[plugins]]
+repo = 'prettier/vim-prettier'
+on_ft = ['typescript.jsx', 'javascript.jsx', 'prettier']
+
+[[plugins]]
+repo = 'vim-scripts/PDV--phpDocumentor-for-Vim'
+on_ft = ['php']

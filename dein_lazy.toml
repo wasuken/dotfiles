@@ -57,3 +57,11 @@ on_ft = ['typescript.jsx', 'javascript.jsx', 'prettier']
 [[plugins]]
 repo = 'vim-scripts/PDV--phpDocumentor-for-Vim'
 on_ft = ['php']
+
+[[plugins]]
+repo = 'dag/vim-fish'
+on_ft = ['fish']
+
+[[plugins]]
+repo = 'rust-lang/rust.vim'
+on_ft = ['rust']

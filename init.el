@@ -8,9 +8,9 @@
       '(("t" "TODO" entry (file+headline "~/todo/todo.org" "Inbox")
          "*** %?\n    CAPTURED_AT: %a\n    %i")))
 
-; macOS専用処理
+										; macOS専用処理
 (when (equal system-type 'darwin)
-  ; 最小化無効
+										; 最小化無効
   (global-set-key "\C-z" nil)
   (define-key global-map [?¥] [?\\]))
 
@@ -175,6 +175,11 @@
 (unless (package-installed-p 'leaf)
   (package-install 'leaf))
 
+(defconst my:d:tmp
+  (expand-file-name ".cache/emacs/" (getenv "HOME")))
+(unless (file-directory-p my:d:tmp)
+  (make-directory my:d:tmp))
+
 (require 'leaf)
 
 (add-to-list 'load-path "~/dotfiles/me")
@@ -206,7 +211,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-jump-buffer all-the-icons smartparens ace-jump docker-compose-mode mwim dockerfile docker-compose nwim side-hustle orderless vertico smartparen doom-themes zop-to-char zenburn-theme yaml-mode which-key web-mode w3m vue-mode use-package undo-tree typescript-mode twittering-mode twig-mode tuareg svelte-mode super-save sayid rustic robe rjsx-mode rainbow-mode rainbow-delimiters racer quickrun python-pytest pug-mode pt protobuf-mode php-mode pdf-tools parsec ocamlformat nvm neotree multi-term mozc move-text merlin magit-popup magit lsp-ui lsp-scala lsp-ruby lsp-java lsp-haskell leaf-convert julia-mode javadoc-lookup java-imports iter2 intero imenu-anywhere howm helm-fish-completion google-translate golden-ratio go-mode fsharp-mode flycheck-pos-tip flycheck-clojure fish-mode expand-region exec-path-from-shell ess-R-data-view ensime emmet-mode elscreen elm-mode elisp-slime-nav elfeed edn easy-kill dotnet dockerfile-mode dired-subtree diff-hl csharp-mode crux counsel company-lsp clj-refactor cask-mode cargo anzu ammonite-term-repl ag ace-jump-mode)))
+   '(slime skk-hint recentf-ext embark-consult ace-jump-buffer all-the-icons smartparens ace-jump docker-compose-mode mwim dockerfile docker-compose nwim side-hustle orderless vertico smartparen doom-themes zop-to-char zenburn-theme yaml-mode which-key web-mode w3m vue-mode use-package undo-tree typescript-mode twittering-mode twig-mode tuareg svelte-mode super-save sayid rustic robe rjsx-mode rainbow-mode rainbow-delimiters racer quickrun python-pytest pug-mode pt protobuf-mode php-mode pdf-tools parsec ocamlformat nvm neotree multi-term mozc move-text merlin magit-popup magit lsp-ui lsp-scala lsp-ruby lsp-java lsp-haskell leaf-convert julia-mode javadoc-lookup java-imports iter2 intero imenu-anywhere howm helm-fish-completion google-translate golden-ratio go-mode fsharp-mode flycheck-pos-tip flycheck-clojure fish-mode expand-region exec-path-from-shell ess-R-data-view ensime emmet-mode elscreen elm-mode elisp-slime-nav elfeed edn easy-kill dotnet dockerfile-mode dired-subtree diff-hl csharp-mode crux counsel company-lsp clj-refactor cask-mode cargo anzu ammonite-term-repl ag ace-jump-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -235,7 +240,12 @@
   :init
   (savehist-mode 1)
   (push 'compile-command savehist-additional-variables)
-  (push 'command-history savehist-ignored-variables))
+  (push 'command-history savehist-ignored-variables)
+  :custom
+  `((savehist-file
+     . ,(expand-file-name "history" my:d:tmp)))
+  :hook
+  ((after-init-hook . savehist-mode)))
 
 (leaf whitespace
   :ensure t
@@ -296,10 +306,10 @@
 		lsp-ui-sideline-enable nil)
   )
 
-(leaf company-lsp
-  :ensure t
-  :require t
-  :commands company-lsp)
+;; (leaf company-lsp
+;;   :ensure t
+;;   :require t
+;;   :commands company-lsp)
 
 (leaf mwim
   :ensure t
@@ -324,11 +334,31 @@
   (global-set-key (kbd "C-;") 'ace-jump-word-mode)
   (global-set-key (kbd "C-M-;") 'ace-jump-line-mode))
 
+(defun tab-move-right ()
+    (interactive)
+    (let* ((ix (tab-bar--current-tab-index))
+           (n-tabs (length (funcall tab-bar-tabs-function)))
+           (next-ix (mod (+ ix 1) n-tabs)))
+        ;; use 1-based index
+        (tab-bar-move-tab-to (+ 1 next-ix))))
+
+(defun tab-move-left ()
+    (interactive)
+    (let* ((ix (tab-bar--current-tab-index))
+           (n-tabs (length (funcall tab-bar-tabs-function)))
+           (next-ix (mod (+ ix n-tabs -1) n-tabs)))
+        ;; use 1-based index
+        (tab-bar-move-tab-to (+ 1 next-ix))))
+
 (leaf tab-bar
   :ensure t
   :require t
   :config
-  (tab-bar-mode 1))
+  (tab-bar-mode 1)
+  (global-set-key (kbd "C-M->") 'tab-move-right)
+  (global-set-key (kbd "C-M-<") 'tab-move-light)
+  (global-set-key (kbd "C-c n") 'tab-bar-new-tab)
+  )
 
 (leaf neotree
   :ensure t
@@ -384,4 +414,232 @@
 			  '(mac ns))
 	(exec-path-from-shell-initialize)))
 
-(leaf )
+(leaf projectile
+  :ensure t
+  :require t
+  :config
+  (projectile-mode +1)
+  ;; Recommended keymap prefix on macOS
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  ;; Recommended keymap prefix on Windows/Linux
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+
+;; Example configuration for Consult
+(leaf consult
+  :require t
+  :ensure t
+  ;; :map isearch-mode-map
+  :bind (;; C-c bindings (mode-specific-map)
+         ("C-c h" . consult-history)
+         ("C-c m" . consult-mode-command)
+         ("C-c b" . consult-bookmark)
+         ("C-c k" . consult-kmacro)
+         ;; C-x bindings (ctl-x-map)
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ("<help> a" . consult-apropos)            ;; orig. apropos-command
+         ;; M-g bindings (goto-map)
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings (search-map)
+         ("M-s f" . consult-find)
+         ("M-s F" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s m" . consult-multi-occur)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI. You may want to also
+  ;; enable `consult-preview-at-point-mode` in Embark Collect buffers.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  (setq consult-preview-key 'any)
+  (setq consult-preview-key (kbd "M-."))
+  (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
+   :preview-key (kbd "M-."))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; Optionally configure a function which returns the project root directory.
+  ;; There are multiple reasonable alternatives to chose from.
+  ;;;; 1. project.el (project-roots)
+  (setq consult-project-root-function
+        (lambda ()
+          (when-let (project (project-current))
+            (car (project-roots project)))))
+  ;; 2. projectile.el (projectile-project-root)
+  (autoload 'projectile-project-root "projectile")
+  (setq consult-project-root-function #'projectile-project-root)
+  ;; 3. vc.el (vc-root-dir)
+  (setq consult-project-root-function #'vc-root-dir)
+  ;; 4. locate-dominating-file
+  (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
+  )
+
+;; Enable richer annotations using the Marginalia package
+(leaf marginalia
+  :require t
+  :ensure t
+  ;; :map minibuffer-local-map
+  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+  :bind (("M-A" . marginalia-cycle)
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init configuration is always executed (Not lazy!)
+  :init
+
+  ;; Must be in the :init section of use-package such that the mode gets
+  ;; enabled right away. Note that this forces loading the package.
+  (marginalia-mode))
+
+(leaf embark
+  :ensure t
+  :require t
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-c ," . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :config
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(leaf embark-consult
+  :require t
+  :ensure t
+  :after (embark consult)
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+
+(leaf recentf
+  :ensure t
+  :require t
+  :config
+  (setq recentf-save-file "~/.emacs.d/.recentf")
+  (setq recentf-max-saved-items 1000)            ;; recentf に保存するファイルの数
+  (setq recentf-exclude '(".recentf"))           ;; .recentf自体は含まない
+  ;;(setq recentf-auto-cleanup 'never)             ;; 保存する内容を整理
+  (run-with-idle-timer 30 t '(lambda ()          ;; 30秒ごとに .recentf を保存
+							   (with-suppressed-message (recentf-save-list))))
+  )
+
+(leaf recentf-ext
+  :ensure t
+  :require t
+  )
+
+(leaf autorevert
+  :custom
+  ((auto-revert-interval . 0.1))
+  :hook
+  (emacs-startup-hook . global-auto-revert-mode)
+  )
+
+(leaf migemo
+  :if (executable-find "cmigemo")
+  :ensure t
+  ;; :require t
+  :custom
+  '((migemo-user-dictionary  . nil)
+    (migemo-regex-dictionary . nil)
+    (migemo-options          . '("-q" "--emacs"))
+    (migemo-command          . "cmigemo")
+    (migemo-coding-system    . 'utf-8-unix))
+  :init
+  (cond
+   ((and (eq system-type 'darwin)
+         (file-directory-p "/usr/local/share/migemo/utf-8/"))
+    (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict"))
+   (t
+    (setq migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict")))
+  :hook
+  (after-init-hook . migemo-init)
+  )
+
+(setq default-input-method "japanese-skk")
+(global-set-key (kbd "C-c C-j") 'skk-mode)
+(global-set-key (kbd "C-x j") 'skk-auto-fill-mode)
+(setq skk-large-jisyo "/usr/share/skk/SKK-JISYO.L")
+
+(leaf slime
+  :ensure t
+  :require t)

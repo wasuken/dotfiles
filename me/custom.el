@@ -9,7 +9,8 @@
 																","
 																left)
 												   cur-strs)
-						 right))  (print right)))
+						 right))
+	(print right)))
 (defun replace-dc ()
   (interactive)
   (replace-sepa "\""))
@@ -38,3 +39,19 @@
 
 (global-set-key (kbd "C->") 'other-window)
 (global-set-key (kbd "C-<") (lambda () (interactive) (other-window -1)))
+
+(defun insert-hugo-header ()
+  (interactive)
+  (goto-char 0)
+  (let ((ts (format-time-string "%Y-%m-%dT%T"))
+		(title (read-string "title: ")))
+	(insert (format "---
+title: \"%s\"
+date: %s
+draft: false
+---
+" title ts))
+	)
+  )
+
+(global-set-key (kbd "C-c i h") 'insert-hugo-header)

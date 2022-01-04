@@ -128,6 +128,8 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 ;; revert buffers automatically when underlying files are changed externally
 (global-auto-revert-mode t)
 
@@ -287,7 +289,10 @@
   :require t
   :config
   (setq lsp-prefer-flymake nil)
-  :hook (php-mode . lsp)
+  (setq lsp-rust-server 'rust-analyzer)
+  :bind ("C-c h" . lsp-describe-thing-at-point)
+  :hook ((php-mode . lsp)
+		 (rust-mode . lsp))
   :commands lsp)
 
 (leaf lsp-ui
@@ -306,10 +311,12 @@
 		lsp-ui-sideline-enable nil)
   )
 
-;; (leaf company-lsp
-;;   :ensure t
-;;   :require t
-;;   :commands company-lsp)
+(leaf company-lsp
+  :commands company-lsp)
+
+(leaf yasnippet
+  :ensure t
+  :require t)
 
 (leaf mwim
   :ensure t
@@ -356,7 +363,7 @@
   :config
   (tab-bar-mode 1)
   (global-set-key (kbd "C-M->") 'tab-move-right)
-  (global-set-key (kbd "C-M-<") 'tab-move-light)
+  (global-set-key (kbd "C-M-<") 'tab-move-left)
   (global-set-key (kbd "C-c n") 'tab-bar-new-tab)
   )
 
@@ -643,3 +650,27 @@
 (leaf slime
   :ensure t
   :require t)
+
+(add-to-list 'exec-path (expand-file-name "~/.cargo/bin"))
+(add-to-list 'exec-path (expand-file-name "~/.local/rust/bin"))
+
+(leaf rust-mode
+  :require t
+  :ensure t
+  :config
+  (setq rust-format-on-save t)
+  (add-hook 'rust-mode-hook (lambda ()
+                              (flycheck-rust-setup)
+                              (lsp)
+                              (flycheck-mode)
+							  (yas-minor-mode)
+                              )))
+
+(leaf flycheck-rust
+  :ensure t
+  :require t)
+
+(leaf cargo
+  :require t
+  :ensure t
+  :hook (rust-mode . cargo-minor-mode))

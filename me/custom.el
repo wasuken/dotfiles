@@ -43,12 +43,17 @@
 (defun insert-hugo-header ()
   (interactive)
   (goto-char 0)
-  (let ((ts (format-time-string "%Y-%m-%dT%T"))
+  (let ((ts (format-time-string "%Y-%m-%d"))
 		(title (read-string "title: ")))
 	(insert (format "---
 title: \"%s\"
+description:
 date: %s
 draft: false
+categories:
+  - ""
+tags:
+  - ""
 ---
 " title ts))
 	)

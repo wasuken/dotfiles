@@ -51,9 +51,9 @@ description:
 date: %s
 draft: false
 categories:
-  - ""
+  - \"\"
 tags:
-  - ""
+  - \"\"
 ---
 " title ts))
 	)

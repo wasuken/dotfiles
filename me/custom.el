@@ -60,3 +60,53 @@ tags:
   )
 
 (global-set-key (kbd "C-c i h") 'insert-hugo-header)
+
+(require 'request)
+
+(defvar *create-md-link-url* "")
+
+(defun create-md-link ()
+  (interactive)
+  (setq *create-md-link-url* (read-string "url: "))
+  (request
+	*create-md-link-url*
+	:parser 'buffer-string
+	:error (function* (lambda (&key error-thrown &allow-other-keys&rest _)
+						(message "Got error: %S" error-thrown)))
+	:success (function*
+			  (lambda (&key data &allow-other-keys)
+				(string-match "<title>\\(.*?\\)</title>" data)
+				(insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
+
+(global-set-key (kbd "C-c l") #'create-md-link)
+
+;; 縦サイズをcntで分割して、小さい方の割合と、残ったサイズを返却
+(defun window-height-div (
+					   cnt				;分割数
+					   sm-ratio			;小さい方の割合
+					   )
+  (let* ((fh (frame-height))
+		 (fh-one (/ fh cnt))
+		 (small (* fh-one sm-ratio))
+		 (big (* fh-one (- cnt sm-ratio))))
+	`(,small ,big)
+	)
+  )
+
+(defun window-adjust (f)
+  (let* ((sm-big (window-height-div 3 1)))
+	(funcall f sm-big)))
+
+(defun adjust-height (hei)
+  (- hei (window-height)))
+
+(defun window-adjust-sm ()
+  (interactive)
+  (enlarge-window (window-adjust #'(lambda (x) (- (car x) (window-height))))))
+
+(defun window-adjust-big ()
+  (interactive)
+  (enlarge-window (window-adjust #'(lambda (x) (- (cadr x) (window-height))))))
+
+(global-set-key (kbd "C-c w s") #'window-adjust-sm)
+(global-set-key (kbd "C-c w b") #'window-adjust-big)

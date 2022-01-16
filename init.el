@@ -157,6 +157,8 @@
 ;; replace buffer-menu with ibuffer
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
+
+
 ;; align code in a pretty way
 (global-set-key (kbd "C-x \\") #'align-regexp)
 
@@ -364,7 +366,12 @@
   (tab-bar-mode 1)
   (global-set-key (kbd "C-M->") 'tab-move-right)
   (global-set-key (kbd "C-M-<") 'tab-move-left)
-  (global-set-key (kbd "C-c n") 'tab-bar-new-tab)
+  (global-set-key (kbd "C-c C-t w") #'tab-bar-new-tab)
+  (global-set-key (kbd "C-c C-t t") #'tab-bar-switch-to-tab)
+  (global-set-key (kbd "C-c C-t n") #'tab-bar-switch-to-next-tab)
+  (global-set-key (kbd "C-c C-t p") #'tab-bar-switch-to-prev-tab)
+  (global-set-key (kbd "C-c C-t c") #'tab-bar-close-tab)
+  ;; (global-set-key (kbd "C-c C-t") #'tab-bar-switch-to-next-tab)
   )
 
 (leaf neotree

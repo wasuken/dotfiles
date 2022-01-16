@@ -686,5 +686,4 @@
   :ensure t
   :require t
   :config
-  (define-key magit-mode-map (kbd "C-c g P") #'magit-push-to-remote)
   )

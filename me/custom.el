@@ -71,9 +71,9 @@ tags:
   (request
 	*create-md-link-url*
 	:parser 'buffer-string
-	:error (function* (lambda (&key error-thrown &allow-other-keys&rest _)
+	:error (cl-function (lambda (&key error-thrown &allow-other-keys&rest _)
 						(message "Got error: %S" error-thrown)))
-	:success (function*
+	:success (cl-function
 			  (lambda (&key data &allow-other-keys)
 				(string-match "<title>\\(.*?\\)</title>" data)
 				(insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))

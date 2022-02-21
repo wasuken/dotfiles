@@ -425,7 +425,7 @@
   :require t
   :config
   (when (memq window-system
-			  '(mac ns))
+			  '(mac ns x))
 	(exec-path-from-shell-initialize)))
 
 (leaf projectile
@@ -686,4 +686,11 @@
   :ensure t
   :require t
   :config
+  )
+
+(leaf golden-ratio
+  :ensure t
+  :require t
+  :config
+  (global-set-key (kbd "C-c r") 'golden-ratio)
   )

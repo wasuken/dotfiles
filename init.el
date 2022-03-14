@@ -215,7 +215,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(flycheck-rust embark marginalia consult slime skk-hint recentf-ext embark-consult ace-jump-buffer all-the-icons smartparens ace-jump docker-compose-mode mwim dockerfile docker-compose nwim side-hustle orderless vertico smartparen doom-themes zop-to-char zenburn-theme yaml-mode which-key web-mode w3m vue-mode use-package undo-tree typescript-mode twittering-mode twig-mode tuareg svelte-mode super-save sayid rustic robe rjsx-mode rainbow-mode rainbow-delimiters racer quickrun python-pytest pug-mode pt protobuf-mode php-mode pdf-tools parsec ocamlformat nvm neotree multi-term mozc move-text merlin magit-popup magit lsp-ui lsp-scala lsp-ruby lsp-java lsp-haskell leaf-convert julia-mode javadoc-lookup java-imports iter2 intero imenu-anywhere howm helm-fish-completion google-translate golden-ratio go-mode fsharp-mode flycheck-pos-tip flycheck-clojure fish-mode expand-region exec-path-from-shell ess-R-data-view ensime emmet-mode elscreen elm-mode elisp-slime-nav elfeed edn easy-kill dotnet dockerfile-mode dired-subtree diff-hl csharp-mode crux counsel company-lsp clj-refactor cask-mode cargo anzu ammonite-term-repl ag ace-jump-mode)))
+   '(dumb-jump dump-jump avy-migemo emmet prettier markdown-preview-mode markdown flycheck-rust embark marginalia consult slime skk-hint recentf-ext embark-consult ace-jump-buffer all-the-icons smartparens ace-jump docker-compose-mode mwim dockerfile docker-compose nwim side-hustle orderless vertico smartparen doom-themes zop-to-char zenburn-theme yaml-mode which-key web-mode w3m vue-mode use-package undo-tree typescript-mode twittering-mode twig-mode tuareg svelte-mode super-save sayid rustic robe rjsx-mode rainbow-mode rainbow-delimiters racer quickrun python-pytest pug-mode pt protobuf-mode php-mode pdf-tools parsec ocamlformat nvm neotree multi-term mozc move-text merlin magit-popup magit lsp-ui lsp-scala lsp-ruby lsp-java lsp-haskell leaf-convert julia-mode javadoc-lookup java-imports iter2 intero imenu-anywhere howm helm-fish-completion google-translate golden-ratio go-mode fsharp-mode flycheck-pos-tip flycheck-clojure fish-mode expand-region exec-path-from-shell ess-R-data-view ensime emmet-mode elscreen elm-mode elisp-slime-nav elfeed edn easy-kill dotnet dockerfile-mode dired-subtree diff-hl csharp-mode crux counsel company-lsp clj-refactor cask-mode cargo anzu ammonite-term-repl ag ace-jump-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -294,7 +294,8 @@
   (setq lsp-rust-server 'rust-analyzer)
   :bind ("C-c h" . lsp-describe-thing-at-point)
   :hook ((php-mode . lsp)
-		 (rust-mode . lsp))
+		 (rust-mode . lsp)
+		 (web-mode . lsp))
   :commands lsp)
 
 (leaf lsp-ui
@@ -692,5 +693,83 @@
   :ensure t
   :require t
   :config
-  (global-set-key (kbd "C-c r") 'golden-ratio)
+  (global-set-key (kbd "C-c r") 'golden-ratio))
+
+(leaf markdown-preview-mode
+  :ensure t
+  :require t
+  :config
+  (setq markdown-command "pandoc -c ~/.pandoc/github-markdown.css"))
+
+(setq scheme-program-name "gosh")
+
+(require 'cmuscheme)
+
+(defun scheme-other-window ()
+  "Run scheme on other window"
+  (interactive)
+  (switch-to-buffer-other-window
+   　　　 (get-buffer-create "*scheme*"))
+  (run-scheme scheme-program-name))
+
+(define-key global-map
+  (kbd "C-c s") 'scheme-other-window)
+
+(leaf prettier
+  :ensure t
+  :require t
+  :config
+  (add-hook 'web-mode 'prettier-js-mode)
+)
+
+(leaf emmet-mode
+  :ensure t
+  :require t
+  :config
+  (define-key web-mode-map (kbd "C-c j") 'emmet-expand-line))
+
+(leaf elscreen
+  :ensure t
+  :require t
+  :setq ((elscreen-tab-display-kill-screen)
+		 (elscreen-tab-display-control)
+		 (elscreen-buffer-to-nickname-alist quote
+											(("^dired-mode$" lambda nil
+											  (format "Dired(%s)" dired-directory))
+											 ("^Info-mode$" lambda nil
+											  (format "Info(%s)"
+													  (file-name-nondirectory Info-current-file)))
+											 ("^mew-draft-mode$" lambda nil
+											  (format "Mew(%s)"
+													  (buffer-name
+													   (current-buffer))))
+											 ("^mew-" . "Mew")
+											 ("^irchat-" . "IRChat")
+											 ("^liece-" . "Liece")
+											 ("^lookup-" . "Lookup")))
+		 (elscreen-mode-to-nickname-alist quote
+										  (("[Ss]hell" . "shell")
+										   ("compilation" . "compile")
+										   ("-telnet" . "telnet")
+										   ("dict" . "OnlineDict")
+										   ("*WL:Message*" . "Wanderlust"))))
+  :config
+  (setq elscreen-prefix-key (kbd "C-z"))
+  (elscreen-start))
+
+(leaf swiper
+  :ensure t
+  :require t
+  :config
+  (global-set-key "\C-s" 'swiper))
+
+(leaf avy-migemo
+  :ensure t
+  :require t
+  :config
+  (avy-migemo-mode 1))
+
+(leaf dumb-jump
+  :ensure t
+  :require t
   )

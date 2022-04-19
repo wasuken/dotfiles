@@ -1,5 +1,5 @@
 set nowritebackup
-set nobackup
+set nobackup 
 set virtualedit=block
 set backspace=indent,eol,start
 set ambiwidth=double
@@ -100,6 +100,10 @@ let g:airline_symbols.whitespace = 'Ξ'
 
 " vim-powerlne end
 
+nnoremap <silent>bp :bprevious<CR>
+nnoremap <silent>bn :bnext<CR>
+nnoremap <silent>bb :b#<CR>
+
 " sneark
 let g:sneak#label = 1
 
@@ -111,6 +115,20 @@ let g:ycm_min_num_of_chars_for_completion = 1
 let g:ycm_autoclose_preview_window_after_insertion = 1
 set completeopt-=preview
 let g:ycm_add_preview_to_completeopt = 0
+
+map  <Leader>f <Plug>(easymotion-bd-f)
+nmap <Leader>f <Plug>(easymotion-overwin-f)
+
+" s{char}{char} to move to {char}{char}
+nmap s <Plug>(easymotion-overwin-f2)
+
+" Move to line
+map <Leader>L <Plug>(easymotion-bd-jk)
+nmap <Leader>L <Plug>(easymotion-overwin-line)
+
+" Move to word
+map  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
 
 augroup source-vimrc
   autocmd!

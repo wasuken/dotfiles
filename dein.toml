@@ -53,3 +53,9 @@ depends = 'fzf'
 
 [[plugins]]
 repo = 'tpope/vim-commentary'
+
+[[plugins]]
+repo = 'junegunn/vim-easy-align'
+
+[[plugins]]
+repo = 'jiangmiao/auto-pairs'

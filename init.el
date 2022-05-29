@@ -771,3 +771,16 @@
   :ensure t
   :require t
   )
+
+(leaf golden-ratio
+  :ensure t
+  :require t
+  :config
+  (golden-ratio-mode 1)
+  (setq golden-ratio-exclude-modes '(calendar-mode))
+  (setq golden-ratio-exclude-buffer-names '(" *Org tags*" " *Org todo*"))
+  (setq golden-ratio-exclude-buffer-regexp '("\\*anything" "\\*helm"))
+
+  (setq golden-ratio-extra-commands
+		'(windmove-left windmove-right windmove-down windmove-up))
+  )

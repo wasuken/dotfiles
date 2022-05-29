@@ -16,6 +16,7 @@ set display=lastline
 set list
 set listchars=tab:^\ ,trail:~
 set history=10000
+let mapleader = ","
 
 hi Comment ctermfg=3
 set expandtab
@@ -144,12 +145,37 @@ augroup ENDaugroup MyXML
   autocmd Filetype html inoremap <buffer> </ </<C-x><C-o>
 augroup END
 
+"autopep8を<sift>+fで実行
+function! Preserve(command)
+  " Save the last search.
+  let search = @/
+  " Save the current cursor position.
+  let cursor_position = getpos('.')
+  " Save the current window position.
+  normal! H
+  let window_position = getpos('.')
+  call setpos('.', cursor_position)
+  " Execute the command.
+  execute a:command
+  " Restore the last search.
+  let @/ = search
+  " Restore the previous
+  " window position.
+  call setpos('.', window_position)
+  normal! zt
+  " Restore the previous cursor position.
+  call setpos('.', cursor_position)
+endfunction
+function! Autopep8()
+  call Preserve(':silent %!autopep8 --ignore=E501 -')
+endfunction
+                                                                        autocmd FileType python nnoremap <S-f> :call Autopep8()<CR>
+
 let g:rspec_command = "!bundle exec rspec {spec}"
 map <Leader>t :call RunCurrentSpecFile()<CR>
 map <Leader>s :call RunNearestSpec()<CR>
 map <Leader>l :call RunLastSpec()<CR>
 map <Leader>a :call RunAllSpecs()<CR>
-let mapleader = "\<Space>"
 
 let s:dein_dir = expand('$HOME/.cache/dein')
 let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'

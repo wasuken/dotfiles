@@ -316,7 +316,7 @@ let g:lsp_diagnostics_enabled = 0
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 
-
+nmap gl :GFile<CR>
 
   
 " Vim color file
@@ -329,7 +329,7 @@ if exists("syntax_on")
 endif
 
 set t_Co=256
-let g:colors_name = "moneyforward"
+" let g:colors_name = "moneyforward"
 
 hi Cursor ctermfg=235 ctermbg=231 cterm=NONE
 hi Visual ctermfg=NONE ctermbg=59 cterm=NONE

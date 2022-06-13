@@ -811,6 +811,6 @@
   :ensure t
   :require t
   :config
-  (setq company-idle-delay 0)
+  (setq company-idle-delay 1)
   (setq company-show-numbers t)
   (add-to-list 'company-backends #'company-tabnine))

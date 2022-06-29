@@ -316,9 +316,23 @@ let g:lsp_diagnostics_enabled = 0
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 
-nmap gl :GFile<CR>
+nmap gl :GFiles<CR>
+nmap fl :Files<CR>
 
-  
+nmap nt :tabnew<CR>
+
+let g:user_emmet_leader_key='<c-,>'
+
+if executable('solargraph')
+  " gem install solargraph
+  au User lsp_setup call lsp#register_server({
+        \ 'name': 'solargraph',
+        \ 'cmd': {server_info->[&shell, &shellcmdflag, 'solargraph stdio']},
+        \ 'initialization_options': {"diagnostics": "true"},
+        \ 'whitelist': ['ruby'],
+        \ })
+endif
+
 " Vim color file
 
 set background=dark

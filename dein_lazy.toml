@@ -69,3 +69,4 @@ on_ft = ['rust']
 [[plugins]]
 repo = 'thoughtbot/vim-rspec'
 on_ft = ['ruby']
+

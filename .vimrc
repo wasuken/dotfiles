@@ -177,6 +177,8 @@ map <Leader>s :call RunNearestSpec()<CR>
 map <Leader>l :call RunLastSpec()<CR>
 map <Leader>a :call RunAllSpecs()<CR>
 
+map <Leader>p :Prettier<CR>
+
 let s:dein_dir = expand('$HOME/.cache/dein')
 let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
 "if &compatible

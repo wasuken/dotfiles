@@ -215,7 +215,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(dumb-jump dump-jump avy-migemo emmet prettier markdown-preview-mode markdown flycheck-rust embark marginalia consult slime skk-hint recentf-ext embark-consult ace-jump-buffer all-the-icons smartparens ace-jump docker-compose-mode mwim dockerfile docker-compose nwim side-hustle orderless vertico smartparen doom-themes zop-to-char zenburn-theme yaml-mode which-key web-mode w3m vue-mode use-package undo-tree typescript-mode twittering-mode twig-mode tuareg svelte-mode super-save sayid rustic robe rjsx-mode rainbow-mode rainbow-delimiters racer quickrun python-pytest pug-mode pt protobuf-mode php-mode pdf-tools parsec ocamlformat nvm neotree multi-term mozc move-text merlin magit-popup magit lsp-ui lsp-scala lsp-ruby lsp-java lsp-haskell leaf-convert julia-mode javadoc-lookup java-imports iter2 intero imenu-anywhere howm helm-fish-completion google-translate golden-ratio go-mode fsharp-mode flycheck-pos-tip flycheck-clojure fish-mode expand-region exec-path-from-shell ess-R-data-view ensime emmet-mode elscreen elm-mode elisp-slime-nav elfeed edn easy-kill dotnet dockerfile-mode dired-subtree diff-hl csharp-mode crux counsel company-lsp clj-refactor cask-mode cargo anzu ammonite-term-repl ag ace-jump-mode)))
+   '(js-jsx company-tabnine counsel-tramp dumb-jump dump-jump avy-migemo emmet prettier markdown-preview-mode markdown flycheck-rust embark marginalia consult slime skk-hint recentf-ext embark-consult ace-jump-buffer all-the-icons smartparens ace-jump docker-compose-mode mwim dockerfile docker-compose nwim side-hustle orderless vertico smartparen doom-themes zop-to-char zenburn-theme yaml-mode which-key web-mode w3m vue-mode use-package undo-tree typescript-mode twittering-mode twig-mode tuareg svelte-mode super-save sayid rustic robe rjsx-mode rainbow-mode rainbow-delimiters racer quickrun python-pytest pug-mode pt protobuf-mode php-mode pdf-tools parsec ocamlformat nvm neotree multi-term mozc move-text merlin magit-popup magit lsp-ui lsp-scala lsp-ruby lsp-java lsp-haskell leaf-convert julia-mode javadoc-lookup java-imports iter2 intero imenu-anywhere howm helm-fish-completion google-translate golden-ratio go-mode fsharp-mode flycheck-pos-tip flycheck-clojure fish-mode expand-region exec-path-from-shell ess-R-data-view ensime emmet-mode elscreen elm-mode elisp-slime-nav elfeed edn easy-kill dotnet dockerfile-mode dired-subtree diff-hl csharp-mode crux counsel company-lsp clj-refactor cask-mode cargo anzu ammonite-term-repl ag ace-jump-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -267,9 +267,20 @@
 										; 画面最大化
 (set-frame-parameter nil 'fullscreen 'maximized)
 
+(leaf go-mode
+  :ensure t
+  :require t
+  :config
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  )
+
 (leaf eglot
   :ensure t
-  :require t)
+  :require t
+  :config
+  (add-hook 'ruby-mode-hook #'eglot)
+  (add-hook 'go-mode-hook #'eglot)
+  )
 
 (leaf phpunit
   :ensure t
@@ -286,6 +297,14 @@
   :require t
   :ensure t)
 
+(leaf rjsx-mode
+  :ensure t
+  :require t
+  :config
+  (add-hook 'rjsx-mode-hook #'eglot)
+  )
+
+
 (leaf lsp-mode
   :ensure t
   :require t
@@ -294,8 +313,7 @@
   (setq lsp-rust-server 'rust-analyzer)
   :bind ("C-c h" . lsp-describe-thing-at-point)
   :hook ((php-mode . lsp)
-		 (rust-mode . lsp)
-		 (web-mode . lsp))
+		 (rust-mode . lsp))
   :commands lsp)
 
 (leaf lsp-ui
@@ -400,8 +418,8 @@
   :mode (
 		 ("\\.ts\\'" . web-mode)
 		 ("\\.tsx\\'" . web-mode)
-		 ("\\.js\\'" . web-mode)
-		 ("\\.jsx\\'" . web-mode)
+		 ;; ("\\.js\\'" . web-mode)
+		 ;; ("\\.jsx\\'" . web-mode)
 		 )
   :config
   (setq web-mode-attr-indent-offset nil)
@@ -784,3 +802,15 @@
   (setq golden-ratio-extra-commands
 		'(windmove-left windmove-right windmove-down windmove-up))
   )
+
+(leaf counsel-tramp
+  :ensure t
+  :require t)
+
+(leaf company-tabnine
+  :ensure t
+  :require t
+  :config
+  (setq company-idle-delay 1)
+  (setq company-show-numbers t)
+  (add-to-list 'company-backends #'company-tabnine))

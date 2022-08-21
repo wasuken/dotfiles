@@ -70,3 +70,6 @@ on_ft = ['rust']
 repo = 'thoughtbot/vim-rspec'
 on_ft = ['ruby']
 
+[[plugins]]
+repo = 'ziglang/zig.vim'
+on_ft = ['zig']

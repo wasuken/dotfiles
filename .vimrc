@@ -40,6 +40,7 @@ let g:rufo_auto_formatting = 1
 nnoremap <Esc><Esc> :nohlsearch<CR><ESC>
 inoremap <silent> jj <ESC>
 nmap <C-l> :tabnext<CR>
+nmap <C-x> :tabnew<CR>
 
 nnoremap <silent> gf :e .<CR><ESC>
 

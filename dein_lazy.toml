@@ -59,6 +59,10 @@ repo = 'vim-scripts/PDV--phpDocumentor-for-Vim'
 on_ft = ['php']
 
 [[plugins]]
+repo = 'stephpy/vim-php-cs-fixer'
+on_ft = ['php']
+
+[[plugins]]
 repo = 'dag/vim-fish'
 on_ft = ['fish']
 

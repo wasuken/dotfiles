@@ -336,6 +336,9 @@ if executable('solargraph')
         \ })
 endif
 
+nnoremap <silent><leader>pcd :call PhpCsFixerFixDirectory()<CR>
+nnoremap <silent><leader>pcf :call PhpCsFixerFixFile()<CR>
+
 " Vim color file
 
 set background=dark

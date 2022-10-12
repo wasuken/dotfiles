@@ -33,7 +33,12 @@ set noswapfile
 set nofoldenable
 set title
 set number
-set clipboard=unnamed,autoselect
+" set clipboard=unnamed,autoselect
+if has('nvim')
+  set clipboard=unnamed
+else
+  set clipboard=unnamedutoselect
+endif
 
 let g:rufo_auto_formatting = 1
 
@@ -324,7 +329,14 @@ nmap fl :Files<CR>
 
 nmap nt :tabnew<CR>
 
-let g:user_emmet_leader_key='<c-,>'
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+let g:UltiSnipsEditSplit="vertical"
+
+let g:user_emmet_leader_key=','
+let g:user_emmet_mode='a'
 
 if executable('solargraph')
   " gem install solargraph

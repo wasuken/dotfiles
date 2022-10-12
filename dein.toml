@@ -62,3 +62,13 @@ repo = 'jiangmiao/auto-pairs'
 
 [[plugins]]
 repo = 'roman/golden-ratio'
+
+[[plugins]]
+repo = 'honza/vim-snippets'
+
+[[plugins]]
+repo = 'SirVer/ultisnips'
+hook_add = '''
+  let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
+  let g:UltiSnipsExpandTrigger="<Down>"
+'''

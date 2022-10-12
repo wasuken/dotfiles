@@ -72,3 +72,5 @@ source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 ### End of Zinit's installer chunk
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

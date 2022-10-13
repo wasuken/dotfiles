@@ -6,7 +6,11 @@ set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath = &runtimepath
 source ~/.vimrc
 
-call plug#begin()
+filetype plugin on
+set omnifunc=syntaxcomplete#Complete
+
+" call plug#begin()
+call plug#begin(stdpath('data') . '/plugged')
 " The default plugin directory will be as follows:
 "   - Vim (Linux/macOS): '~/.vim/plugged'
 "   - Vim (Windows): '~/vimfiles/plugged'
@@ -25,5 +29,26 @@ Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
 Plug 'fatih/vim-go', { 'tag': '*' }
 Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'dyng/ctrlsf.vim'
+Plug 'vijaymarupudi/nvim-fzf'
+Plug 'eightpigs/win_resize.nvim'
+Plug 'mattn/emmet-vim'
 
 call plug#end()
+
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard'] "Hide files in .gitignore
+let g:ctrlp_show_hidden = 1
+
+nmap     <C-F>f <Plug>CtrlSFPrompt
+nmap     <C-F>n <Plug>CtrlSFCwordPath
+nmap     <C-F>p <Plug>CtrlSFPwordPath
+
+nnoremap <Esc><Esc> :nohlsearch<CR><ESC>
+inoremap <silent> jj <ESC>
+nmap <C-l> :tabnext<CR>
+nmap <C-x> :tabnew<CR>
+nmap fl :FZF<CR>
+
+let g:user_emmet_mode='i'
+

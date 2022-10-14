@@ -61,9 +61,12 @@ inoremap ( ()<LEFT>
 inoremap " ""<LEFT>
 inoremap ' ''<LEFT>
 
-inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
-nnoremap <C-P> :call PhpDocSingle()<CR>
-vnoremap <C-P> :call PhpDocRange()<CR>
+"inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
+"nnoremap <C-P> :call PhpDocSingle()<CR>
+"vnoremap <C-P> :call PhpDocRange()<CR>
+autocmd Filetype php inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
+autocmd Filetype php nnoremap <C-P> :call PhpDocSingle()<CR>
+autocmd Filetype php vnoremap <C-P> :call PhpDocRange()<CR>
 
 let g:pdv_cfg_Type = "mixed"
 let g:pdv_cfg_Package = ""

@@ -9,31 +9,32 @@ source ~/.vimrc
 filetype plugin on
 set omnifunc=syntaxcomplete#Complete
 
-" call plug#begin()
+"call plug#begin()
 call plug#begin(stdpath('data') . '/plugged')
-" The default plugin directory will be as follows:
-"   - Vim (Linux/macOS): '~/.vim/plugged'
-"   - Vim (Windows): '~/vimfiles/plugged'
-"   - Neovim (Linux/macOS/Windows): stdpath('data') . '/plugged'
-" You can specify a custom plugin directory by passing it as the argument
-"   - e.g. `call plug#begin('~/.vim/plugged')`
-"   - Avoid using standard Vim directory names like 'plugin'
-
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'junegunn/vim-easy-align'
-Plug 'https://github.com/junegunn/vim-github-dashboard.git'
-Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
-Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
-Plug 'fatih/vim-go', { 'tag': '*' }
-Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'dyng/ctrlsf.vim'
-Plug 'vijaymarupudi/nvim-fzf'
-Plug 'eightpigs/win_resize.nvim'
-Plug 'mattn/emmet-vim'
+  " The default plugin directory will be as follows:
+  "   - Vim (Linux/macOS): '~/.vim/plugged'
+  "   - Vim (Windows): '~/vimfiles/plugged'
+  "   - Neovim (Linux/macOS/Windows): stdpath('data') . '/plugged'
+  " You can specify a custom plugin directory by passing it as the argument
+  "   - e.g. `call plug#begin('~/.vim/plugged')`
+  "   - Avoid using standard Vim directory names like 'plugin'
+  
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+  Plug 'junegunn/vim-easy-align'
+  Plug 'https://github.com/junegunn/vim-github-dashboard.git'
+  Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+  Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+  Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
+  Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
+  Plug 'fatih/vim-go', { 'tag': '*' }
+  Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
+  Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+  Plug 'ctrlpvim/ctrlp.vim'
+  Plug 'dyng/ctrlsf.vim'
+  Plug 'vijaymarupudi/nvim-fzf'
+  Plug 'eightpigs/win_resize.nvim'
+  Plug 'mattn/emmet-vim'
+  Plug 'https://github.com/preservim/nerdtree.git'
 
 call plug#end()
 
@@ -52,3 +53,7 @@ nmap fl :FZF<CR>
 
 let g:user_emmet_mode='i'
 
+nnoremap <leader>n :NERDTreeFocus<CR>
+nnoremap <C-n> :NERDTree<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-f> :NERDTreeFind<CR>

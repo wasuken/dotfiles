@@ -35,11 +35,15 @@ call plug#begin(stdpath('data') . '/plugged')
   Plug 'eightpigs/win_resize.nvim'
   Plug 'mattn/emmet-vim'
   Plug 'https://github.com/preservim/nerdtree.git'
+  Plug 'https://github.com/ap/vim-css-color.git'
+  Plug 'jiaoshijie/undotree'
 
 call plug#end()
 
 let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard'] "Hide files in .gitignore
 let g:ctrlp_show_hidden = 1
+
+nnoremap <leader>u :UndotreeToggle<cr>
 
 nmap     <C-F>f <Plug>CtrlSFPrompt
 nmap     <C-F>n <Plug>CtrlSFCwordPath

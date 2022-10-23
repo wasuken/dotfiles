@@ -422,6 +422,7 @@
   :mode (
 		 ("\\.ts\\'" . web-mode)
 		 ("\\.tsx\\'" . web-mode)
+		 ("\\.svelte\\'" . web-mode)
 		 ;; ("\\.js\\'" . web-mode)
 		 ;; ("\\.jsx\\'" . web-mode)
 		 )

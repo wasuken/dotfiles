@@ -830,3 +830,9 @@
   (leaf ddskk-posframe
     :ensure t
     :global-minor-mode t))
+
+(leaf elfeed
+  :ensure t
+  :config
+  (setq elfeed-feeds '("https://b.hatena.ne.jp/hotentry/it.rss" "https://zenn.dev/feed"))
+  )

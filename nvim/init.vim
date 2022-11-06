@@ -37,6 +37,7 @@ call plug#begin(stdpath('data') . '/plugged')
   Plug 'https://github.com/preservim/nerdtree.git'
   Plug 'https://github.com/ap/vim-css-color.git'
   Plug 'jiaoshijie/undotree'
+  Plug 'wuelnerdotexe/vim-astro'
 
 call plug#end()
 
@@ -65,3 +66,5 @@ nnoremap <C-f> :NERDTreeFind<CR>
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsForwardTrigger="<c-n>"
 let g:UltiSnipsBackwardTrigger="<c-p>"
+
+let g:astro_typescript = 'enable'

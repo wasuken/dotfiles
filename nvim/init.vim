@@ -38,6 +38,7 @@ call plug#begin(stdpath('data') . '/plugged')
   Plug 'https://github.com/ap/vim-css-color.git'
   Plug 'jiaoshijie/undotree'
   Plug 'wuelnerdotexe/vim-astro'
+  Plug 'roman/golden-ratio'
 
 call plug#end()
 

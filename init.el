@@ -846,3 +846,9 @@
   :config
   (setq elfeed-feeds '("https://b.hatena.ne.jp/hotentry/it.rss" "https://zenn.dev/feed"))
   )
+
+(leaf undo-tree
+  :ensure t
+  :config
+  (global-set-key (kbd "C-u") 'global-undo-tree-mode)
+  )

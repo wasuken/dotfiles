@@ -72,3 +72,6 @@ hook_add = '''
   let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips']
   let g:UltiSnipsExpandTrigger="<Down>"
 '''
+
+[[plugins]]
+repo = 'hylang/vim-hy'

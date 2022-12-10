@@ -364,9 +364,22 @@
   :ensure t
   :require t)
 
+(leaf paredit
+  :ensure t
+  :require t
+  :config
+  (add-hook 'hy-mode-hook 'enable-paredit-mode)
+  (eval-after-load "paredit"
+	#'(define-key paredit-mode-map (kbd "C-c f") 'paredit-forward-slurp-sexp))
+  (eval-after-load "paredit"
+	#'(define-key paredit-mode-map (kbd "C-c d") 'paredit-forward-barf-sexp))
+  )
+
 (leaf smartparens
   :ensure t
   :require t
+  :config
+  (smartparens-global-mode t)
   )
 
 (leaf ace-jump
@@ -852,3 +865,17 @@
   :config
   (global-set-key (kbd "C-u") 'global-undo-tree-mode)
   )
+
+(leaf hy-mode
+  :ensure t
+  :require t
+  :config
+  (setq auto-mode-alist (append '(("\\.hy$" . hy-mode)) auto-mode-alist))
+  (add-hook 'hy-mode-hook
+	  (lambda ()
+            (setq hy-font-lock-keywords
+                  (append '(("(\\|)" . paren-face))
+                          hy-font-lock-keywords))))
+  )
+
+(leaf )

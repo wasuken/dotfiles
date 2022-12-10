@@ -39,6 +39,7 @@ call plug#begin(stdpath('data') . '/plugged')
   Plug 'jiaoshijie/undotree'
   Plug 'wuelnerdotexe/vim-astro'
   Plug 'roman/golden-ratio'
+  Plug 'hylang/vim-hy'
 
 call plug#end()
 

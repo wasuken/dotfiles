@@ -877,5 +877,3 @@
                   (append '(("(\\|)" . paren-face))
                           hy-font-lock-keywords))))
   )
-
-(leaf )

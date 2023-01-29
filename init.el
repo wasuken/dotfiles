@@ -858,6 +858,7 @@
   :ensure t
   :config
   (setq elfeed-feeds '("https://b.hatena.ne.jp/hotentry/it.rss" "https://zenn.dev/feed"))
+  (setq browse-url-browser-function 'eww-browse-url)
   )
 
 (leaf undo-tree

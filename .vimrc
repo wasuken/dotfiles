@@ -16,7 +16,7 @@ set display=lastline
 set list
 set listchars=tab:^\ ,trail:~
 set history=10000
-let mapleader = ","
+let mapleader = "\<Space>"
 
 hi Comment ctermfg=3
 set expandtab
@@ -338,7 +338,7 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 let g:UltiSnipsEditSplit="vertical"
 
-let g:user_emmet_leader_key=','
+let g:user_emmet_leader_key='<Tab>'
 let g:user_emmet_mode='a'
 
 if executable('solargraph')

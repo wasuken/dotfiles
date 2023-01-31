@@ -58,7 +58,7 @@ nmap <C-l> :tabnext<CR>
 nmap <C-x> :tabnew<CR>
 nmap fl :FZF<CR>
 
-let g:user_emmet_mode='i'
+let g:user_emmet_mode='a'
 
 nnoremap <leader>n :NERDTreeFocus<CR>
 nnoremap <C-n> :NERDTree<CR>

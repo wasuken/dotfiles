@@ -74,3 +74,8 @@ autoload -Uz _zinit
 ### End of Zinit's installer chunk
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# pnpm
+export PNPM_HOME="/home/wasu/.local/share/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+# pnpm end

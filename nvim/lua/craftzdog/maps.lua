@@ -35,11 +35,5 @@ keymap.set('n', '<C-w><right>', '<C-w>>')
 keymap.set('n', '<C-w><up>', '<C-w>+')
 keymap.set('n', '<C-w><down>', '<C-w>-')
 
--- my maps
-keymap.set('n', 'tb', ':Telescope file_browser')
-keymap.set('n', 'to', ':Telescope oldfiles')
-keymap.set('n', 'tt', ':Telescope')
-
+-- Quit
 keymap.set('n', '<Leader>q', ':quit')
-
-keymap.set('n', '<Leader>z', ':ZenMode')

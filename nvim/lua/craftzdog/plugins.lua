@@ -50,4 +50,8 @@ packer.startup(function(use)
 
   use 'lewis6991/gitsigns.nvim'
   use 'dinhhuy258/git.nvim' -- For git blame & browse
+  use 'roman/golden-ratio'
+  use 'neovim/nvim-lspconfig'
+  use 'MunifTanjim/prettier.nvim'
+  use("gbprod/yanky.nvim")
 end)

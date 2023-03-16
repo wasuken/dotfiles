@@ -1,5 +1,7 @@
 (electric-pair-mode 1)
-(load (expand-file-name "~/.roswell/helper.el"))
+(when (file-exists-p (expand-file-name "~/.roswell/helper.el"))
+  (load (expand-file-name "~/.roswell/helper.el")))
+
 
 (setq org-agenda-files (list "~/todo/todo.org"))
 

@@ -147,6 +147,8 @@
 (unless (file-directory-p my-d-tmp)
   (make-directory my-d-tmp))
 
+(setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+
 ;; 画面最大化
 (set-frame-parameter nil 'fullscreen 'maximized)
 

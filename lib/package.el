@@ -337,7 +337,13 @@
   :ensure t
   :require t
   :config
+  (sp-with-modes)
   (smartparens-global-mode t)
+  (sp-with-modes '(lisp-mode lisp-interaction-mode slime-mode)
+	(sp-local-pair "'" nil :actions nil)
+	(sp-local-pair "`" nil :actions nil))
+
+  (provide 'smartpares-lisp)
   )
 
 (leaf ace-jump
@@ -837,3 +843,18 @@
 					(append '(("(\\|)" . paren-face))
 							hy-font-lock-keywords))))
   )
+
+
+(leaf lsp-pyright
+  :require t
+  :ensure t
+  :hook (python-mode . lsp))
+
+;; chatgpt config
+(add-to-list 'load-path "~/.emacs.d/elpa/ChatGPT.el/")
+(require 'chatgpt)
+(global-set-key (kbd "C-c q") #'chatgpt-query)
+(require 'python)
+(unless (boundp 'python-interpreter)
+  (defvaralias 'python-interpreter 'python-shell-interpreter))
+(setq chatgpt-repo-path "~/.emacs.d/elpa/ChatGPT.el/")

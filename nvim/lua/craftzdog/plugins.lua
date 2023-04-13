@@ -52,5 +52,7 @@ packer.startup(function(use)
   use 'dinhhuy258/git.nvim' -- For git blame & browse
   use 'roman/golden-ratio'
   use 'MunifTanjim/prettier.nvim'
+  use 'lambdalisue/fern.vim'
+  use 'kylechui/nvim-surround'
   use("gbprod/yanky.nvim")
 end)

@@ -829,7 +829,8 @@
 (leaf undo-tree
   :ensure t
   :config
-  (global-set-key (kbd "C-u") 'global-undo-tree-mode)
+  ;; (global-set-key (kbd "C-x u") 'global-undo-tree-mode)
+  (global-undo-tree-mode t)
   )
 
 (leaf hy-mode

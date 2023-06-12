@@ -121,7 +121,7 @@
   :ensure t
   :config
   (global-company-mode)
-  (setq company-global-modes '(not markdown-mode))
+  (setq company-global-modes '(not markdown-mode shell-mode))
   ;; 遅延なしにする。
   (setq company-idle-delay 0)
   ;; デフォルトは4。より少ない文字数から補完が始まる様にする。
@@ -437,7 +437,23 @@
 	      (setq indent-tabs-mode nil)))
   )
 
-(use-package lsp-mode :ensure t)
+(setq exec-path (cons (expand-file-name "~/bin") exec-path))
+(setq exec-path (cons (expand-file-name "~/.cargo/bin") exec-path))
+
+(use-package rust-mode
+  :ensure t
+  :custom rust-format-on-save t)
+
+(use-package cargo
+  :ensure t
+  :hook (rust-mode . cargo-minor-mode))
+
+(use-package lsp-mode
+  :ensure t
+  :hook (rust-mode . lsp)
+  :bind ("C-c h" . lsp-describe-thing-at-point)
+  :custom (lsp-rust-server 'rust-analyzer))
+
 (use-package lsp-ui :ensure t)
 
 (defun reload-config ()
@@ -455,7 +471,7 @@
  '(custom-safe-themes
    '("fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" default))
  '(package-selected-packages
-   '(path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package)))
+   '(mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -54,6 +54,8 @@ packer.startup(function(use)
   use 'MunifTanjim/prettier.nvim'
   use 'lambdalisue/fern.vim'
   use 'kylechui/nvim-surround'
+  use 'wuelnerdotexe/vim-astro'
+  use 'rust-lang/rust.vim'
   use("gbprod/yanky.nvim")
   use {
     "nvim-neo-tree/neo-tree.nvim",

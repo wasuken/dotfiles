@@ -121,7 +121,7 @@
   :ensure t
   :config
   (global-company-mode)
-  (setq company-global-modes '(not markdown-mode shell-mode))
+  (setq company-global-modes '(not markdown-mode shell-mode rust-mode))
   ;; 遅延なしにする。
   (setq company-idle-delay 0)
   ;; デフォルトは4。より少ない文字数から補完が始まる様にする。
@@ -142,7 +142,8 @@
 (use-package company-tabnine
   :ensure t
   :config
-  (add-to-list 'company-backends #'company-tabnine))
+  ;; (add-to-list 'company-backends #'company-tabnine)
+  )
 
 (use-package magit :ensure t)
 
@@ -442,7 +443,13 @@
 
 (use-package rust-mode
   :ensure t
-  :custom rust-format-on-save t)
+  :bind (("C-c n t" . rust-test) ("C-c n f" . rust-format-buffer))
+  ;; くそおそいので無効化
+  ;; :custom (rust-format-on-save t)
+  :config
+  (setq rust-cargo-default-arguments " -- --test-threads=1")
+  )
+
 
 (use-package cargo
   :ensure t

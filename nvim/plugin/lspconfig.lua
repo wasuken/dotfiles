@@ -126,6 +126,13 @@ nvim_lsp.astro.setup {
   capabilities = capabilities
 }
 
+nvim_lsp.rust_analyzer.setup {
+  on_attach = on_attach,
+}
+
+vim.g.rustfmt_autosave = 1
+
+
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
   underline = true,

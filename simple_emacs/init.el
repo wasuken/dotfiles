@@ -32,7 +32,7 @@
 
 (global-set-key "\C-h" 'delete-backward-char)
 
-(global-linum-mode t)
+;; (global-linum-mode t)
 (setq linum-format "%d ")
 
 (setq inhibit-splash-screen t)
@@ -69,6 +69,18 @@
   :config
   (path-headerline-mode +1)
   )
+
+(use-package elfeed
+  :ensure t
+  :config
+  (setq elfeed-feeds
+      '("https://b.hatena.ne.jp/hotentry/it.rss"
+	"https://zenn.dev/feed"
+	"https://zenn.dev/topics/rust/feed"
+	"https://zenn.dev/topics/nextjs/feed"
+	"https://zenn.dev/topics/solidjs/feed"
+	"https://zenn.dev/topics/react/feed"
+	)))
 
 (use-package biblio :ensure t)
 
@@ -463,6 +475,21 @@
 
 (use-package lsp-ui :ensure t)
 
+(use-package treesit-auto
+  :ensure t
+  :config
+  (setq treesit-auto-install t)
+  (global-treesit-auto-mode))
+
+(use-package treesit
+  :config
+  (setq treesit-font-lock-level 4))
+
+(use-package prettier
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-prettier-mode))
+
 (defun reload-config ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
@@ -478,7 +505,7 @@
  '(custom-safe-themes
    '("fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" default))
  '(package-selected-packages
-   '(mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package)))
+   '(prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

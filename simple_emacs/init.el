@@ -38,16 +38,78 @@
 
 (setq inhibit-splash-screen t)
 
+
+;; ============== start org-mode ==============
+(setq org-agenda-files '(
+			 "/home/wasu/org/agenda.org"
+			 "/home/wasu/org/remind.org"
+			 "/home/wasu/org/knowledge.org"
+			 )
+      )
+
+(setq org-capture-templates
+      '(
+	("t" "Todo" entry (file+headline "/home/wasu/org/remind.org" "■Capture")
+	 "* REMIND %? (wrote on %U)")
+	("k" "Knowledge" entry (file+headline "/home/wasu/org/knowledge.org" "Top")
+	 "* %?\n  # Wrote on %U")
+	)
+      )
+
+(define-key global-map (kbd "C-c a") 'org-agenda)
+
+;; アジェンダ表示で下線を用いる
+(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+(setq hl-line-face 'underline)
+
+;; 標準の祝日を利用しない
+(setq calendar-holidays nil)
+
+;; TODO状態
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "WAIT(w)" "REMIND(r)" "|" "DONE(d)" "SOMEDAY(s)")))
+
+;; DONEの時刻を記録
+(setq org-log-done 'time)
+
+;; タグリスト
+(setq org-tag-alist
+      '(
+	("reading" . ?r)
+	("develop" .?d)
+	("plan" . ?p)
+	("introspection" . ?i)
+	("networking" . ?n)
+	)
+      )
+
+
+;; ###### org-capture
+;; C-cc で org-capture
+(global-set-key "\C-cc" 'org-capture)
+
+
+;; ##### org-clock
+;; clockログを隠す
+(setq org-clock-into-drawer t)
+
+;; clocktable の体裁を整える
+(defun my-org-clocktable-indent-string (level)
+  (if (= level 1) ""
+    (let ((str " "))
+      (while (> level 2)
+	(setq level (1- level)
+	      str (concat str "--")))
+      (concat str "-> "))))
+
+(advice-add 'org-clocktable-indent-string :override #'my-org-clocktable-indent-string)
+
+;; ============== end org-mode ==============
+
 ;; lib内部で利用するため
 (use-package request :ensure t)
 (add-to-list 'load-path "~/dotfiles/simple_emacs/lib")
 (load "util.el")
-
-;; tab-bar
-
-(global-set-key (kbd "C-c C-t c") 'tab-bar-new-tab)
-(global-set-key (kbd "C-c C-t n") 'tab-bar-switch-to-next-tab)
-(global-set-key (kbd "C-c C-t b") 'tab-bar-switch-to-prev-tab)
 
 ;; ----------------------------------------------------------------
 ;; use-package
@@ -491,11 +553,95 @@
   :config
   (add-hook 'after-init-hook #'global-prettier-mode))
 
+(use-package tree-sitter
+  :ensure t
+  :hook (tree-sitter-after-on-hook . tree-sitter-hl-mode)
+  :config
+  (global-tree-sitter-mode)
+  (tree-sitter-require 'c)
+  (add-to-list 'tree-sitter-major-mode-language-alist '(c-mode . c))
+  )
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter
+  :config
+  (tree-sitter-require 'cpp)
+  (add-to-list 'tree-sitter-major-mode-language-alist '(cpp-mode . c))
+  )
+
+(use-package c-mode
+  :hook (c-mode . eglot))
+
+(use-package slime
+  :if (file-exists-p "~/.roswell/helper.el")
+  :ensure slime-company
+  :init (load "~/.roswell/helper.el")
+  :custom (inferior-lisp-program "ros -Q run")
+  :config (slime-setup '(slime-fancy slime-company)))
+
+(use-package cider
+  :ensure t
+  :init
+  (add-hook 'cider-mode-hook #'clj-refactor-mode)
+  (add-hook 'cider-mode-hook #'company-mode)
+  (add-hook 'cider-mode-hook #'eldoc-mode)
+  (add-hook 'cider-repl-mode-hook #'company-mode)
+  (add-hook 'cider-repl-mode-hook #'eldoc-mode)
+  :diminish subword-mode
+  :config
+  (setq nrepl-log-messages t
+	cider-repl-display-in-current-window t
+	cider-repl-use-clojure-font-lock t
+	cider-prompt-save-file-on-load 'always-save
+	cider-font-lock-dynamically '(macro core function var)
+	cider-overlays-use-font-lock t)
+  (cider-repl-toggle-pretty-printing))
+
+(use-package clojure-mode
+  :ensure t
+  :init
+  (add-hook 'clojure-mode-hook #'subword-mode))
+
+(add-to-list
+ 'treesit-language-source-alist
+ '(prisma "https://github.com/victorhqc/tree-sitter-prisma"))
+
+(use-package prisma-ts-mode
+  :ensure t
+  :mode ("\\.prisma\\'" . prisma-ts-mode))
+
+(use-package docker-compose-mode
+  :ensure t)
+
+(use-package dockerfile-mode
+  :ensure t)
+
+(use-package yasnippet
+  :ensure t
+  :config
+  (setq yas-snippet-dirs
+	'("~/.emacs.d/mySnippets"
+	  "~/.emacs.d/snippets"
+	  ))
+  (define-key yas-minor-mode-map (kbd "C-c y i") 'yas-insert-snippet)
+  (define-key yas-minor-mode-map (kbd "C-c y n") 'yas-new-snippet)
+  (define-key yas-minor-mode-map (kbd "C-c y v") 'yas-visit-snippet-file)
+  (yas-global-mode 1)
+  )
+
+(use-package poly-markdown
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode)))
+
+
 (defun reload-config ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
 
-(vs-dark-theme)
+;; (vs-dark-theme)
+(load-theme 'leuven-dark t)
 
 
 (custom-set-variables
@@ -504,9 +650,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" default))
+   '("34af44a659b79c9f92db13ac7776b875a8d7e1773448a8301f97c18437a822b6" "c05fd2078f02a7585cbf9c08c854fef95c5c284d52a26a71c6f7a139e2127d34" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "3e200d49451ec4b8baa068c989e7fba2a97646091fd555eca0ee5a1386d56077" "833ddce3314a4e28411edf3c6efde468f6f2616fc31e17a62587d6a9255f4633" "4c56af497ddf0e30f65a7232a8ee21b3d62a8c332c6b268c81e9ea99b11da0d3" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "285d1bf306091644fb49993341e0ad8bafe57130d9981b680c1dbd974475c5c7" "830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" default))
  '(package-selected-packages
-   '(prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package)))
+   '(poly-markdown yasnippet dockerfile-mode docker-compose-mode yaml prisma-ts-mode cider clojure-mode clojure yas-minor-mode leuven-theme slime-company tree-sitter-langs tree-sitter prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

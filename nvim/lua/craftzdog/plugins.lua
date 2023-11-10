@@ -66,4 +66,5 @@ packer.startup(function(use)
       "MunifTanjim/nui.nvim",
     }
   }
+  use 'vlime/vlime'
 end)

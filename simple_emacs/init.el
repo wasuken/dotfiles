@@ -129,7 +129,7 @@
   :ensure t
   :config
   (when (memq window-system
-			  '(mac ns x))
+	      '(mac ns x))
     (exec-path-from-shell-initialize)))
 
 (use-package path-headerline-mode :ensure t
@@ -141,13 +141,13 @@
   :ensure t
   :config
   (setq elfeed-feeds
-      '("https://b.hatena.ne.jp/hotentry/it.rss"
-	"https://zenn.dev/feed"
-	"https://zenn.dev/topics/rust/feed"
-	"https://zenn.dev/topics/nextjs/feed"
-	"https://zenn.dev/topics/solidjs/feed"
-	"https://zenn.dev/topics/react/feed"
-	)))
+	'("https://b.hatena.ne.jp/hotentry/it.rss"
+	  "https://zenn.dev/feed"
+	  "https://zenn.dev/topics/rust/feed"
+	  "https://zenn.dev/topics/nextjs/feed"
+	  "https://zenn.dev/topics/solidjs/feed"
+	  "https://zenn.dev/topics/react/feed"
+	  )))
 
 (use-package biblio :ensure t)
 
@@ -486,12 +486,12 @@
     (when action
       (eglot--dcase action
 	(((Command) command arguments)
-	  (eglot-execute-command server (intern command) arguments))
+	 (eglot-execute-command server (intern command) arguments))
 	(((CodeAction) edit command)
-	  (when edit (eglot--apply-workspace-edit edit))
-	  (when command
-	    (eglot--dbind ((Command) command arguments) command
-	      (eglot-execute-command server (intern command) arguments))))))))
+	 (when edit (eglot--apply-workspace-edit edit))
+	 (when command
+	   (eglot--dbind ((Command) command arguments) command
+	     (eglot-execute-command server (intern command) arguments))))))))
 
 (defun eglot-organize-imports-on-save ()
   (defun eglot-organize-imports-nosignal ()
@@ -651,16 +651,21 @@
     ;; (setq haskell-process-type 'cabal-new-repl)
     (setq haskell-stylish-on-save 't)
     (setq haskell-tags-on-save 't)
-    (define-key inf-haskell-map (kbd "C-c <tab> s")
-		#'(lambda ()
-		    (interactive)
-		    (insert ":{")))
-    (define-key inf-haskell-map (kbd "C-c <tab> e")
-		#'(lambda ()
-		    (interactive)
-		    (insert ":}")))
+    )
+  :config
+  (progn
+    (defun insert-repl-start ()
+      (interactive)
+      (insert ":{"))
+    (defun insert-repl-end ()
+      (interactive)
+      (insert ":}"))
+    ;; TODO replのときだけ有効にする
+    (define-key haskell-mode-map (kbd "C-c <tab> s") 'insert-repl-start)
+    (define-key haskell-mode-map (kbd "C-c <tab> e") 'insert-repl-end)
     )
   )
+
 
 
 (use-package flycheck-haskell

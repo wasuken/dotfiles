@@ -114,6 +114,7 @@
 (use-package request :ensure t)
 (add-to-list 'load-path "~/dotfiles/simple_emacs/lib")
 (load "util.el")
+(load "keymap.el")
 
 ;; ----------------------------------------------------------------
 ;; use-package

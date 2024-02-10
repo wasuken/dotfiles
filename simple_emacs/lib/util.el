@@ -1,16 +1,8 @@
 ;; tab-bar
 
-(global-set-key (kbd "C-c z c") 'tab-bar-new-tab)
-(global-set-key (kbd "C-c z n") 'tab-bar-switch-to-next-tab)
-(global-set-key (kbd "C-c z b") 'tab-bar-switch-to-prev-tab)
-
-
 (defun insert-current-time()
   (interactive)
   (insert (format-time-string "%Y-%m-%d(%a) %H:%M:%S" (current-time))))
-
-(global-set-key (kbd "C->") 'other-window)
-(global-set-key (kbd "C-<") (lambda () (interactive) (other-window -1)))
 
 (defun format-yaml-lines (items indent)
   (string-join (mapcar #'(lambda (x) (format "%s- \"%s\"" indent x)) items) "
@@ -43,7 +35,6 @@ tags:
 
 
 
-(global-set-key (kbd "C-c b i") 'insert-hugo-header)
 
 (defvar *create-md-link-url* "")
 
@@ -60,7 +51,6 @@ tags:
 		(string-match "<title>\\(.*?\\)</title>" data)
 		(insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
 
-(global-set-key (kbd "C-c l") #'create-md-link)
 
 (require 'seq)
 
@@ -133,12 +123,8 @@ tags:
 	  (if this-win-2nd (other-window 1))))
     (princ "count-windows is not 2")))
 
-(global-set-key (kbd "C-x t s") 'toggle-window-split)
-
-(defun insert-hugo-diary-header ()
-  (interactive)
-  (goto-char 0)
-  (insert (format "---
+(defun generate-hugo-diary-header-text ()
+  (format "---
 title: \"日記\"
 description:
 date: %s
@@ -149,6 +135,27 @@ tags:
   - \"life\"
 ---
 " (format-time-string "%Y-%m-%d")))
+
+(defun insert-hugo-diary-header ()
+  (interactive)
+  (goto-char 0)
+  (insert (generate-hugo-diary-header-text))
   )
 
-(define-key markdown-mode-map (kbd "C-c d") 'insert-hugo-diary-header)
+(setf *diary-directory-path* "/home/wasu/memo/diary/")
+
+(defun generate-today-diary-file ()
+  (interactive)
+  ;; カレントディレクトリ
+  (let* ((diary-file-path (format "%s%s"
+				  *diary-directory-path*
+				  (format-time-string "%Y/%m/%d.md"))))
+
+    (if (file-exists-p diary-file-path)
+	(message "already exists file.")
+      (with-temp-buffer
+	(insert (generate-hugo-diary-header-text))
+	(write-file diary-file-path)))
+    (find-file diary-file-path)
+    )
+  )

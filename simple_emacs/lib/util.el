@@ -20,14 +20,14 @@
   (interactive)
   (goto-char 0)
   (let* ((ts (format-time-string "%Y-%m-%d"))
-		 (title (read-string "title: "))
-		 (categories-str (read-string "categories(a,b): "))
-		 (tags-str (read-string "tags(a,b): "))
-		 (categories (split-string categories-str ","))
-		 (tags (mapcar #'string-trim (split-string tags-str ",")))
-		 )
-	(insert
-	 (format "---
+	 (title (read-string "title: "))
+	 (categories-str (read-string "categories(a,b): "))
+	 (tags-str (read-string "tags(a,b): "))
+	 (categories (split-string categories-str ","))
+	 (tags (mapcar #'string-trim (split-string tags-str ",")))
+	 )
+    (insert
+     (format "---
 title: \"%s\"
 description:
 date: %s
@@ -38,7 +38,7 @@ tags:
 %s
 ---
 " title ts (format-yaml-lines categories "  ") (format-yaml-lines tags "  ")))
-	)
+    )
   )
 
 
@@ -51,14 +51,14 @@ tags:
   (interactive)
   (setq *create-md-link-url* (read-string "url: "))
   (request
-	*create-md-link-url*
-	:parser 'buffer-string
-	:error (cl-function (lambda (&key error-thrown &allow-other-keys&rest _)
-						  (message "Got error: %S" error-thrown)))
-	:success (cl-function
-			  (lambda (&key data &allow-other-keys)
-				(string-match "<title>\\(.*?\\)</title>" data)
-				(insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
+    *create-md-link-url*
+    :parser 'buffer-string
+    :error (cl-function (lambda (&key error-thrown &allow-other-keys&rest _)
+			  (message "Got error: %S" error-thrown)))
+    :success (cl-function
+	      (lambda (&key data &allow-other-keys)
+		(string-match "<title>\\(.*?\\)</title>" data)
+		(insert (format "[%s](%s)" (match-string 1 data) *create-md-link-url*))))))
 
 (global-set-key (kbd "C-c l") #'create-md-link)
 
@@ -75,7 +75,7 @@ tags:
     ;; Sort by creation time and take the N latest files
     (mapcar 'car
 	    (seq-take (sort files-with-times (lambda (a b)
-						(time-less-p (cdr b) (cdr a))))
+					       (time-less-p (cdr b) (cdr a))))
 		      n))))
 
 (defun open-files-vertically (file-paths)
@@ -134,3 +134,21 @@ tags:
     (princ "count-windows is not 2")))
 
 (global-set-key (kbd "C-x t s") 'toggle-window-split)
+
+(defun insert-hugo-diary-header ()
+  (interactive)
+  (goto-char 0)
+  (insert (format "---
+title: \"日記\"
+description:
+date: %s
+draft: false
+categories:
+  - \"diary\"
+tags:
+  - \"life\"
+---
+" (format-time-string "%Y-%m-%d")))
+  )
+
+(define-key markdown-mode-map (kbd "C-c d") 'insert-hugo-diary-header)

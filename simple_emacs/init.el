@@ -106,7 +106,7 @@
 	      str (concat str "--")))
       (concat str "-> "))))
 
-(advice-add 'org-clocktable-indent-string :override #'my-org-clocktable-indent-string)
+(advice-add 'org-clocktable-indent-string :override 'my-org-clocktable-indent-string)
 
 ;; ============== end org-mode ==============
 
@@ -259,6 +259,7 @@
   (org-image-actual-width nil))
 
 (use-package eglot :ensure t
+  :hook (go-ts-mode . eglot-ensure)
   :config)
 
 (use-package vertico
@@ -399,16 +400,16 @@
 
   ;; By default `consult-project-function' uses `project-root' from project.el.
   ;; Optionally configure a different project root function.
-  ;;;; 1. project.el (the default)
+	;;;; 1. project.el (the default)
   ;; (setq consult-project-function #'consult--default-project--function)
-  ;;;; 2. vc.el (vc-root-dir)
+	;;;; 2. vc.el (vc-root-dir)
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
-  ;;;; 3. locate-dominating-file
+	;;;; 3. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-  ;;;; 4. projectile.el (projectile-project-root)
+	;;;; 4. projectile.el (projectile-project-root)
   ;; (autoload 'projectile-project-root "projectile")
   ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
-  ;;;; 5. No project support
+	;;;; 5. No project support
   ;; (setq consult-project-function nil)
   )
 
@@ -481,17 +482,17 @@
 		   (list :textDocument (eglot--TextDocumentIdentifier))))
 	 (action (cl-find-if
 		  (jsonrpc-lambda (&key kind &allow-other-keys)
-		    (string-equal kind "source.organizeImports" ))
+				  (string-equal kind "source.organizeImports" ))
 		  actions)))
     (when action
       (eglot--dcase action
-	(((Command) command arguments)
-	 (eglot-execute-command server (intern command) arguments))
-	(((CodeAction) edit command)
-	 (when edit (eglot--apply-workspace-edit edit))
-	 (when command
-	   (eglot--dbind ((Command) command arguments) command
-	     (eglot-execute-command server (intern command) arguments))))))))
+		    (((Command) command arguments)
+		     (eglot-execute-command server (intern command) arguments))
+		    (((CodeAction) edit command)
+		     (when edit (eglot--apply-workspace-edit edit))
+		     (when command
+		       (eglot--dbind ((Command) command arguments) command
+				     (eglot-execute-command server (intern command) arguments))))))))
 
 (defun eglot-organize-imports-on-save ()
   (defun eglot-organize-imports-nosignal ()
@@ -501,20 +502,35 @@
     ;; so that we do not prevent subsequent save hooks from running
     ;; if we encounter a spurious error.
     (with-demoted-errors "Error: %s" (eglot-organize-imports)))
-  (add-hook 'before-save-hook #'eglot-organize-imports-on-save)
+  (add-hook 'before-save-hook 'eglot-organize-imports-on-save)
   )
 
 (use-package go-mode :ensure t
   :config
-  (add-hook 'go-mode-hook #'eglot-organize-imports-on-save)
-  (add-hook 'go-mode-hook #'eglot-ensure)
+  (add-hook 'go-mode-hook 'eglot-organize-imports-on-save)
+  (add-hook 'go-mode-hook 'eglot-ensure)
   (add-hook 'before-save-hook 'gofmt-before-save)
-  (add-hook 'go-mode-hook
-	    (lambda ()
-	      (setq-default)
-	      (setq tab-width 2)
-	      (setq standard-indent 2)
-	      (setq indent-tabs-mode nil)))
+  ;; (add-hook 'go-mode-hook 'my-go-mode-hook)
+  (define-key go-mode-map (kbd "C-c =")
+	      #'(lambda ()
+		  (interactive)
+		  (insert ":=")))
+  )
+
+(defun gofmt-ts-before-save ()
+  (interactive)
+  (when (eq major-mode 'go-ts-mode) (gofmt)))
+
+(use-package go-ts-mode
+  :config
+  (add-hook 'go-ts-mode-hook 'eglot-organize-imports-on-save)
+  (add-hook 'go-ts-mode-hook 'eglot-ensure)
+  (add-hook 'before-save-hook 'gofmt-ts-before-save)
+  ;; (add-hook 'go-ts-mode-hook 'my-go-mode-hook)
+  (define-key go-ts-mode-map (kbd "C-c =")
+	      #'(lambda ()
+		  (interactive)
+		  (insert ":=")))
   )
 
 (setq exec-path (cons (expand-file-name "~/bin") exec-path))
@@ -641,6 +657,7 @@
 
 (use-package haskell-mode
   :ensure t
+  :mode ("\\.hs\\'" . haskell-mode)
   :init
   (progn
     (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
@@ -666,8 +683,6 @@
     )
   )
 
-
-
 (use-package flycheck-haskell
   :ensure t
   :config
@@ -684,12 +699,37 @@
 (use-package lsp-haskell
   :ensure t
   :config
-  (add-hook 'haskell-mode-hook #'lsp)
+  (add-hook 'haskell-mode-hook 'lsp)
   )
+
+(use-package elcord
+  :ensure t)
+
+(defun plantuml-preview-frame (prefix)
+  (interactive "p")
+  (plantuml-preview 16))
+
+(use-package plantuml-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+  (setq plantuml-executable-path "plantuml")
+  (setq plantuml-default-exec-mode 'executable)
+  (setq plantuml-output-type "png")
+  (add-hook 'plantuml-mode-hook
+	    (lambda ()
+	      (define-key plantuml-mode-map (kbd "C-c C-p") 'plantuml-preview-frame)
+	      (setq plantuml-executable-args
+		    (append plantuml-executable-args '("-charset" "UTF-8")))))
+
+)
 
 (defun reload-config ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
+
+(when (treesit-ready-p 'go)
+  (treesit-parser-create 'go))
 
 ;; (vs-dark-theme)
 (load-theme 'leuven-dark t)
@@ -703,10 +743,13 @@
  '(custom-safe-themes
    '("34af44a659b79c9f92db13ac7776b875a8d7e1773448a8301f97c18437a822b6" "c05fd2078f02a7585cbf9c08c854fef95c5c284d52a26a71c6f7a139e2127d34" "7f1d414afda803f3244c6fb4c2c64bea44dac040ed3731ec9d75275b9e831fe5" "3e200d49451ec4b8baa068c989e7fba2a97646091fd555eca0ee5a1386d56077" "833ddce3314a4e28411edf3c6efde468f6f2616fc31e17a62587d6a9255f4633" "4c56af497ddf0e30f65a7232a8ee21b3d62a8c332c6b268c81e9ea99b11da0d3" "00445e6f15d31e9afaa23ed0d765850e9cd5e929be5e8e63b114a3346236c44c" "285d1bf306091644fb49993341e0ad8bafe57130d9981b680c1dbd974475c5c7" "830877f4aab227556548dc0a28bf395d0abe0e3a0ab95455731c9ea5ab5fe4e1" "fee7287586b17efbfda432f05539b58e86e059e78006ce9237b8732fde991b4c" default))
  '(package-selected-packages
-   '(haskell haskell-mode poly-markdown yasnippet dockerfile-mode docker-compose-mode yaml prisma-ts-mode cider clojure-mode clojure yas-minor-mode leuven-theme slime-company tree-sitter-langs tree-sitter prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package)))
+   '(plantuml-mode elcord haskell haskell-mode poly-markdown yasnippet dockerfile-mode docker-compose-mode yaml prisma-ts-mode cider clojure-mode clojure yas-minor-mode leuven-theme slime-company tree-sitter prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package))
+ '(warning-suppress-log-types '((comp) (comp) (treesit))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)

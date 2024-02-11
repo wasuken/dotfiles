@@ -8,6 +8,21 @@
   (string-join (mapcar #'(lambda (x) (format "%s- \"%s\"" indent x)) items) "
 "))
 
+(defun generate-diary-text (title description date categories tags contents)
+  (format "---
+title: \"%s\"
+description: %s
+date: %s
+draft: false
+categories:
+%s
+tags:
+%s
+---
+
+%s
+" title description date categories tags contents))
+
 (defun insert-hugo-header ()
   (interactive)
   (goto-char 0)
@@ -19,17 +34,9 @@
 	 (tags (mapcar #'string-trim (split-string tags-str ",")))
 	 )
     (insert
-     (format "---
-title: \"%s\"
-description:
-date: %s
-draft: false
-categories:
-%s
-tags:
-%s
----
-" title ts (format-yaml-lines categories "  ") (format-yaml-lines tags "  ")))
+     (generate-diary-text title ts
+			  (format-yaml-lines categories "  ") (format-yaml-lines tags "  ")
+			  ""))
     )
   )
 
@@ -123,18 +130,7 @@ tags:
 	  (if this-win-2nd (other-window 1))))
     (princ "count-windows is not 2")))
 
-(defun generate-hugo-diary-header-text ()
-  (format "---
-title: \"日記\"
-description:
-date: %s
-draft: false
-categories:
-  - \"diary\"
-tags:
-  - \"life\"
----
-
+(setq *diary-mental-template* "
 ---
 
 # mental
@@ -178,17 +174,34 @@ tags:
 | 夜   |      |
 
 ## 所感
-" (format-time-string "%Y-%m-%d")))
+")
+
+(defun generate-hugo-diary-header-text ()
+  (generate-diary-text "日記"
+		       "日記"
+		       (format-time-string "%Y-%m-%d")
+		       "  - \"diary\""
+		       "  - \"life\""
+		       "")
+  )
 
 (defun insert-hugo-diary-header ()
+  "本日の日記ヘッダを生成してカレントバッファの先頭に挿入する"
   (interactive)
   (goto-char 0)
-  (insert (generate-hugo-diary-header-text))
+  (insert (generate-diary-text
+	   "日記"
+	   ""
+	   (format-time-string "%Y-%m-%d")
+	   "  - \"diary\""
+	   "  - \"life\""
+	   *diary-mental-template*))
   )
 
 (setf *diary-directory-path* "/home/wasu/memo/diary/")
 
 (defun generate-today-diary-file ()
+  "本日の日記ファイルを生成する"
   (interactive)
   ;; カレントディレクトリ
   (let* ((diary-file-path (format "%s%s"
@@ -198,7 +211,13 @@ tags:
     (if (file-exists-p diary-file-path)
 	(message "already exists file.")
       (with-temp-buffer
-	(insert (generate-hugo-diary-header-text))
+	(insert (generate-diary-text
+		 "日記"
+		 ""
+		 (format-time-string "%Y-%m-%d")
+		 "  - \"diary\""
+		 "  - \"life\""
+		 *diary-mental-template*))
 	(write-file diary-file-path)))
     (find-file diary-file-path)
     )

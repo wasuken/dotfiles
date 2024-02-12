@@ -134,3 +134,5 @@ tags:
     (princ "count-windows is not 2")))
 
 (global-set-key (kbd "C-x t s") 'toggle-window-split)
+
+(global-set-key (kbd "C-c g") 'find-grep)

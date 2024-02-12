@@ -67,4 +67,6 @@ packer.startup(function(use)
     }
   }
   use 'vlime/vlime'
+  use 'ray-x/go.nvim'
+  use 'ray-x/guihua.lua'
 end)

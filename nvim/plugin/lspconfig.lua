@@ -72,6 +72,8 @@ nvim_lsp.gopls.setup {
   filetypes = { "go" }
 }
 
+require('go').setup {}
+
 nvim_lsp.flow.setup {
   on_attach = on_attach,
   capabilities = capabilities

@@ -198,7 +198,7 @@ tags:
 	   *diary-mental-template*))
   )
 
-(setf *diary-directory-path* "/home/wasu/memo/diary/")
+(setf *diary-directory-path* (expand-file-name "~/memo/diary/"))
 
 (defun generate-today-diary-file ()
   "本日の日記ファイルを生成する"
@@ -222,3 +222,9 @@ tags:
     (find-file diary-file-path)
     )
   )
+
+;; ruby
+(defun run-ruby-test-unit ()
+  (interactive)
+  (let ((test-command (format "bundle exec ruby %s" (buffer-file-name))))
+    (compile test-command)))

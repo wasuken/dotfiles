@@ -10,3 +10,4 @@
 
 ;; my keymap
 (global-set-key (kbd "C-c g") 'find-grep)
+(global-set-key (kbd "C-c M-d") 'generate-today-diary-file)

@@ -525,6 +525,10 @@
   (interactive)
   (when (eq major-mode 'go-ts-mode) (gofmt)))
 
+(use-package ruby-ts-mode
+  :config
+  (define-key ruby-ts-mode-map (kbd "C-c b t") 'run-ruby-test-unit))
+
 (use-package go-ts-mode
   :config
   (add-hook 'go-ts-mode-hook 'eglot-organize-imports-on-save)

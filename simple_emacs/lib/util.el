@@ -34,8 +34,11 @@ tags:
 	 (tags (mapcar #'string-trim (split-string tags-str ",")))
 	 )
     (insert
-     (generate-diary-text title ts
-			  (format-yaml-lines categories "  ") (format-yaml-lines tags "  ")
+     (generate-diary-text title
+			  ""
+			  ts
+			  (format-yaml-lines categories "  ")
+			  (format-yaml-lines tags "  ")
 			  ""))
     )
   )

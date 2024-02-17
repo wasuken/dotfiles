@@ -11,4 +11,3 @@
 ;; my keymap
 (global-set-key (kbd "C-c g") 'find-grep)
 (global-set-key (kbd "C-c M-d") 'generate-today-diary-file)
-(define-key ruby-ts-mode-map (kbd "C-c b t") 'run-ruby-test-unit)

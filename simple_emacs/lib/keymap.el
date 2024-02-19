@@ -3,7 +3,6 @@
 (global-set-key (kbd "C-c l") 'create-md-link)
 (global-set-key (kbd "C-x t s") 'toggle-window-split)
 (global-set-key (kbd "C-c M-d") 'generate-today-diary-file)
-(define-key markdown-mode-map (kbd "C-c RET") 'simple-formatting)
 
 ;; my keymap
 (global-set-key (kbd "C-c g") 'find-grep)

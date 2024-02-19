@@ -464,7 +464,8 @@
 (use-package markdown-mode :ensure t
   :config
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-  (define-key markdown-mode-map (kbd "C-c d") #'insert-hugo-diary-header))
+  (define-key markdown-mode-map (kbd "C-c d") #'insert-hugo-diary-header)
+  (define-key markdown-mode-map (kbd "C-c RET") 'simple-formatting))
 
 (use-package golden-ratio :ensure t
   :config

@@ -241,6 +241,6 @@ tags:
 	     (end (region-end))
 	     (region-text (buffer-substring-no-properties begin end)))
 	(delete-region begin end)
-	(insert (replace-regexp-in-string "[。.]" "\n" region-text)))
+	(insert (replace-regexp-in-string "[。.]" "\\&\n" region-text)))
     (message "リージョンが選択されていません。"))
   )

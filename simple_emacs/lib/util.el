@@ -133,9 +133,7 @@ tags:
 	  (if this-win-2nd (other-window 1))))
     (princ "count-windows is not 2")))
 
-(global-set-key (kbd "C-x t s") 'toggle-window-split)
 
-(global-set-key (kbd "C-c g") 'find-grep)
 (setq *diary-mental-template* "
 ---
 
@@ -234,3 +232,15 @@ tags:
   (interactive)
   (let ((test-command (format "bundle exec ruby %s" (buffer-file-name))))
     (compile test-command)))
+
+
+(defun simple-formatting ()
+  (interactive)
+  (if (use-region-p)
+      (let* ((begin (region-beginning))
+	     (end (region-end))
+	     (region-text (buffer-substring-no-properties begin end)))
+	(delete-region begin end)
+	(insert (replace-regexp-in-string "[。.]" "\\&\n" region-text)))
+    (message "リージョンが選択されていません。"))
+  )

@@ -756,7 +756,7 @@
  '(org-agenda-files
    '("/home/wasu/org/agenda.org" "/home/wasu/org/knowledge.org"))
  '(package-selected-packages
-   '(plantuml-mode elcord haskell haskell-mode poly-markdown yasnippet dockerfile-mode docker-compose-mode yaml prisma-ts-mode cider clojure-mode clojure yas-minor-mode leuven-theme slime-company tree-sitter prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package))
+   '(php-mode plantuml-mode elcord haskell haskell-mode poly-markdown yasnippet dockerfile-mode docker-compose-mode yaml prisma-ts-mode cider clojure-mode clojure yas-minor-mode leuven-theme slime-company tree-sitter prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package))
  '(warning-suppress-log-types '((comp) (comp) (treesit))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

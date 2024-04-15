@@ -745,7 +745,7 @@
 
 ;; (vs-dark-theme)
 (load-theme 'leuven-dark t)
-(set-frame-font "Noto Sans Mono-8")
+(set-frame-font "Noto Sans Mono-7")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

@@ -11,3 +11,4 @@
 (global-set-key (kbd "C-c z c") 'tab-bar-new-tab)
 (global-set-key (kbd "C-c z n") 'tab-bar-switch-to-next-tab)
 (global-set-key (kbd "C-c z b") 'tab-bar-switch-to-prev-tab)
+(global-set-key (kbd "C-c x r") 'revert-buffer-no-confirm)

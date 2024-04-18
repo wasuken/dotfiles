@@ -592,15 +592,18 @@
   (add-hook 'typescript-ts-mode-hook 'prettier-js-mode)
   (add-hook 'typescript-ts-tsx-mode-hook 'prettier-js-mode)
   (add-hook 'web-mode-hook 'prettier-js-mode)
+
   (add-hook 'typescript-ts-mode-hook
 	    (lambda ()
-	      (add-hook 'after-save-hook 'prettier-js nil 'local)))
+	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
+
   (add-hook 'typescript-ts-tsx-mode-hook
 	    (lambda ()
-	      (add-hook 'after-save-hook 'prettier-js nil 'local)))
+	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
+
   (add-hook 'web-mode-hook
 	    (lambda ()
-	      (add-hook 'after-save-hook 'prettier-js nil 'local)))
+	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
   )
 
 ;; (use-package prettier
@@ -761,7 +764,7 @@
 	      (setq plantuml-executable-args
 		    (append plantuml-executable-args '("-charset" "UTF-8")))))
 
-)
+  )
 
 (defun reload-config ()
   (interactive)

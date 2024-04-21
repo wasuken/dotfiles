@@ -34,3 +34,9 @@
 (unless IS-LINUX
   (setq command-line-x-option-alist nil))
 
+;; (let ((font-size (getenv "EMACS_FONT")))
+;;   (cond
+;;    (font-size
+;;     (set-frame-font font-size))
+;;    (t (set-frame-font "Noto Sans Mono-8"))))
+

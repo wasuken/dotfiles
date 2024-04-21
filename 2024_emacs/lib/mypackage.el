@@ -519,9 +519,9 @@
   (marginalia-mode +1))
 
 (use-package embark
-  :bind (("C-." . embark-act)         ;; pick some comfortable binding
-         ("C-;" . embark-dwim)        ;; good alternative: M-.
-         ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+  :bind (("C-c e ." . embark-act)         ;; pick some comfortable binding
+         ("C-c e ;" . embark-dwim)        ;; good alternative: M-.
+         ("C-c e b" . embark-bindings)) ;; alternative for `describe-bindings'
   :config
   (setq prefix-help-command #'embark-prefix-help-command)
 
@@ -591,6 +591,10 @@
   (undo-fu-session-global-mode +1))
 
 (use-package vundo)
+
+(use-package golden-ratio
+  :config
+  (golden-ratio-mode))
 
 (use-package rg
   :defer t)
@@ -935,10 +939,17 @@
 (use-package pyvenv
   :defer t)
 
+;; (use-package slime
+;;   :defer t
+;;   :config
+;;   (setq inferior-lisp-program "sbcl"))
+
 (use-package slime
-  :defer t
-  :config
-  (setq inferior-lisp-program "sbcl"))
+  :if (file-exists-p "~/.roswell/helper.el")
+  :ensure slime-company
+  :init (load "~/.roswell/helper.el")
+  :custom (inferior-lisp-program "ros -Q run")
+  :config (slime-setup '(slime-fancy slime-company)))
 
 (use-package slime-company
   :after (slime company)

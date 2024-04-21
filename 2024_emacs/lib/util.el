@@ -255,3 +255,6 @@ tags:
   (if (or force-reverting (not (buffer-modified-p)))
       (revert-buffer :ignore-auto :noconfirm)
     (error "The buffer has been modified")))
+
+(defun my/save-all-buffers ()
+  (save-some-buffers "!"))

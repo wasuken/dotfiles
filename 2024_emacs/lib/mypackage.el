@@ -670,7 +670,10 @@
   :config
   (setq treesit-auto-install 'prompt)
   (treesit-auto-add-to-auto-mode-alist 'all)
+  (setq treesit-auto-install t)
   (global-treesit-auto-mode +1))
+
+(setq treesit-font-lock-level 4)
 
 (use-package string-inflection
   :bind ( :map my-string-inflection-map
@@ -963,4 +966,5 @@
 (use-package sqlformat
   :config
   (setq sqlformat-command "sqlfluff"))
+
 

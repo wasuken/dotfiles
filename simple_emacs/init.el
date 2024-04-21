@@ -62,7 +62,7 @@
 (define-key global-map (kbd "C-c a") 'org-agenda)
 
 ;; アジェンダ表示で下線を用いる
-(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+(add-hook 'org-agenda-mode-hook #'(lambda () (hl-line-mode 1)))
 (setq hl-line-face 'underline)
 
 ;; 標準の祝日を利用しない
@@ -113,6 +113,18 @@
 
 ;; ============== end org-mode ==============
 
+(defun my-find-file-check-mode ()
+  "Set major mode to fundamental-mode if an error occurs."
+  (condition-case err
+      (progn
+	(normal-mode)
+	(run-hooks 'find-file-hook))
+    (error
+     (message "Error setting major mode: %s" (error-message-string err))
+     (fundamental-mode))))
+
+(setq-default major-mode 'fundamental-mode)
+(add-hook 'find-file-hook 'my-find-file-check-mode)
 
 ;; lib内部で利用するため
 (use-package request :ensure t)
@@ -596,15 +608,18 @@
   (add-hook 'typescript-ts-mode-hook 'prettier-js-mode)
   (add-hook 'typescript-ts-tsx-mode-hook 'prettier-js-mode)
   (add-hook 'web-mode-hook 'prettier-js-mode)
+
   (add-hook 'typescript-ts-mode-hook
-	    (lambda ()
-	      (add-hook 'after-save-hook 'prettier-js nil 'local)))
+	    #'(lambda ()
+	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
+
   (add-hook 'typescript-ts-tsx-mode-hook
-	    (lambda ()
-	      (add-hook 'after-save-hook 'prettier-js nil 'local)))
+	    #'(lambda ()
+	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
+
   (add-hook 'web-mode-hook
-	    (lambda ()
-	      (add-hook 'after-save-hook 'prettier-js nil 'local)))
+	    #'(lambda ()
+	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
   )
 
 ;; (use-package prettier
@@ -760,12 +775,12 @@
   (setq plantuml-default-exec-mode 'executable)
   (setq plantuml-output-type "png")
   (add-hook 'plantuml-mode-hook
-	    (lambda ()
+	    #'(lambda ()
 	      (define-key plantuml-mode-map (kbd "C-c C-p") 'plantuml-preview-frame)
 	      (setq plantuml-executable-args
 		    (append plantuml-executable-args '("-charset" "UTF-8")))))
 
-)
+  )
 
 (defun reload-config ()
   (interactive)
@@ -776,7 +791,11 @@
 
 ;; (vs-dark-theme)
 (load-theme 'leuven-dark t)
-(set-frame-font "Noto Sans Mono-7")
+
+(let ((font-size (getenv "EMACS_FONT")))
+  (cond (font-size
+	 (set-frame-font font-size))
+	(t (set-frame-font "Noto Sans Mono-8"))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -788,7 +807,7 @@
  '(org-agenda-files
    '("/home/wasu/org/agenda.org" "/home/wasu/org/knowledge.org"))
  '(package-selected-packages
-   '(json-mode prettier-js php-mode plantuml-mode elcord haskell haskell-mode poly-markdown yasnippet dockerfile-mode docker-compose-mode yaml prisma-ts-mode cider clojure-mode clojure yas-minor-mode leuven-theme slime-company tree-sitter prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package))
+   '(shell-script-mode  prettier-js php-mode plantuml-mode elcord haskell haskell-mode poly-markdown yasnippet dockerfile-mode docker-compose-mode yaml prisma-ts-mode cider clojure-mode clojure yas-minor-mode leuven-theme slime-company tree-sitter prettier treesit-auto elfeed mwim path-headerline-mode path-header-mode neotree exec-path-from-shell lsp-mode go-mode request ddskk-posframe ddskk golden-ratio markdown-mode embark-consult embark marginalia consult orderless vertico biblio company-tabnine ace-window ace-jump-mode gitignore vs-dark-theme solarized-theme dashboard org-tree-slide which-key web-mode swiper flycheck magit gitignore-mode ivy rainbow-mode emojify use-package))
  '(warning-suppress-log-types '((comp) (comp) (treesit))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

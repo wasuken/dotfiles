@@ -15,3 +15,9 @@ $ touch dotfiles/zsh/config.zsh
 # $home/.config/ディレクトリで
 $ ln -sf ~/dotfiles/nvim ./
 ```
+
+## emacs
+
+```bash
+$ ln -sf ~/dotfiles/init.el ~/.emacs.d/init.el
+```

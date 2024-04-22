@@ -31,3 +31,5 @@
 ;; (add-hook 'find-file-hook 'my-find-file-check-mode)
 
 (add-hook 'sh-mode-hook 'sh-set-shell)
+
+(global-display-line-numbers-mode t)

@@ -556,8 +556,7 @@
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
          ("M-*" . tempel-insert)))
 
-(use-package tempel-collection
-  :after tempel)
+(use-package tempel-collection :after tempel)
 
 (use-package magit
   :config
@@ -706,7 +705,7 @@
 
 (use-package go-translate
   :config
-  (setq gts-translate-list '(("en" "ja")))
+  (setq gts-translate-list '(("en" "ja") ("ja" "en")))
   )
 
 (use-package avy
@@ -716,6 +715,13 @@
   :config
   (custom-set-faces
    '(aw-leading-char-face ((t (:foreground "red" :height 4.0))))))
+
+(use-package ace-jump-mode
+  :config
+  (define-key global-map (kbd "C-'") #'ace-jump-char-mode)
+  (define-key global-map (kbd "C-M-'") #'ace-jump-word-mode)
+  (define-key global-map (kbd "M-'") #'ace-jump-line-mode)
+  )
 
 (use-package migemo
   :config

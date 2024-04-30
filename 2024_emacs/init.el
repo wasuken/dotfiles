@@ -24,29 +24,30 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-window aggressive-indent apheleia auto-compile
-                auto-package-update avy beframe breadcrumb cape cargo
-                company consult consult-eglot corfu corfu-prescient
-                corfu-terminal dashboard ddskk ddskk-posframe diff-hl
-                difftastic ef-themes eglot-booster
-                eglot-signature-eldoc-talkative eglot-tempel eglot-x
-                eldoc-box embark embark-consult emmet-mode expreg flx
-                flymake-collection fontaine go-translate goggles
-                golden-ratio golden-ratio-mode highlight-defined
-                highlight-quoted imenu-list jsonrpc jtsx lin macrostep
-                magit marginalia markdown-mode migemo minions
-                modus-themes mozc nerd-icons-completion
-                nerd-icons-corfu nerd-icons-dired nyan-mode orderless
-                page-break-lines perfect-margin php-mode popon
-                prescient pulsar puni pyvenv rainbow-delimiters
-                reformatter rg rust-mode skk slime slime-company
-                spacious-padding sql-indent sqlformat
-                string-inflection tabnine tempel tempel-collection
-                tr-ime transient tree-sitter tree-sitter-langs treesit
-                treesit-auto treesitter typescript-mode undo-fu
-                undo-fu-session vc-use-package vertico
-                vertico-prescient vertico-truncate vundo web-beautify
-                wgrep which-key))
+
+   '(ace-jump-mode ace-window aggressive-indent apheleia auto-compile
+                   auto-package-update avy beframe breadcrumb cape
+                   cargo company consult consult-eglot corfu
+                   corfu-prescient corfu-terminal dashboard diff-hl
+                   difftastic ef-themes eglot-booster
+                   eglot-signature-eldoc-talkative eglot-tempel
+                   eglot-x eldoc-box embark embark-consult emmet-mode
+                   expreg flx flymake-collection fontaine go-translate
+                   goggles golden-ratio golden-ratio-mode
+                   highlight-defined highlight-quoted imenu-list
+                   jsonrpc jtsx lin macrostep magit marginalia
+                   markdown-mode migemo minions modus-themes mozc
+                   nerd-icons-completion nerd-icons-corfu
+                   nerd-icons-dired nyan-mode orderless
+                   page-break-lines perfect-margin popon prescient
+                   pulsar puni pyvenv rainbow-delimiters reformatter
+                   rg rust-mode slime slime-company spacious-padding
+                   sql-indent sqlformat string-inflection tabnine
+                   tempel tempel-collection tr-ime transient treesit
+                   treesit-auto treesitter typescript-mode undo-fu
+                   undo-fu-session vc-use-package vertico
+                   vertico-prescient vertico-truncate vundo
+                   web-beautify wgrep which-key))
  '(package-vc-selected-packages
    '((nerd-icons-corfu :vc-backend Git :url
                        "https://github.com/LuigiPiucco/nerd-icons-corfu")

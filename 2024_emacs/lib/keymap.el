@@ -17,4 +17,3 @@
 (global-set-key (kbd "C-c s s") #'replace-string)
 
 
-;; (add-hook 'focus-out-hook #'my/save-all-buffers)

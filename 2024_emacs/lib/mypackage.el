@@ -113,10 +113,26 @@
   (w32-ime-initialize))
 
 
-(use-package mozc
-  :unless IS-WINDOWS
+;; ignore
+;; (use-package mozc
+;;   :ensure t
+;;   :config
+;;   (setq default-input-method "japanese-mozc")
+;;   (setq mozc-candidate-style 'overlay))
+
+(use-package ddskk
   :config
-  (setq default-input-method "japanese-mozc"))
+  (setq default-input-method "japanese-skk")
+  (setq skk-large-jisyo "~/.emacs.d/SKK-JISYO.L")
+  (setq skk-jisyo-list '("~/.emacs.d/SKK-JISYO.L" "~/.emacs.d/SKK-JISYO.propernoun"))
+  (require 'skk-study))
+
+(use-package ddskk-posframe)
+
+;; (use-package skk
+;;   :config
+;;   (global-set-key (kbd "<zenkaku-hankaku>") 'skk-mode)
+;;   (global-set-key (kbd "C-<zenkaku-hankaku>") 'skk-katakana-region))
 
 
 (use-package fontaine

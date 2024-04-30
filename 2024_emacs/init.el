@@ -24,10 +24,34 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(treesitter treesit golden-ratio-mode golden-ratio modus-themes nerd-icons-corfu sqlformat slime-company slime cargo eglot-signature-eldoc-talkative eglot-x eglot-booster consult-eglot eglot-tempel ace-window rg difftastic magit tempel-collection tempel embark-consult embark marginalia consult corfu-prescient vertico-prescient vertico-truncate corfu-terminal tabnine which-key wgrep web-beautify vundo vertico vc-use-package undo-fu-session undo-fu typescript-mode treesit-auto transient tr-ime string-inflection sql-indent spacious-padding rust-mode reformatter rainbow-delimiters pyvenv puni pulsar prescient popon perfect-margin page-break-lines orderless nyan-mode nerd-icons-dired nerd-icons-completion mozc minions migemo markdown-mode macrostep lin jtsx jsonrpc imenu-list highlight-quoted highlight-defined goggles go-translate fontaine flymake-collection flx expreg emmet-mode eldoc-box ef-themes diff-hl dashboard corfu company cape breadcrumb beframe avy auto-package-update auto-compile apheleia aggressive-indent))
+   '(ace-window aggressive-indent apheleia auto-compile
+                auto-package-update avy beframe breadcrumb cape cargo
+                company consult consult-eglot corfu corfu-prescient
+                corfu-terminal dashboard ddskk ddskk-posframe diff-hl
+                difftastic ef-themes eglot-booster
+                eglot-signature-eldoc-talkative eglot-tempel eglot-x
+                eldoc-box embark embark-consult emmet-mode expreg flx
+                flymake-collection fontaine go-translate goggles
+                golden-ratio golden-ratio-mode highlight-defined
+                highlight-quoted imenu-list jsonrpc jtsx lin macrostep
+                magit marginalia markdown-mode migemo minions
+                modus-themes mozc nerd-icons-completion
+                nerd-icons-corfu nerd-icons-dired nyan-mode orderless
+                page-break-lines perfect-margin php-mode popon
+                prescient pulsar puni pyvenv rainbow-delimiters
+                reformatter rg rust-mode skk slime slime-company
+                spacious-padding sql-indent sqlformat
+                string-inflection tabnine tempel tempel-collection
+                tr-ime transient tree-sitter tree-sitter-langs treesit
+                treesit-auto treesitter typescript-mode undo-fu
+                undo-fu-session vc-use-package vertico
+                vertico-prescient vertico-truncate vundo web-beautify
+                wgrep which-key))
  '(package-vc-selected-packages
-   '((nerd-icons-corfu :vc-backend Git :url "https://github.com/LuigiPiucco/nerd-icons-corfu")
-     (vc-use-package :vc-backend Git :url "https://github.com/slotThe/vc-use-package"))))
+   '((nerd-icons-corfu :vc-backend Git :url
+                       "https://github.com/LuigiPiucco/nerd-icons-corfu")
+     (vc-use-package :vc-backend Git :url
+                     "https://github.com/slotThe/vc-use-package"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

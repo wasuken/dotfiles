@@ -29,7 +29,7 @@
 
 (use-package auto-package-update
   :config
-  (setq auto-package-update-interval 1)
+  (setq auto-package-update-interval 7)
   (auto-package-update-maybe))
 
 (use-package auto-compile

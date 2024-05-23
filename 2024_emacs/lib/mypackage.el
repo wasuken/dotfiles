@@ -703,10 +703,10 @@
   (defvar my-string-inflection-map (make-keymap))
   )
 
-(use-package go-translate
-  :config
-  (setq gts-translate-list '(("en" "ja") ("ja" "en")))
-  )
+;; (use-package go-translate
+;;   :config
+;;   (setq gts-translate-list '(("en" "ja") ("ja" "en")))
+;;   )
 
 (use-package avy
   )
@@ -989,4 +989,4 @@
   :config
   (setq sqlformat-command "sqlfluff"))
 
-
+(use-package docker-compose-mode)

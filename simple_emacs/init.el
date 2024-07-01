@@ -611,15 +611,15 @@
 
   (add-hook 'typescript-ts-mode-hook
 	    #'(lambda ()
-	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
+	        (add-hook 'before-save-hook 'prettier-js nil 'local)))
 
   (add-hook 'typescript-ts-tsx-mode-hook
 	    #'(lambda ()
-	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
+	        (add-hook 'before-save-hook 'prettier-js nil 'local)))
 
   (add-hook 'web-mode-hook
 	    #'(lambda ()
-	      (add-hook 'before-save-hook 'prettier-js nil 'local)))
+	        (add-hook 'before-save-hook 'prettier-js nil 'local)))
   )
 
 ;; (use-package prettier
@@ -776,9 +776,9 @@
   (setq plantuml-output-type "png")
   (add-hook 'plantuml-mode-hook
 	    #'(lambda ()
-	      (define-key plantuml-mode-map (kbd "C-c C-p") 'plantuml-preview-frame)
-	      (setq plantuml-executable-args
-		    (append plantuml-executable-args '("-charset" "UTF-8")))))
+	        (define-key plantuml-mode-map (kbd "C-c C-p") 'plantuml-preview-frame)
+	        (setq plantuml-executable-args
+		      (append plantuml-executable-args '("-charset" "UTF-8")))))
 
   )
 

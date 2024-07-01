@@ -77,10 +77,9 @@
   :config
   (global-subword-mode +1))
 
-(use-package simple
-  :ensure nil
-  :config
-  (setq-default indent-tabs-mode nil))
+;; (use-package simple
+;;   :config
+;;   (setq-default indent-tabs-mode nil))
 
 (use-package so-long
   :config
@@ -580,7 +579,6 @@
   ;; (global-diff-hl-show-hunk-mouse-mode +1)
   )
 
-
 (use-package difftastic
   :demand t
   :bind (:map magit-blame-read-only-mode-map
@@ -753,7 +751,7 @@
 (use-package goggles
   :hook ((prog-mode text-mode) . goggles-mode)
   :config
-  (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
+  (setq-default goggles-pulse t))
 
 (use-package spacious-padding
   :config
@@ -804,7 +802,6 @@
   :config
   (setq perfect-margin-ignore-filters nil)
   (perfect-margin-mode +1))
-
 
 (use-package dashboard
   :config
@@ -989,4 +986,7 @@
   :config
   (setq sqlformat-command "sqlfluff"))
 
-(use-package docker-compose-mode)
+(use-package docker-compose-mode
+  :mode (("docker-compose\\.yml\\'" . docker-compose-mode)
+         ("compose\\.yml\\'" . docker-compose-mode)
+         ("\\(?:docker\\|compose\\).+\\.yaml\\'" . docker-compose-mode)))

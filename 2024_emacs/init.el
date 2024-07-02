@@ -23,12 +23,35 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(ace-jump-mode ace-window aggressive-indent apheleia auto-compile
+		   auto-package-update beframe breadcrumb cape cargo
+		   cider consult-eglot corfu-prescient corfu-terminal
+		   dashboard ddskk-posframe diff-hl difftastic
+		   docker-compose-mode dockerfile-mode ef-themes
+		   eglot-booster eglot-signature-eldoc-talkative
+		   eglot-tempel eglot-x eldoc-box embark-consult
+		   emmet-mode exec-path-from-shell expreg flx flycheck
+		   flymake-collection fontaine go-mode go-translate
+		   goggles golden-ratio haskell-mode highlight-defined
+		   highlight-quoted imenu-list json-mode jtsx lin
+		   marginalia migemo minions mozc neotree
+		   nerd-icons-completion nerd-icons-corfu
+		   nerd-icons-dired nyan-mode orderless org-tree-slide
+		   page-break-lines perfect-margin php-mode pulsar
+		   puni pyvenv rainbow-delimiters rainbow-mode request
+		   rg rust-mode slime-company spacious-padding
+		   sql-indent sqlformat string-inflection swiper
+		   tabnine tempel-collection tr-ime tree-sitter-langs
+		   treesit-auto typescript-mode undo-fu
+		   undo-fu-session vc-use-package vertico-prescient
+		   vertico-truncate vterm vundo web-beautify web-mode
+		   which-key yasnippet))
  '(package-vc-selected-packages
    '((nerd-icons-corfu :vc-backend Git :url
-                       "https://github.com/LuigiPiucco/nerd-icons-corfu")
+		       "https://github.com/LuigiPiucco/nerd-icons-corfu")
      (vc-use-package :vc-backend Git :url
-                     "https://github.com/slotThe/vc-use-package"))))
+		     "https://github.com/slotThe/vc-use-package"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -40,6 +63,7 @@
  '(header-line-highlight ((t :box (:color "#afbcbf"))))
  '(keycast-key ((t)))
  '(line-number ((t :background "#000e17")))
+ '(line-number-current-line ((t (:inherit line-number))))
  '(mode-line ((t :background "#000e17" :overline "#ceeeff" :box (:line-width 6 :color "#000e17" :style nil))))
  '(mode-line-active ((t :background "#000e17" :overline "#ceeeff" :box (:line-width 6 :color "#000e17" :style nil))))
  '(mode-line-highlight ((t :box (:color "#afbcbf"))))

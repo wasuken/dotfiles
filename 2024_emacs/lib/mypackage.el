@@ -990,3 +990,6 @@
   :mode (("docker-compose\\.yml\\'" . docker-compose-mode)
          ("compose\\.yml\\'" . docker-compose-mode)
          ("\\(?:docker\\|compose\\).+\\.yaml\\'" . docker-compose-mode)))
+
+(use-package neotree
+  :bind ("C-c t" . neotree))

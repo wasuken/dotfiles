@@ -612,27 +612,28 @@
 (use-package rg
   :defer t)
 
-(use-package apheleia
-  :config
-  (when IS-WINDOWS
-    (add-to-list 'apheleia-formatters
-                 '(prettier-css
-                   . (npx "prettier" "--stdin-filepath" filepath "--parser=css"
-                          (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
-    (add-to-list 'apheleia-formatters
-                 '(prettier-html
-                   . (npx "prettier" "--stdin-filepath" filepath "--parser=html"
-                          (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
-    (add-to-list 'apheleia-formatters
-                 '(prettier-json
-                   . (npx "prettier" "--stdin-filepath" filepath "--parser=json"
-                          (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
-    (add-to-list 'apheleia-formatters
-                 '(prettier-typescript
-                   . (npx "prettier" "--stdin-filepath" filepath "--parser=typescript"
-                          (apheleia-formatters-js-indent "--use-tabs" "--tab-width")))))
+;; (use-package apheleia
+;;   :config
+;;   (when IS-WINDOWS
+;;     (add-to-list 'apheleia-formatters
+;;                  '(prettier-css
+;;                    . (npx "prettier" "--stdin-filepath" filepath "--parser=css"
+;;                           (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
+;;     (add-to-list 'apheleia-formatters
+;;                  '(prettier-html
+;;                    . (npx "prettier" "--stdin-filepath" filepath "--parser=html"
+;;                           (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
+;;     (add-to-list 'apheleia-formatters
+;;                  '(prettier-json
+;;                    . (npx "prettier" "--stdin-filepath" filepath "--parser=json"
+;;                           (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
+;;     (add-to-list 'apheleia-formatters
+;;                  '(prettier-typescript
+;;                    . (npx "prettier" "--stdin-filepath" filepath "--parser=typescript"
+;;                           (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
+;;     )
 
-  (apheleia-global-mode +1))
+;;   (apheleia-global-mode +1))
 
 (use-package ef-themes
   :config

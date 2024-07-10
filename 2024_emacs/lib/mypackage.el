@@ -685,6 +685,9 @@
   :config
   (setq treesit-auto-install 'prompt)
   (treesit-auto-add-to-auto-mode-alist 'all)
+  (add-to-list
+   'treesit-language-source-alist
+   '(prisma "https://github.com/victorhqc/tree-sitter-prisma"))
   (setq treesit-auto-install t)
   (global-treesit-auto-mode +1))
 

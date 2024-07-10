@@ -5,6 +5,11 @@ require('craftzdog.highlights')
 require('craftzdog.maps')
 require('craftzdog.plugins')
 
+local util_path = vim.fn.stdpath('config') .. '/util/?.lua'
+package.path = package.path .. ';' .. util_path
+
+require('cmd')
+
 local has = vim.fn.has
 local is_mac = has "macunix"
 local is_win = has "win32"

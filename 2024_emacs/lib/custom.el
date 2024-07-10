@@ -17,6 +17,9 @@
 
 (setq-default cursor-in-non-selected-windows nil)
 
+(custom-set-faces
+ '(line-number-current-line ((t (:inherit line-number)))))
+
 ;; (defun my-find-file-check-mode ()
 ;;   "Set major mode to fundamental-mode if an error occurs."
 ;;   (condition-case err

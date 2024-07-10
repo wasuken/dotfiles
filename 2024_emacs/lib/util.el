@@ -199,7 +199,9 @@ tags:
 	   (format-time-string "%Y-%m-%d")
 	   "  - \"diary\""
 	   "  - \"life\""
-	   *diary-mental-template*))
+	   ;; *diary-mental-template*
+	   ""
+	   ))
   )
 
 (setf *diary-directory-path* (expand-file-name "~/memo/diary/"))
@@ -221,7 +223,9 @@ tags:
 		 (format-time-string "%Y-%m-%d")
 		 "  - \"diary\""
 		 "  - \"life\""
-		 *diary-mental-template*))
+		 ;; *diary-mental-template*
+		 ""
+		 ))
 	(write-file diary-file-path)))
     (find-file diary-file-path)
     )

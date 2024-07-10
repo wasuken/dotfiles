@@ -77,10 +77,9 @@
   :config
   (global-subword-mode +1))
 
-(use-package simple
-  :ensure nil
-  :config
-  (setq-default indent-tabs-mode nil))
+;; (use-package simple
+;;   :config
+;;   (setq-default indent-tabs-mode nil))
 
 (use-package so-long
   :config
@@ -580,7 +579,6 @@
   ;; (global-diff-hl-show-hunk-mouse-mode +1)
   )
 
-
 (use-package difftastic
   :demand t
   :bind (:map magit-blame-read-only-mode-map
@@ -614,27 +612,28 @@
 (use-package rg
   :defer t)
 
-(use-package apheleia
-  :config
-  (when IS-WINDOWS
-    (add-to-list 'apheleia-formatters
-                 '(prettier-css
-                   . (npx "prettier" "--stdin-filepath" filepath "--parser=css"
-                          (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
-    (add-to-list 'apheleia-formatters
-                 '(prettier-html
-                   . (npx "prettier" "--stdin-filepath" filepath "--parser=html"
-                          (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
-    (add-to-list 'apheleia-formatters
-                 '(prettier-json
-                   . (npx "prettier" "--stdin-filepath" filepath "--parser=json"
-                          (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
-    (add-to-list 'apheleia-formatters
-                 '(prettier-typescript
-                   . (npx "prettier" "--stdin-filepath" filepath "--parser=typescript"
-                          (apheleia-formatters-js-indent "--use-tabs" "--tab-width")))))
+;; (use-package apheleia
+;;   :config
+;;   (when IS-WINDOWS
+;;     (add-to-list 'apheleia-formatters
+;;                  '(prettier-css
+;;                    . (npx "prettier" "--stdin-filepath" filepath "--parser=css"
+;;                           (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
+;;     (add-to-list 'apheleia-formatters
+;;                  '(prettier-html
+;;                    . (npx "prettier" "--stdin-filepath" filepath "--parser=html"
+;;                           (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
+;;     (add-to-list 'apheleia-formatters
+;;                  '(prettier-json
+;;                    . (npx "prettier" "--stdin-filepath" filepath "--parser=json"
+;;                           (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
+;;     (add-to-list 'apheleia-formatters
+;;                  '(prettier-typescript
+;;                    . (npx "prettier" "--stdin-filepath" filepath "--parser=typescript"
+;;                           (apheleia-formatters-js-indent "--use-tabs" "--tab-width"))))
+;;     )
 
-  (apheleia-global-mode +1))
+;;   (apheleia-global-mode +1))
 
 (use-package ef-themes
   :config
@@ -706,10 +705,10 @@
   (defvar my-string-inflection-map (make-keymap))
   )
 
-(use-package go-translate
-  :config
-  (setq gts-translate-list '(("en" "ja") ("ja" "en")))
-  )
+;; (use-package go-translate
+;;   :config
+;;   (setq gts-translate-list '(("en" "ja") ("ja" "en")))
+;;   )
 
 (use-package avy
   )
@@ -756,7 +755,7 @@
 (use-package goggles
   :hook ((prog-mode text-mode) . goggles-mode)
   :config
-  (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
+  (setq-default goggles-pulse t))
 
 (use-package spacious-padding
   :config
@@ -807,7 +806,6 @@
   :config
   (setq perfect-margin-ignore-filters nil)
   (perfect-margin-mode +1))
-
 
 (use-package dashboard
   :config
@@ -992,4 +990,10 @@
   :config
   (setq sqlformat-command "sqlfluff"))
 
+(use-package docker-compose-mode
+  :mode (("docker-compose\\.yml\\'" . docker-compose-mode)
+         ("compose\\.yml\\'" . docker-compose-mode)
+         ("\\(?:docker\\|compose\\).+\\.yaml\\'" . docker-compose-mode)))
 
+(use-package neotree
+  :bind ("C-c t" . neotree))

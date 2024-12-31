@@ -262,3 +262,140 @@ tags:
 
 (defun my/save-all-buffers ()
   (save-some-buffers "!"))
+
+
+(require 'request)
+(require 'auth-source)
+
+(defgroup hatena-blog nil
+  "Settings for hatena-blog."
+  :group 'external)
+
+(defcustom hatena-blog-config-file
+  (expand-file-name "config.el" user-emacs-directory)
+  "Path to hatena blog configuration file."
+  :type 'file
+  :group 'hatena-blog)
+
+(defcustom hatena-user-id nil
+  "Hatena User ID (e.g. 'your-user-id')."
+  :type 'string
+  :group 'hatena-blog)
+
+(defcustom hatena-blog-id nil
+  "Hatena Blog ID (e.g. 'your-blog-id.hatenablog.com')."
+  :type 'string
+  :group 'hatena-blog)
+
+(defcustom hatena-blog-api-key nil
+  "Hatena Blog API Key."
+  :type 'string
+  :group 'hatena-blog)
+
+;; 設定ファイルを読み込む関数
+(defun hatena-blog-load-config ()
+  "Load hatena blog configuration from file."
+  (when (file-exists-p hatena-blog-config-file)
+    (load hatena-blog-config-file)))
+
+;; 初期化時に設定を読み込む
+(hatena-blog-load-config)
+
+;; 設定用の変数
+(defvar hatena-user-id "your-user-id"
+  "はてなブログのユーザーID")
+(defvar hatena-blog-id "your-blog-id.hatenablog:control>
+    <app:draft>%s</app:draft>
+  </app:control>
+</entry>"
+                      (xml-escape-string title)
+                      (xml-escape-string (remove-hugo-frontmatter content))
+                      (if draft "yes" "no"))))
+    (request
+      url
+      :type "POST"
+      :headers `(("Content-Type" . "application/xml")
+                 ("Authorization" . ,(concat "Basic "
+                                             (base64-encode-string auth))))
+      :data xml
+      :parser 'buffer-string
+      :success (cl-function
+		(lambda (&key data &allow-other-keys)
+                  (message "投稿成功！")))
+      :error (cl-function
+              (lambda (&key error-thrown &allow-other-keys)
+		(message "エラー: %S" error-thrown))))))
+
+(defun my-post-current-buffer-to-hatena ()
+  "現在のバッファの内容をはてなブログに投稿する"
+  (interactive)
+  (let ((title (read-string "タイトル: "))
+        (content (buffer-string))
+        (draft (y-or-n-p "下書きとして保存？")))
+    (hatena-blog-post title content draft)))
+.com"
+  "はてなブログのID")
+(defvar hatena-blog-api-key "your-api-key"
+  "はてなブログのAPIキー")
+
+(defun xml-escape-string (string)
+  "Escape XML special characters in STRING."
+  (with-temp-buffer
+    (insert string)
+    (goto-char (point-min))
+    (while (re-search-forward "[&<>\"]" nil t)
+      (replace-match
+       (pcase (match-string 0)
+         ("&" "&amp;")
+         ("<" "&lt;")
+         (">" "&gt;")
+         ("\"" "&quot;"))
+       t t))
+    (buffer-string)))
+
+(defun remove-hugo-frontmatter (content)
+  "Remove Hugo frontmatter from content."
+  (with-temp-buffer
+    (insert content)
+    (goto-char (point-min))
+    ;; フロントマターが存在するか確認
+    (if (looking-at "---\n")
+        (progn
+          ;; 2つ目の --- を探す
+          (forward-line 1)
+          (if (re-search-forward "^---$" nil t)
+              (progn
+                ;; フロントマター部分を削除して残りを返す
+                (forward-line 1)
+                (buffer-substring (point) (point-max)))
+            ;; 2つ目の --- が見つからない場合は元の内容を返す
+            content))
+      ;; フロントマターがない場合は元の内容を返す
+      content)))
+
+(defun hatena-blog-post (title content &optional draft)
+  "はてなブログに投稿する関数
+TITLE: エントリのタイトル
+CONTENT: 本文
+DRAFT: 下書きとして保存する場合はt"
+  (let* ((url (format "https://blog.hatena.ne.jp/%s/%s/atom/entry"
+                      hatena-user-id
+                      hatena-blog-id))
+         (auth (format "%s:%s" hatena-user-id hatena-blog-api-key))
+         (xml (format "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<entry xmlns=\"http://www.w3.org/2005/Atom\"
+       xmlns:app=\"http://www.w3.org/2007/app\">
+  <title>%s</title>
+  <content type=\"text/markdown\">
+    %s
+  </content>
+  <app(require 'request)
+(require 'auth-source)
+
+(defgroup hatena-blog nil
+  "Settings for hatena-blog."
+  :group 'external)
+
+(defcustom hatena-blog-config-file
+  (expand-file-name "config.el" user-emacs-directory)
+  "Path t

@@ -36,7 +36,7 @@ zinit light zdharma-continuum/fast-syntax-highlighting
 zinit load zdharma-continuum/history-search-multi-word
 
 zinit ice from"gh-r" as"program"
-zinit load junegunn/fzf-bin
+# zinit load junegunn/fzf-bin
 
 zinit wait lucid atload"zicompinit; zicdreplay" blockf for zsh-users/zsh-completions
 

@@ -241,15 +241,15 @@
   (define-key corfu-map (kbd "<backspace") corfu-magic-cancel-or-backspace)
   )
 
-(use-package tabnine
-  :demand t
-  :hook (kill-emacs . tabnine-kill-process)
-  :bind ( :map tabnine-completion-map
-          ("TAB" . nil)
-          ("<tab>" . nil))
-  :config
-  (tabnine-start-process)
-  (global-tabnine-mode +1))
+;; (use-package tabnine
+;;   :demand t
+;;   :hook (kill-emacs . tabnine-kill-process)
+;;   :bind ( :map tabnine-completion-map
+;;           ("TAB" . nil)
+;;           ("<tab>" . nil))
+;;   :config
+;;   (tabnine-start-process)
+;;   (global-tabnine-mode +1))
 
 (use-package cape
   :hook (((prog-mode
@@ -267,7 +267,7 @@
                               arg
                             (car completion-at-point-functions))))
                         #'tempel-complete
-                        #'tabnine-completion-at-point
+                        ;; #'tabnine-completion-at-point
                         #'cape-dabbrev
                         #'cape-file)
                        :sort t)))))

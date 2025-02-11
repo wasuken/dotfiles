@@ -302,38 +302,10 @@ tags:
 (hatena-blog-load-config)
 
 ;; 設定用の変数
+;; 設定用の変数
 (defvar hatena-user-id "your-user-id"
   "はてなブログのユーザーID")
-(defvar hatena-blog-id "your-blog-id.hatenablog:control>
-    <app:draft>%s</app:draft>
-  </app:control>
-</entry>"
-                      (xml-escape-string title)
-                      (xml-escape-string (remove-hugo-frontmatter content))
-                      (if draft "yes" "no"))))
-    (request
-      url
-      :type "POST"
-      :headers `(("Content-Type" . "application/xml")
-                 ("Authorization" . ,(concat "Basic "
-                                             (base64-encode-string auth))))
-      :data xml
-      :parser 'buffer-string
-      :success (cl-function
-		(lambda (&key data &allow-other-keys)
-                  (message "投稿成功！")))
-      :error (cl-function
-              (lambda (&key error-thrown &allow-other-keys)
-		(message "エラー: %S" error-thrown))))))
-
-(defun my-post-current-buffer-to-hatena ()
-  "現在のバッファの内容をはてなブログに投稿する"
-  (interactive)
-  (let ((title (read-string "タイトル: "))
-        (content (buffer-string))
-        (draft (y-or-n-p "下書きとして保存？")))
-    (hatena-blog-post title content draft)))
-.com"
+(defvar hatena-blog-id "your-blog-id.hatenablog.com"
   "はてなブログのID")
 (defvar hatena-blog-api-key "your-api-key"
   "はてなブログのAPIキー")
@@ -389,13 +361,33 @@ DRAFT: 下書きとして保存する場合はt"
   <content type=\"text/markdown\">
     %s
   </content>
-  <app(require 'request)
-(require 'auth-source)
+  <app:control>
+    <app:draft>%s</app:draft>
+  </app:control>
+</entry>"
+                      (xml-escape-string title)
+                      (xml-escape-string (remove-hugo-frontmatter content))
+                      (if draft "yes" "no"))))
+    (request
+      url
+      :type "POST"
+      :headers `(("Content-Type" . "application/xml")
+                 ("Authorization" . ,(concat "Basic "
+                                             (base64-encode-string auth))))
+      :data xml
+      :parser 'buffer-string
+      :success (cl-function
+		(lambda (&key data &allow-other-keys)
+                  (message "投稿成功！")))
+      :error (cl-function
+              (lambda (&key error-thrown &allow-other-keys)
+		(message "エラー: %S" error-thrown))))))
 
-(defgroup hatena-blog nil
-  "Settings for hatena-blog."
-  :group 'external)
+(defun my-post-current-buffer-to-hatena ()
+  "現在のバッファの内容をはてなブログに投稿する"
+  (interactive)
+  (let ((title (read-string "タイトル: "))
+        (content (buffer-string))
+        (draft (y-or-n-p "下書きとして保存？")))
+    (hatena-blog-post title content draft)))
 
-(defcustom hatena-blog-config-file
-  (expand-file-name "config.el" user-emacs-directory)
-  "Path t

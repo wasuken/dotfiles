@@ -1,3 +1,4 @@
 UltiSnips/*
 !UltiSnips/.gitkeep
 nvim/*.toml
+/config.el

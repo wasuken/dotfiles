@@ -5,6 +5,26 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# 履歴ファイルの設定
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+
+# 履歴の即時共有
+setopt share_history
+# 直前と同じコマンドは履歴に追加しない
+setopt hist_ignore_dups
+# historyコマンドは履歴に登録しない
+setopt hist_no_store
+# 余分な空白は詰めて記録
+setopt hist_reduce_blanks
+
+# shutdown 対策
+sync_history() {
+    fc -W
+}
+add-zsh-hook precmd sync_history
+
 ### 修正後 ###
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then

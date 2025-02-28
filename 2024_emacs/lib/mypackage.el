@@ -112,21 +112,22 @@
   (w32-ime-initialize))
 
 
-;; ignore
-;; (use-package mozc
-;;   :ensure t
-;;   :config
-;;   (setq default-input-method "japanese-mozc")
-;;   (setq mozc-candidate-style 'overlay))
 
-(use-package ddskk
+(use-package mozc
+  :ensure t
   :config
-  (setq default-input-method "japanese-skk")
-  (setq skk-large-jisyo "~/.emacs.d/SKK-JISYO.L")
-  (setq skk-jisyo-list '("~/.emacs.d/SKK-JISYO.L" "~/.emacs.d/SKK-JISYO.propernoun"))
-  (require 'skk-study))
+  (setq default-input-method "japanese-mozc")
+  (setq mozc-candidate-style 'overlay))
 
-(use-package ddskk-posframe)
+;; ignore
+;; (use-package ddskk
+;;   :config
+;;   (setq default-input-method "japanese-skk")
+;;   (setq skk-large-jisyo "~/.emacs.d/SKK-JISYO.L")
+;;   (setq skk-jisyo-list '("~/.emacs.d/SKK-JISYO.L" "~/.emacs.d/SKK-JISYO.propernoun"))
+;;   (require 'skk-study))
+
+;; (use-package ddskk-posframe)
 
 ;; (use-package skk
 ;;   :config
@@ -680,17 +681,27 @@
   :config
   (puni-global-mode +1))
 
+(setq treesit-language-source-alist
+      '((json "https://github.com/tree-sitter/tree-sitter-json")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+        (go "https://github.com/tree-sitter/tree-sitter-go")
+        (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
+        (python "https://github.com/tree-sitter/tree-sitter-python")
+        ))
+
+(use-package treesit
+  :ensure nil
+  :config
+  (setq treesit-font-lock-level 4))
+
 (use-package treesit-auto
   :config
-  (setq treesit-auto-install 'prompt)
   (treesit-auto-add-to-auto-mode-alist 'all)
-  (add-to-list
-   'treesit-language-source-alist
-   '(prisma "https://github.com/victorhqc/tree-sitter-prisma"))
+
   (setq treesit-auto-install t)
   (global-treesit-auto-mode +1))
 
-(setq treesit-font-lock-level 4)
 
 (use-package string-inflection
   :bind ( :map my-string-inflection-map
@@ -997,3 +1008,5 @@
 
 (use-package neotree
   :bind ("C-c t" . neotree))
+
+(use-package mermaid-mode)

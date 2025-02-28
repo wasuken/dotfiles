@@ -5,6 +5,7 @@
 (global-set-key (kbd "C-c l")   #'create-md-link)
 (global-set-key (kbd "C-x t s") #'toggle-window-split)
 (global-set-key (kbd "C-c M-d") #'generate-today-diary-file)
+(global-set-key (kbd "C-c M-w") #'generate-weekly-file)
 
 ;; my keymap
 (global-set-key (kbd "C-c g") 'find-grep)

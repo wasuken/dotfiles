@@ -23,6 +23,26 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(ace-jump-mode ace-window aggressive-indent auto-compile
+		   auto-package-update beframe breadcrumb cape cargo
+		   consult-eglot corfu-prescient corfu-terminal
+		   dashboard ddskk ddskk-posframe diff-hl difftastic
+		   docker-compose-mode ef-themes eglot-booster
+		   eglot-signature-eldoc-talkative eglot-tempel
+		   eglot-x eldoc-box embark-consult emmet-mode expreg
+		   flx flymake-collection fontaine goggles
+		   golden-ratio highlight-defined highlight-quoted
+		   imenu-list jtsx lin marginalia mermaid-mode migemo
+		   minions mozc neotree nerd-icons-completion
+		   nerd-icons-corfu nerd-icons-dired nyan-mode
+		   orderless page-break-lines perfect-margin pulsar
+		   puni pyvenv rainbow-delimiters request rg rust-mode
+		   slime-company spacious-padding sql-indent sqlformat
+		   string-inflection tabnine tempel-collection tr-ime
+		   treesit-auto typescript-mode undo-fu
+		   undo-fu-session vc-use-package vertico-prescient
+		   vertico-truncate vundo web-beautify))
  '(package-vc-selected-packages
    '((eglot-x :vc-backend Git :url "https://github.com/nemethf/eglot-x")
      (eglot-booster :vc-backend Git :url
@@ -40,4 +60,5 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(aw-leading-char-face ((t (:foreground "red" :height 4.0)))))
+ '(aw-leading-char-face ((t (:foreground "red" :height 4.0))))
+ '(line-number-current-line ((t (:inherit line-number)))))

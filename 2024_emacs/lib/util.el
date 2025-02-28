@@ -8,7 +8,7 @@
   (string-join (mapcar #'(lambda (x) (format "%s- \"%s\"" indent x)) items) "
 "))
 
-(defun generate-diary-text (title description date categories tags contents)
+(defun generate-header-text (title description date categories tags contents)
   (format "---
 title: \"%s\"
 description: %s
@@ -34,12 +34,12 @@ tags:
 	 (tags (mapcar #'string-trim (split-string tags-str ",")))
 	 )
     (insert
-     (generate-diary-text title
-			  ""
-			  ts
-			  (format-yaml-lines categories "  ")
-			  (format-yaml-lines tags "  ")
-			  ""))
+     (generate-header-text title
+			   ""
+			   ts
+			   (format-yaml-lines categories "  ")
+			   (format-yaml-lines tags "  ")
+			   ""))
     )
   )
 
@@ -181,19 +181,19 @@ tags:
 ")
 
 (defun generate-hugo-diary-header-text ()
-  (generate-diary-text "日記"
-		       "日記"
-		       (format-time-string "%Y-%m-%d")
-		       "  - \"diary\""
-		       "  - \"life\""
-		       "")
+  (generate-header-text "日記"
+			"日記"
+			(format-time-string "%Y-%m-%d")
+			"  - \"diary\""
+			"  - \"life\""
+			"")
   )
 
 (defun insert-hugo-diary-header ()
   "本日の日記ヘッダを生成してカレントバッファの先頭に挿入する"
   (interactive)
   (goto-char 0)
-  (insert (generate-diary-text
+  (insert (generate-header-text
 	   "日記"
 	   ""
 	   (format-time-string "%Y-%m-%d")
@@ -205,6 +205,51 @@ tags:
   )
 
 (setf *diary-directory-path* (expand-file-name "~/memo/diary/"))
+(setf *weekly-directory-path* (expand-file-name "~/memo/weekly/"))
+
+(defun get-week-dates ()
+  "Get start and end dates of current week."
+  (let* ((now (current-time))
+         (decoded-time (decode-time now))
+         (current-day (nth 6 decoded-time))  ; 0-6, 0 is Sunday
+         ;; 何日前に戻るか計算（日曜起点）
+         (days-to-subtract current-day)
+         ;; 週初め（日曜日）の時間を計算
+         (week-start (time-subtract now
+                                    (seconds-to-time (* days-to-subtract 86400))))
+         ;; 週末（土曜日）の時間を計算（週初めから6日後）
+         (week-end (time-add week-start
+                             (seconds-to-time (* 6 86400)))))
+    (list (format-time-string "%Y-%m-%d" week-start)
+          (format-time-string "%Y-%m-%d" week-end))))
+
+(defun generate-weekly-file ()
+  "本日の日記ファイルを生成する"
+  (interactive)
+  ;; カレントディレクトリ
+  (let* ((week-dates (get-week-dates))
+	 (weekly-file-path (format "%s%s_%s.md"
+				   *weekly-directory-path*
+				   (car week-dates)
+				   (cadr week-dates)
+				   )))
+
+    (if (file-exists-p weekly-file-path)
+	(message "already exists file.")
+      (with-temp-buffer
+	(insert (generate-header-text
+		 "週報"
+		 ""
+		 (format-time-string "%Y-%m-%d")
+		 "  - \"weekly\""
+		 "  - \"life\""
+		 ;; *weekly-mental-template*
+		 ""
+		 ))
+	(write-file weekly-file-path)))
+    (find-file weekly-file-path)
+    )
+  )
 
 (defun generate-today-diary-file ()
   "本日の日記ファイルを生成する"
@@ -217,7 +262,7 @@ tags:
     (if (file-exists-p diary-file-path)
 	(message "already exists file.")
       (with-temp-buffer
-	(insert (generate-diary-text
+	(insert (generate-header-text
 		 "日記"
 		 ""
 		 (format-time-string "%Y-%m-%d")
@@ -301,7 +346,6 @@ tags:
 ;; 初期化時に設定を読み込む
 (hatena-blog-load-config)
 
-;; 設定用の変数
 ;; 設定用の変数
 (defvar hatena-user-id "your-user-id"
   "はてなブログのユーザーID")
@@ -390,4 +434,3 @@ DRAFT: 下書きとして保存する場合はt"
         (content (buffer-string))
         (draft (y-or-n-p "下書きとして保存？")))
     (hatena-blog-post title content draft)))
-

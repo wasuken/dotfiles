@@ -25,24 +25,31 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(ace-jump-mode ace-window aggressive-indent auto-compile
-		   auto-package-update beframe breadcrumb cape cargo
-		   consult-eglot corfu-prescient corfu-terminal
-		   dashboard ddskk ddskk-posframe diff-hl difftastic
+		   auto-package-update beframe bind-key breadcrumb
+		   cape cargo cl-generic cl-lib consult-eglot
+		   corfu-prescient corfu-terminal dashboard ddskk
+		   ddskk-posframe diff-hl difftastic
 		   docker-compose-mode ef-themes eglot-booster
 		   eglot-signature-eldoc-talkative eglot-tempel
-		   eglot-x eldoc-box embark-consult emmet-mode expreg
-		   flx flymake-collection fontaine goggles
+		   eglot-x eldoc-box embark-consult emmet-mode erc
+		   expreg external-completion faceup flx flymake
+		   flymake-collection fontaine gfm-mode goggles
 		   golden-ratio highlight-defined highlight-quoted
-		   imenu-list jtsx lin marginalia mermaid-mode migemo
-		   minions mozc neotree nerd-icons-completion
-		   nerd-icons-corfu nerd-icons-dired nyan-mode
-		   orderless page-break-lines perfect-margin pulsar
-		   puni pyvenv rainbow-delimiters request rg rust-mode
-		   slime-company spacious-padding sql-indent sqlformat
-		   string-inflection tabnine tempel-collection tr-ime
-		   treesit-auto typescript-mode undo-fu
-		   undo-fu-session vc-use-package vertico-prescient
-		   vertico-truncate vundo web-beautify))
+		   idlwave imenu-list jtsx let-alist lin map
+		   marginalia markdown-preview-mode mermaid-mode
+		   migemo minions mozc nadvice neotree
+		   nerd-icons-completion nerd-icons-corfu
+		   nerd-icons-dired ntlm nyan-mode orderless org
+		   page-break-lines peg perfect-margin project pulsar
+		   puni python pyvenv rainbow-delimiters request rg
+		   rust-mode seq slime-company so-long soap-client
+		   spacious-padding sql-indent sqlformat
+		   string-inflection svg tabnine tempel-collection
+		   tr-ime tramp treesit-auto typescript-mode undo-fu
+		   undo-fu-session use-package vc-use-package
+		   verilog-mode vertico-prescient vertico-truncate
+		   vundo web-beautify window-tool-bar xref
+		   xref-history-storage))
  '(package-vc-selected-packages
    '((eglot-x :vc-backend Git :url "https://github.com/nemethf/eglot-x")
      (eglot-booster :vc-backend Git :url

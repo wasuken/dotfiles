@@ -786,6 +786,7 @@
 
   (spacious-padding-mode +1))
 
+(require 'xref)
 (use-package beframe
   :config
   (defvar consult-buffer-sources)
@@ -847,7 +848,8 @@
           ("C-c o" . eglot-code-action-organize-imports)
           ("C-c a" . eglot-code-actions)
           ("C-c h" . eldoc)
-          ("<f6>" . xref-find-definitions))
+          ("<f6>" . xref-find-definitions)
+	  )
   :config
   (setq eglot-events-buffer-config '(:size 0  :format short)
         eglot-ignored-server-capabilities '(:documentHighlightProvider)
@@ -1010,3 +1012,10 @@
   :bind ("C-c t" . neotree))
 
 (use-package mermaid-mode)
+
+(use-package markdown-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  (setq markdown-command "cmark"))
+

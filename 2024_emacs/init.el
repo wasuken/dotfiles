@@ -30,14 +30,15 @@
 		   dashboard ddskk ddskk-posframe diff-hl difftastic
 		   docker-compose-mode ef-themes eglot-booster
 		   eglot-signature-eldoc-talkative eglot-tempel
-		   eglot-x eldoc-box embark-consult emmet-mode expreg
-		   flx flymake-collection fontaine goggles
-		   golden-ratio highlight-defined highlight-quoted
-		   imenu-list jtsx lin marginalia mermaid-mode migemo
-		   minions mozc neotree nerd-icons-completion
-		   nerd-icons-corfu nerd-icons-dired nyan-mode
-		   orderless page-break-lines perfect-margin pulsar
-		   puni pyvenv rainbow-delimiters request rg rust-mode
+		   eglot-x eldoc-box elfeed embark-consult emmet-mode
+		   expreg flx flymake-collection fontaine go-translate
+		   goggles golden-ratio highlight-defined
+		   highlight-quoted imenu-list jtsx lin marginalia
+		   mermaid-mode migemo minions mozc neotree
+		   nerd-icons-completion nerd-icons-corfu
+		   nerd-icons-dired nyan-mode orderless
+		   page-break-lines perfect-margin pulsar puni pyvenv
+		   rainbow-delimiters request rg rust-mode
 		   slime-company spacious-padding sql-indent sqlformat
 		   string-inflection tabnine tempel-collection tr-ime
 		   treesit-auto typescript-mode undo-fu

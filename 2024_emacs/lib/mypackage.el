@@ -3,6 +3,16 @@
 (add-to-list 'package-archives '("gnu-elpa-devel" . "https://elpa.gnu.org/devel/"))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
+(setq user-config-file
+      (expand-file-name "config.el" user-emacs-directory))
+
+(defun user-load-config ()
+  "Load user configuration from file."
+  (when (file-exists-p user-config-file)
+    (load user-config-file)))
+
+(user-load-config)
+
 ;; インストールする優先順位を指定
 (setq package-archive-priorities
       '(("gnu-elpa-devel" . 3)
@@ -18,6 +28,22 @@
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 (use-package use-package
   :config
@@ -693,7 +719,14 @@
 (use-package treesit
   :ensure nil
   :config
-  (setq treesit-font-lock-level 4))
+  (setq treesit-font-lock-level 4)
+  ;; xmp
+  (setq load-path (cons "~/.emacs.d/site-lisp/" load-path))
+  ;; (define-key ruby-mode (kbd "C-c C-d") 'xmp)
+  ;; (define-key ruby-ts-mode-map (kbd "C-c C-d") 'xmp)
+  (setq go-ts-mode-indent-offset 4)
+  (require 'rcodetools)
+  )
 
 (use-package treesit-auto
   :config
@@ -716,10 +749,18 @@
   (defvar my-string-inflection-map (make-keymap))
   )
 
-;; (use-package go-translate
-;;   :config
-;;   (setq gts-translate-list '(("en" "ja") ("ja" "en")))
-;;   )
+(use-package go-translate
+  :bind ("C-c C-g" . gt-do-translate)
+  :config
+  (setq gt-langs '(en ja))
+  (setq gt-taker-text 'word)
+  (setq gt-taker-pick 'paragraph)
+  (setq gt-taker-prompt 'nil)
+  ;; (setq gt-default-translator (gt-translator :engines (gt-google-engine)))
+  (setq gt-default-translator (gt-translator :engines (list
+						       (gt-deepl-engine :key deepl-api-key)
+						       )))
+  )
 
 (use-package avy
   )
@@ -786,6 +827,7 @@
 
   (spacious-padding-mode +1))
 
+(require 'xref)
 (use-package beframe
   :config
   (defvar consult-buffer-sources)
@@ -816,7 +858,9 @@
 (use-package perfect-margin
   :config
   (setq perfect-margin-ignore-filters nil)
-  (perfect-margin-mode +1))
+  (perfect-margin-mode -1)
+  (define-key global-map (kbd "C-c p m") 'perfect-margin-mode)
+  )
 
 (use-package dashboard
   :config
@@ -1010,3 +1054,28 @@
   :bind ("C-c t" . neotree))
 
 (use-package mermaid-mode)
+
+(use-package elfeed
+  :config
+  (global-set-key (kbd "C-x w") 'elfeed)
+  (setq elfeed-feeds
+	'("http://nullprogram.com/feed/"
+          "https://planet.emacslife.com/atom.xml"
+	  "https://zenn.dev/topics/react/feed"
+	  "https://zenn.dev/topics/llm/feed"
+	  "https://zenn.dev/topics/mcp/feed"
+	  )))
+
+(use-package mastodon
+  ;; デフォルトでは GitHub を参照するため
+  ;; 明示的に Codeberg からインストール
+  :straight (mastodon :type git
+                      :host codeberg
+                      :repo "martianh/mastodon.el")
+  :custom
+  ;; 使用している Mastodon サーバ
+  (mastodon-instance-url "https://mstdn.jp/")
+  ;; ユーザ名
+  (mastodon-active-user "wasulisp")
+  ;; タイムラインでアバター画像を表示する
+  (mastodon-tl--show-avatars t))

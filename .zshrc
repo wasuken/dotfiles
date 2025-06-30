@@ -23,7 +23,6 @@ setopt hist_reduce_blanks
 sync_history() {
     fc -W
 }
-add-zsh-hook precmd sync_history
 
 ### 修正後 ###
 ### Added by Zinit's installer
@@ -66,3 +65,8 @@ zplugin ice depth=1; zplugin light romkatv/powerlevel10k
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 [[ ! -f ~/dotfiles/zsh/config.zsh ]] || source ~/dotfiles/zsh/config.zsh
+
+add-zsh-hook precmd sync_history
+
+# Created by `pipx` on 2025-03-27 14:24:29
+export PATH="$PATH:/home/wasu/.local/bin"

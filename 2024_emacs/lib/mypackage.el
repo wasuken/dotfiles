@@ -891,7 +891,8 @@
           ("C-c o" . eglot-code-action-organize-imports)
           ("C-c a" . eglot-code-actions)
           ("C-c h" . eldoc)
-          ("<f6>" . xref-find-definitions))
+          ("<f6>" . xref-find-definitions)
+	  )
   :config
   (setq eglot-events-buffer-config '(:size 0  :format short)
         eglot-ignored-server-capabilities '(:documentHighlightProvider)
@@ -1079,3 +1080,9 @@
   (mastodon-active-user "wasulisp")
   ;; タイムラインでアバター画像を表示する
   (mastodon-tl--show-avatars t))
+
+(use-package markdown-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  (setq markdown-command "cmark"))

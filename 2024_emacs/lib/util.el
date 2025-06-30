@@ -134,6 +134,37 @@ tags:
     (princ "count-windows is not 2")))
 
 
+(setq *diary-template* "## 📝 Daily Reflection
+
+### 今日の出来事・感情
+
+
+### 体調・気分の変化
+
+
+### 食事について
+
+
+### 運動・活動について
+
+
+### 睡眠について
+
+
+### ストレス・メンタル
+
+
+### 気づき・学び
+
+
+### 明日への課題・目標
+
+
+### 自由記述
+
+
+")
+
 (setq *diary-mental-template* "
 ---
 
@@ -223,6 +254,7 @@ tags:
     (list (format-time-string "%Y-%m-%d" week-start)
           (format-time-string "%Y-%m-%d" week-end))))
 
+
 (defun generate-weekly-file ()
   "本日の日記ファイルを生成する"
   (interactive)
@@ -251,6 +283,92 @@ tags:
     )
   )
 
+
+(setq *today-yaml-template* "date: \"YYYY-MM-DD\"  # 日付（年-月-日形式）
+day_of_week: \"\"  # 曜日
+weather: \"\"  # 天気
+# 健康指標（1-10段階評価）
+physical_condition:  # 体調（1=最悪、10=最高）
+energy_level:  # エネルギーレベル（1=疲労困憊、10=活力満点）
+morning_mood:  # 朝の気分（1=憂鬱、10=爽快）
+focus_level:  # 集中力（1=全く集中できない、10=高度に集中）
+stress_level:  # ストレスレベル（1=ストレスなし、10=極度のストレス）
+achievement_feeling:  # 達成感（1=何も成し遂げられなかった、10=大きな成果を感じる）
+# 睡眠データ
+bedtime: \"\"  # 就寝時刻（HH:MM形式）
+wake_time: \"\"  # 起床時刻（HH:MM形式）
+sleep_hours:  # 睡眠時間（時間単位）
+sleep_quality:  # 睡眠の質（1=最悪、10=最高）
+dreams_remembered:  # 夢を覚えているか（true/false）
+sleep_environment_score:  # 睡眠環境の良さ（1=最悪、10=理想的）
+# 栄養データ
+meals:
+breakfast:  # 朝食
+  time: \"\"  # 摂取時刻（HH:MM形式）
+  protein_grams:  # タンパク質摂取量（グラム）
+  carbs_quality:  # 炭水化物の質（1=精製糖質中心、10=複合炭水化物中心）
+  description: \"\"  # 食事内容の説明
+lunch:  # 昼食
+  time: \"\"  # 摂取時刻（HH:MM形式）
+  protein_grams:  # タンパク質摂取量（グラム）
+  carbs_quality:  # 炭水化物の質（1=精製糖質中心、10=複合炭水化物中心）
+  description: \"\"  # 食事内容の説明
+dinner:  # 夕食
+  time: \"\"  # 摂取時刻（HH:MM形式）
+  protein_grams:  # タンパク質摂取量（グラム）
+  carbs_quality:  # 炭水化物の質（1=精製糖質中心、10=複合炭水化物中心）
+  description: \"\"  # 食事内容の説明
+coffee_count:  # コーヒー摂取杯数
+water_liters:  # 水分摂取量（リットル）
+junk_food_consumed:  # ジャンクフード摂取の有無（true/false）
+supplements_taken: []  # 摂取したサプリメントのリスト
+# 運動データ
+strength_training:  # 筋力トレーニング
+  performed:  # 実施の有無（true/false）
+  duration_minutes:  # 実施時間（分）
+  intensity:  # 強度（1=軽い、10=最大強度）
+  exercises: []  # 実施した種目のリスト
+cardio:  # 有酸素運動
+  performed:  # 実施の有無（true/false）
+  duration_minutes:  # 実施時間（分）
+  intensity:  # 強度（1=軽い、10=最大強度）
+  type: \"\"  # 運動の種類（ランニング、サイクリングなど）
+stretching:  # ストレッチ
+  performed:  # 実施の有無（true/false）
+  duration_minutes:  # 実施時間（分）
+  type: \"\"  # ストレッチの種類（静的、動的など）
+daily_steps:  # 1日の歩数
+# デジタル習慣
+screen_time_hours:  # スクリーンタイム（時間）
+social_media_hours:  # SNS利用時間（時間）
+blue_light_after_sunset:  # 日没後のブルーライト暴露（true/false）
+phone_in_bedroom:  # 寝室でのスマホ使用（true/false）
+# テストステロン指標（1-10段階評価）
+morning_erection:  # 朝立ちの状況（1=全くなし、10=強い）
+muscle_strength_feeling:  # 筋力の感覚（1=弱い、10=強い）
+motivation_level:  # やる気レベル（1=無気力、10=意欲満々）
+risk_taking_tendency:  # リスクを取る傾向（1=保守的、10=積極的）
+social_confidence:  # 社会的自信（1=内向的、10=外向的）
+competitive_drive:  # 競争心（1=競争を避ける、10=競争を求める）
+")
+
+(defun generate-today-yaml-file ()
+  "本日のyamlを生成する"
+  (interactive)
+  ;; カレントディレクトリ
+  (let* ((diary-file-path (format "%s%s"
+				  *diary-directory-path*
+				  (format-time-string "%Y/%m/%d.yaml"))))
+
+    (if (file-exists-p diary-file-path)
+	(message "already exists file.")
+      (with-temp-buffer
+	(insert *today-yaml-template*)
+	(write-file diary-file-path)))
+    (find-file diary-file-path)
+    )
+  )
+
 (defun generate-today-diary-file ()
   "本日の日記ファイルを生成する"
   (interactive)
@@ -268,8 +386,7 @@ tags:
 		 (format-time-string "%Y-%m-%d")
 		 "  - \"diary\""
 		 "  - \"life\""
-		 ;; *diary-mental-template*
-		 ""
+		 *diary-template*
 		 ))
 	(write-file diary-file-path)))
     (find-file diary-file-path)

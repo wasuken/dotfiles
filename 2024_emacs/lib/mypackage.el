@@ -749,18 +749,29 @@
   (defvar my-string-inflection-map (make-keymap))
   )
 
+
 (use-package go-translate
+  :ensure t
   :bind ("C-c C-g" . gt-do-translate)
   :config
   (setq gt-langs '(en ja))
-  (setq gt-taker-text 'word)
-  (setq gt-taker-pick 'paragraph)
-  (setq gt-taker-prompt 'nil)
-  ;; (setq gt-default-translator (gt-translator :engines (gt-google-engine)))
-  (setq gt-default-translator (gt-translator :engines (list
-						       (gt-deepl-engine :key deepl-api-key)
-						       )))
-  )
+  (setq gt-default-translator
+        (gt-translator
+         :engines (gt-google-engine)
+         :render (gt-posframe-pop-render))))
+
+;; (use-package go-translate
+;;   :bind ("C-c C-g" . gt-do-translate)
+;;   :config
+;;   (setq gt-langs '(en ja))
+;;   (setq gt-taker-text 'word)
+;;   (setq gt-taker-pick 'paragraph)
+;;   (setq gt-taker-prompt 'nil)
+;;   ;; (setq gt-default-translator (gt-translator :engines (gt-google-engine)))
+;;   (setq gt-default-translator (gt-translator :engines (list
+;; 						       (gt-deepl-engine :key deepl-api-key)
+;; 						       )))
+;;   )
 
 (use-package avy
   )

@@ -7,7 +7,8 @@
 (global-set-key (kbd "C-c M-d") (lambda ()
 				  (interactive)
 				  (generate-today-diary-file)
-				  (generate-today-yaml-file)))
+				  ;; (generate-today-yaml-file)
+				  ))
 
 (global-set-key (kbd "C-c M-w") #'generate-weekly-file)
 

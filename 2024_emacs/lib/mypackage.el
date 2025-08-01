@@ -604,7 +604,9 @@
   :config
   (undo-fu-session-global-mode +1))
 
-(use-package vundo)
+(use-package vundo
+  :config
+  (global-set-key (kbd "C-x u") 'vundo))
 
 (use-package golden-ratio
   :config
@@ -675,7 +677,10 @@
   :bind ( :map my-quit-map
           ("r" . restart-emacs)))
 
-(use-package expreg)
+(use-package expreg
+  :config
+  (global-set-key (kbd "C-=") 'expreg-expand)
+  (global-set-key (kbd "C--") 'expreg-contract))
 
 (use-package puni
   :config
@@ -704,17 +709,30 @@
 
 
 (use-package string-inflection
-  :bind ( :map my-string-inflection-map
-          ("a" . string-inflection-all-cycle)
-          ("_" . string-inflection-underscore)
-          ("p" . string-inflection-pascal-case)
-          ("c" . string-inflection-camelcase)
-          ("u" . string-inflection-upcase)
-          ("k" . string-inflection-kebab-case)
-          ("C" . string-inflection-capital-underscore))
+  :bind (("C-c C-u" . string-inflection-all-cycle))
   :config
-  (defvar my-string-inflection-map (make-keymap))
-  )
+  ;; モード別に最適化したい場合
+  (defun my-string-inflection-cycle-auto ()
+    "switching by major-mode"
+    (interactive)
+    (cond
+     ;; TypeScript/JavaScript
+     ((or (eq major-mode 'typescript-mode)
+          (eq major-mode 'js-mode)
+          (eq major-mode 'jtsx-jsx-mode)
+          (eq major-mode 'jtsx-tsx-mode))
+      (string-inflection-java-style-cycle))  ; camelCase <-> PascalCase <-> UPPER_CASE
+     ;; Python
+     ((eq major-mode 'python-mode)
+      (string-inflection-python-style-cycle))
+     ;; Rust
+     ((eq major-mode 'rust-mode)
+      (string-inflection-ruby-style-cycle))   ; snake_case ベース
+     ;; デフォルト
+     (t
+      (string-inflection-all-cycle))))
+
+  (global-set-key (kbd "C-c u") 'my-string-inflection-cycle-auto))
 
 ;; (use-package go-translate
 ;;   :config
@@ -1019,3 +1037,8 @@
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   (setq markdown-command "cmark"))
 
+(use-package mastodon
+  :config
+  (setq mastodon-instance-url "https://mstdn.jp/"
+	mastodon-active-user "wasulisp")
+  )

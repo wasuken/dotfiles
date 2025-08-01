@@ -29,15 +29,15 @@
 		   cape cargo cl-generic cl-lib consult-eglot
 		   corfu-prescient corfu-terminal dashboard ddskk
 		   ddskk-posframe diff-hl difftastic
-		   docker-compose-mode ef-themes eglot-booster
-		   eglot-signature-eldoc-talkative eglot-tempel
-		   eglot-x eldoc-box embark-consult emmet-mode erc
-		   expreg external-completion faceup flx flymake
-		   flymake-collection fontaine gfm-mode goggles
-		   golden-ratio highlight-defined highlight-quoted
-		   idlwave imenu-list jtsx let-alist lin map
-		   marginalia markdown-preview-mode mermaid-mode
-		   migemo minions mozc nadvice neotree
+		   docker-compose-mode edit-indirect ef-themes
+		   eglot-booster eglot-signature-eldoc-talkative
+		   eglot-tempel eglot-x eldoc-box embark-consult
+		   emmet-mode erc expreg external-completion faceup
+		   flx flymake flymake-collection fontaine gfm-mode
+		   goggles golden-ratio highlight-defined
+		   highlight-quoted idlwave imenu-list jtsx let-alist
+		   lin map marginalia markdown-preview-mode mastodon
+		   mermaid-mode migemo minions mozc nadvice neotree
 		   nerd-icons-completion nerd-icons-corfu
 		   nerd-icons-dired ntlm nyan-mode orderless org
 		   page-break-lines peg perfect-margin project pulsar

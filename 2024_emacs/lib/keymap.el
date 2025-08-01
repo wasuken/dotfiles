@@ -7,12 +7,13 @@
 (global-set-key (kbd "C-c M-d") (lambda ()
 				  (interactive)
 				  (generate-today-diary-file)
-				  (generate-today-yaml-file)))
+				  )
+		)
 
 (global-set-key (kbd "C-c M-w") #'generate-weekly-file)
 
 ;; my keymap
-(global-set-key (kbd "C-c g") 'find-grep)
+(global-set-key (kbd "C-c f g") 'find-grep)
 (global-set-key (kbd "C-<") #'(lambda () (interactive) (other-window -1)))
 (global-set-key (kbd "C->") #'other-window)
 (global-set-key (kbd "C-c z c") #'tab-bar-new-tab)

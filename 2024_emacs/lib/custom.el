@@ -13,6 +13,8 @@
 (setq auto-mode-case-fold nil)
 (setq-default bidi-display-reordering 'left-to-right)
 
+(setq browse-url-browser-function 'eww-browse-url)
+
 (setq bidi-inhibit-bpa t)
 
 (setq-default cursor-in-non-selected-windows nil)

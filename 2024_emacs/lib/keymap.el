@@ -21,5 +21,3 @@
 (global-set-key (kbd "C-c z b") #'tab-bar-switch-to-prev-tab)
 (global-set-key (kbd "C-c x r") #'revert-buffer-no-confirm)
 (global-set-key (kbd "C-c s s") #'replace-string)
-
-

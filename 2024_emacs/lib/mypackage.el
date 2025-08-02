@@ -730,7 +730,7 @@
   ;; (define-key ruby-mode (kbd "C-c C-d") 'xmp)
   ;; (define-key ruby-ts-mode-map (kbd "C-c C-d") 'xmp)
   (setq go-ts-mode-indent-offset 4)
-  (require 'rcodetools)
+  ;; (require 'rcodetools)
   )
 
 (use-package treesit-auto
@@ -1116,3 +1116,8 @@
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   (setq markdown-command "cmark"))
 
+(use-package mastodon
+  :config
+  (setq mastodon-instance-url "https://mstdn.jp/"
+	mastodon-active-user "wasulisp")
+  )

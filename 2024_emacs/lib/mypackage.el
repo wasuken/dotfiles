@@ -1,8 +1,4 @@
-(require 'package)
-
-(add-to-list 'package-archives '("gnu-elpa-devel" . "https://elpa.gnu.org/devel/"))
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-
+(setq package-enable-at-startup nil)
 (setq user-config-file
       (expand-file-name "config.el" user-emacs-directory))
 
@@ -13,21 +9,8 @@
 
 (user-load-config)
 
-;; インストールする優先順位を指定
-(setq package-archive-priorities
-      '(("gnu-elpa-devel" . 3)
-        ("melpa" . 2)
-        ("nongnu" . 1)))
-
-(setq package-install-upgrade-built-in t ; built-inパッケージも更新対象にする
-      package-native-compile t           ; インストール時にnative compileする
-      )
-
-(setq package-user-dir "~/.emacs.d/elpa")
-(package-initialize)
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+;; どうにもならないので無視
+(setq warning-suppress-types '((straight)))
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -45,12 +28,17 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
+
 (use-package use-package
   :config
-  (setq use-package-always-ensure t))
+  )
 
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
+(straight-use-package
+ '(vc-use-package :type git :host github :repo "slotThe/vc-use-package"))
+
 (require 'vc-use-package)
 
 (use-package auto-package-update
@@ -65,10 +53,12 @@
   (auto-compile-on-save-mode +1))
 
 (use-package files
-  :ensure nil
+  :straight (:type built-in)
   :config
   (setq auto-save-visited-interval 30)
   (auto-save-visited-mode +1))
+
+(use-package request)
 
 (use-package saveplace
   :config
@@ -140,7 +130,6 @@
 
 
 (use-package mozc
-  :ensure t
   :config
   (setq default-input-method "japanese-mozc")
   (setq mozc-candidate-style 'overlay))
@@ -194,11 +183,12 @@
 (use-package nerd-icons-dired
   :hook (dired-mode . nerd-icons-dired-mode))
 
-(use-package nerd-icons-corfu
-  :vc ( :fetcher github :repo "LuigiPiucco/nerd-icons-corfu")
-  :after corfu nerd-icons
-  :config
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+;; (use-package nerd-icons-corfu
+;;   :straight nil
+;;   :vc ( :fetcher github :repo "LuigiPiucco/nerd-icons-corfu")
+;;   :after corfu nerd-icons
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package nyan-mode
   :config
@@ -240,7 +230,7 @@
   )
 
 (use-package corfu-popupinfo
-  :ensure nil
+  :straight (:type built-in)
   :hook (corfu-mode . corfu-popupinfo-mode))
 
 (with-eval-after-load 'corfu
@@ -313,18 +303,18 @@
   (vertico-mode +1))
 
 (use-package vertico-repeat
-  :ensure nil
+  :straight (:type built-in)
   :after vertico
   :hook (minibuffer-setup . vertico-repeat-save))
 
 (use-package vertico-directory
-  :ensure nil
+  :straight (:type built-in)
   :after vertico
   :bind ( :map vertico-map
           ("<backspace>" . vertico-directory-delete-char)))
 
 (use-package vertico-buffer
-  :ensure nil
+  :straight (:type built-in)
   :config
   (setq vertico-buffer-display-action '(display-buffer-at-bottom))
   (vertico-buffer-mode +1))
@@ -345,10 +335,10 @@
           (concat " " arrow " " cand)
         (concat "    " cand)))))
 
-(use-package vertico-truncate
-  :vc ( :fetcher github :repo "jdtsmith/vertico-truncate")
-  :config
-  (vertico-truncate-mode +1))
+;; (use-package vertico-truncate
+;;   :vc ( :fetcher github :repo "jdtsmith/vertico-truncate")
+;;   :config
+;;   (vertico-truncate-mode +1))
 
 (use-package orderless
   :config
@@ -722,7 +712,7 @@
         ))
 
 (use-package treesit
-  :ensure nil
+  :straight (:type built-in)
   :config
   (setq treesit-font-lock-level 4)
   ;; xmp
@@ -768,15 +758,15 @@
   (global-set-key (kbd "C-c u") 'my-string-inflection-cycle-auto))
 
 
-(use-package go-translate
-  :ensure t
-  :bind ("C-c C-g" . gt-do-translate)
-  :config
-  (setq gt-langs '(en ja))
-  (setq gt-default-translator
-        (gt-translator
-         :engines (gt-google-engine)
-         :render (gt-posframe-pop-render))))
+;; (use-package go-translate
+;;   :ensure t
+;;   :bind ("C-c C-g" . gt-do-translate)
+;;   :config
+;;   (setq gt-langs '(en ja))
+;;   (setq gt-default-translator
+;;         (gt-translator
+;;          :engines (gt-google-engine)
+;;          :render (gt-posframe-pop-render))))
 
 ;; (use-package go-translate
 ;;   :bind ("C-c C-g" . gt-do-translate)
@@ -901,6 +891,7 @@
   (page-break-lines-mode +1))
 
 (use-package breadcrumb
+  :straight nil
   :vc ( :fetcher github :repo "joaotavora/breadcrumb")
   :config
   (breadcrumb-mode +1))
@@ -958,11 +949,13 @@
 
 (use-package eglot-booster
   :after eglot
+  :straight nil
   :vc ( :fetcher github :repo "jdtsmith/eglot-booster")
   :config
   (eglot-booster-mode +1))
 
 (use-package eglot-x
+  :straight nil
   :vc ( :fetcher github :repo "nemethf/eglot-x")
   :after eglot
   :config

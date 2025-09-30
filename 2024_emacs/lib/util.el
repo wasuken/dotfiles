@@ -6,7 +6,7 @@
 
 (defun format-yaml-lines (items indent)
   (string-join (mapcar #'(lambda (x) (format "%s- \"%s\"" indent x)) items) "
-"))
+ "))
 
 (defun generate-header-text (title description date categories tags contents)
   (format "---
@@ -488,19 +488,39 @@ competitive_drive:  # 競争心（1=競争を避ける、10=競争を求める�
       ;; フロントマターがない場合は元の内容を返す
       content)))
 
-(defun hatena-blog-post (title content &optional draft)
-  "はてなブログに投稿する関数
+(defun add-tags-to-content (content tags)
+  "本文末尾にタグをハッシュタグ形式で追加する"
+  (if tags
+      (let ((cleaned-content (string-trim content))
+            (tag-line (mapconcat (lambda (tag) (format "#%s" tag)) tags " ")))
+        (format "%s\n\n%s" cleaned-content tag-line))
+    content))
+
+(defun hatena-blog-post (title content categories tags &optional draft)
+  "はてなブログに投稿する関数（カテゴリ・タグ対応版）
 TITLE: エントリのタイトル
 CONTENT: 本文
+CATEGORIES: カテゴリのリスト（文字列のリスト）
+TAGS: タグのリスト（文字列のリスト、本文末尾に#形式で追加される）
 DRAFT: 下書きとして保存する場合はt"
   (let* ((url (format "https://blog.hatena.ne.jp/%s/%s/atom/entry"
                       hatena-user-id
                       hatena-blog-id))
          (auth (format "%s:%s" hatena-user-id hatena-blog-api-key))
+         (category-xml (if categories
+                           (mapconcat (lambda (cat)
+                                        (format "  <category term=\"%s\" />"
+                                                (xml-escape-string cat)))
+                                      categories "\n")
+                         ""))
+         (processed-content (add-tags-to-content 
+                             (remove-hugo-frontmatter content) 
+                             tags))
          (xml (format "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <entry xmlns=\"http://www.w3.org/2005/Atom\"
        xmlns:app=\"http://www.w3.org/2007/app\">
   <title>%s</title>
+%s
   <content type=\"text/markdown\">
     %s
   </content>
@@ -509,8 +529,15 @@ DRAFT: 下書きとして保存する場合はt"
   </app:control>
 </entry>"
                       (xml-escape-string title)
-                      (xml-escape-string (remove-hugo-frontmatter content))
+                      category-xml
+                      (xml-escape-string processed-content)
                       (if draft "yes" "no"))))
+    
+    ;; デバッグ用情報出力
+    (message "リクエストURL: %s" url)
+    (message "認証情報: %s" auth)
+    (message "送信XML: %s" xml)
+    
     (request
       url
       :type "POST"
@@ -519,17 +546,155 @@ DRAFT: 下書きとして保存する場合はt"
                                              (base64-encode-string auth))))
       :data xml
       :parser 'buffer-string
+      :sync t  ; 同期実行に変更
+      :timeout 30  ; タイムアウトを30秒に設定
       :success (cl-function
-		(lambda (&key data &allow-other-keys)
-                  (message "投稿成功！")))
+		(lambda (&key data response &allow-other-keys)
+                  (message "投稿成功！")
+                  (message "レスポンス: %s" data)))
       :error (cl-function
-              (lambda (&key error-thrown &allow-other-keys)
-		(message "エラー: %S" error-thrown))))))
+              (lambda (&key data error-thrown response &allow-other-keys)
+		(message "エラー発生:")
+                (message "Error thrown: %S" error-thrown)
+                (message "Response data: %s" data)
+                (when response
+                  (message "Status code: %s" (request-response-status-code response))))))))
+
+;; 同期版の簡易テスト関数
+(defun hatena-blog-test-connection ()
+  "はてなブログAPI接続テスト"
+  (interactive)
+  (let* ((url (format "https://blog.hatena.ne.jp/%s/%s/atom/entry"
+                      hatena-user-id
+                      hatena-blog-id))
+         (auth (format "%s:%s" hatena-user-id hatena-blog-api-key)))
+    (message "テスト接続開始...")
+    (request
+      url
+      :type "GET"
+      :headers `(("Authorization" . ,(concat "Basic "
+                                             (base64-encode-string auth))))
+      :sync t
+      :timeout 30
+      :success (cl-function
+		(lambda (&key data response &allow-other-keys)
+                  (message "接続成功！ステータス: %s" 
+                           (request-response-status-code response))))
+      :error (cl-function
+              (lambda (&key data error-thrown response &allow-other-keys)
+		(message "接続エラー:")
+                (message "Error: %S" error-thrown)
+                (when response
+                  (message "Status: %s" (request-response-status-code response))
+                  (message "Data: %s" data)))))))
+
+(defun parse-frontmatter-categories-tags (content)
+  "Hugoフロントマターからカテゴリとタグを抽出する"
+  (let ((categories '())
+        (tags '())
+        (title nil))
+    (with-temp-buffer
+      (insert content)
+      (goto-char (point-min))
+      (when (looking-at "---\n")
+        (let ((frontmatter-end nil))
+          (forward-line 1)
+          (when (re-search-forward "^---$" nil t)
+            (setq frontmatter-end (point))
+            (goto-char (point-min))
+            (forward-line 1)
+            
+            ;; タイトルを抽出
+            (when (re-search-forward "^title: \"\\([^\"]+\\)\"" frontmatter-end t)
+              (setq title (match-string 1)))
+            
+            ;; カテゴリを抽出（クォートあり・なし両対応）
+            (goto-char (point-min))
+            (forward-line 1)
+            (when (re-search-forward "^categories:" frontmatter-end t)
+              (forward-line 1)
+              (while (and (< (point) frontmatter-end)
+                          (or (looking-at "^  - \"\\([^\"]+\\)\"")
+                              (looking-at "^  - \\([^\n]+\\)")))
+                (push (match-string 1) categories)
+                (forward-line 1)))
+            
+            ;; タグを抽出（クォートあり・なし両対応）
+            (goto-char (point-min))
+            (forward-line 1)
+            (when (re-search-forward "^tags:" frontmatter-end t)
+              (forward-line 1)
+              (while (and (< (point) frontmatter-end)
+                          (or (looking-at "^  - \"\\([^\"]+\\)\"")
+                              (looking-at "^  - \\([^\n]+\\)")))
+                (push (match-string 1) tags)
+                (forward-line 1)))))))
+    (list (reverse categories) (reverse tags) title)))
 
 (defun my-post-current-buffer-to-hatena ()
-  "現在のバッファの内容をはてなブログに投稿する"
+  "現在のバッファの内容をはてなブログに投稿する（カテゴリ・タグ対応版）"
   (interactive)
-  (let ((title (read-string "タイトル: "))
-        (content (buffer-string))
-        (draft (y-or-n-p "下書きとして保存？")))
-    (hatena-blog-post title content draft)))
+  (let* ((content (buffer-string))
+         (frontmatter-data (parse-frontmatter-categories-tags content))
+         (detected-categories (nth 0 frontmatter-data))
+         (detected-tags (nth 1 frontmatter-data))
+         (detected-title (nth 2 frontmatter-data))
+         (title (read-string 
+                 (format "タイトル%s: "
+                         (if detected-title
+                             (format " [検出: %s]" detected-title)
+                           ""))
+                 (or detected-title "")))
+         (categories-str (read-string 
+                          (format "カテゴリ（カンマ区切り）%s: "
+                                  (if detected-categories
+                                      (format " [検出: %s]" 
+                                              (string-join detected-categories ", "))
+                                    ""))
+                          (if detected-categories
+                              (string-join detected-categories ", ")
+                            "")))
+         (tags-str (read-string 
+                    (format "タグ（カンマ区切り）%s: "
+                            (if detected-tags
+                                (format " [検出: %s]" 
+                                        (string-join detected-tags ", "))
+                              ""))
+                    (if detected-tags
+                        (string-join detected-tags ", ")
+                      "")))
+         (categories (if (string-empty-p categories-str)
+                         '()
+                       (mapcar #'string-trim 
+                               (split-string categories-str ","))))
+         (tags (if (string-empty-p tags-str)
+                   '()
+                 (mapcar #'string-trim 
+                         (split-string tags-str ","))))
+         (draft (y-or-n-p "下書きとして保存？")))
+    
+    (when tags
+      (message "タグ [%s] を本文末尾に #形式で追加します"
+               (string-join tags ", ")))
+    
+    (hatena-blog-post title content categories tags draft)))
+
+;; より簡潔な投稿用の関数
+(defun my-post-to-hatena-quick ()
+  "クイック投稿（フロントマター完全自動解析）"
+  (interactive)
+  (let* ((content (buffer-string))
+         (frontmatter-data (parse-frontmatter-categories-tags content))
+         (categories (nth 0 frontmatter-data))
+         (tags (nth 1 frontmatter-data))
+         (title (nth 2 frontmatter-data))
+         (draft (y-or-n-p "下書きとして保存？")))
+    
+    (unless title
+      (setq title (read-string "タイトル: ")))
+    
+    (when tags
+      (message "タグ [%s] を本文末尾に #形式で追加します"
+               (string-join tags ", ")))
+    
+    (hatena-blog-post title content categories tags draft)))

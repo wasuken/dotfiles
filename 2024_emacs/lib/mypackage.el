@@ -570,7 +570,9 @@
 (use-package tempel
   :demand t
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-         ("M-*" . tempel-insert)))
+         ("M-*" . tempel-insert))
+  :config
+  (setq tempel-path (expand-file-name "templates" user-emacs-directory)))
 
 (use-package tempel-collection :after tempel)
 
@@ -1048,18 +1050,18 @@
 ;;   :config
 ;;   (setq inferior-lisp-program "sbcl"))
 
+(use-package slime-company
+  :after (slime company)
+  :config
+  (setq slime-company-completion 'fuzzy
+        slime-company-after-completion 'slime-company-just-one-space))
+
 (use-package slime
   :if (file-exists-p "~/.roswell/helper.el")
   :ensure slime-company
   :init (load "~/.roswell/helper.el")
   :custom (inferior-lisp-program "ros -Q run")
   :config (slime-setup '(slime-fancy slime-company)))
-
-(use-package slime-company
-  :after (slime company)
-  :config
-  (setq slime-company-completion 'fuzzy
-        slime-company-after-completion 'slime-company-just-one-space))
 
 (use-package sql-indent
   :hook (sql-mode . sqlind-minor-mode))
@@ -1086,7 +1088,8 @@
           "https://planet.emacslife.com/atom.xml"
 	  "https://zenn.dev/topics/react/feed"
 	  "https://zenn.dev/topics/llm/feed"
-	  "https://zenn.dev/topics/mcp/feed"
+	  "https://b.hatena.ne.jp/hotentry/it.rss"
+	  ;; "https://zenn.dev/topics/mcp/feed"
 	  )))
 
 (use-package mastodon
@@ -1114,3 +1117,51 @@
   (setq mastodon-instance-url "https://mstdn.jp/"
 	mastodon-active-user "wasulisp")
   )
+
+(use-package denote
+  :ensure t
+  :config
+  ;; メモの保存先
+  (setq denote-directory (expand-file-name "~/denote/"))
+
+  ;; Markdownで書く
+  (setq denote-file-type 'markdown-yaml)
+
+  ;; よく使うタグを定義（後から追加可）
+  (setq denote-known-keywords '("note" "intel" "log" " project" "idea" "tech"))
+
+  ;; 日付フォーマット（ISO形式）
+  (setq denote-date-format "%Y%m%dT%H%M%S")
+
+  ;; キーバインド
+  :bind
+  (("C-c n n" . denote)           ; 新規ノート作成
+   ("C-c n f" . denote-open-or-create)  ; 検索または作成
+   ("C-c n i" . denote-link)      ; リンク挿入
+   ("C-c n b" . denote-backlinks) ; バックリンク表示
+   ))
+
+(defun my/denote-with-template (template-name)
+  "Denoteで新規ファイル作成後、テンプレート挿入"
+  (interactive
+   (list (completing-read "Template: "
+                          '("log" "think" "daily" "collect"))))
+  (call-interactively #'denote)
+  (tempel-insert (intern template-name)))
+
+;; キーバインド
+(global-set-key (kbd "C-c n t") #'my/denote-with-template)
+
+(setq org-agenda-files '("~/todo.org"))
+(setq org-capture-templates
+      '(("t" "Todo" entry (file "~/todo.org")
+         "* TODO %?\nDEADLINE: %^t\n")))
+;; 基本キーバインド
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+
+;; org-mode内でのタスク操作
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c o d") 'org-deadline)
+  (define-key org-mode-map (kbd "C-c o s") 'org-schedule)
+  (define-key org-mode-map (kbd "C-c o t") 'org-todo))

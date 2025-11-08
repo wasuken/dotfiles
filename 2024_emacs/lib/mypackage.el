@@ -1100,9 +1100,9 @@
                       :repo "martianh/mastodon.el")
   :custom
   ;; 使用している Mastodon サーバ
-  (mastodon-instance-url "https://mstdn.jp/")
+  (mastodon-instance-url mastodon-instance-url)
   ;; ユーザ名
-  (mastodon-active-user "wasulisp")
+  (mastodon-active-user mastodon-active-user)
   ;; タイムラインでアバター画像を表示する
   (mastodon-tl--show-avatars t))
 
@@ -1118,28 +1118,73 @@
 	mastodon-active-user "wasulisp")
   )
 
+(defun denote-extract-keywords-from-path (file)
+  (when (string-match "_\\([^.]+\\)\\." file)
+    (split-string (match-string 1 file) "_")))
+
 (use-package denote
   :ensure t
   :config
   ;; メモの保存先
   (setq denote-directory (expand-file-name "~/denote/"))
-
   ;; Markdownで書く
   (setq denote-file-type 'markdown-yaml)
-
   ;; よく使うタグを定義（後から追加可）
-  (setq denote-known-keywords '("note" "intel" "log" " project" "idea" "tech"))
-
+  (setq denote-known-keywords '("note" "intel" "log" "project" "idea" "tech"))
   ;; 日付フォーマット（ISO形式）
   (setq denote-date-format "%Y%m%dT%H%M%S")
 
+  ;; 期限設定（デフォルト7日、タグで上書き可能）
+  (setq denote-expiration-days 7)
+  (setq denote-expiration-overrides
+        '(("idea" . 30)
+          ("project" . 90)
+          ("log" . 3)))
+
+  ;; 期限切れメモをチェックして警告
+  (defun denote-check-expired ()
+    "期限切れのメモを検出して警告を表示"
+    (interactive)
+    (let ((expired-files '())
+          (current-time (current-time)))
+      (dolist (file (directory-files denote-directory t "\\.md$"))
+        (let* ((attrs (file-attributes file))
+               (mtime (nth 5 attrs))
+               (tags (denote-extract-keywords-from-path file))
+               (expiry-days (or (cdr (assoc (car tags) denote-expiration-overrides))
+                                denote-expiration-days))
+               (expiry-time (time-add mtime (days-to-time expiry-days))))
+          (when (time-less-p expiry-time current-time)
+            (push (list file (time-subtract current-time expiry-time)) expired-files))))
+      (when expired-files
+        (with-current-buffer (get-buffer-create "*Denote Expired*")
+          (erase-buffer)
+          (insert (format "=== 期限切れメモ (%d件) ===\n\n" (length expired-files)))
+          (dolist (item (sort expired-files
+                              (lambda (a b) (time-less-p (cadr b) (cadr a)))))
+            (let* ((file (car item))
+                   (overdue (cadr item))
+                   (days (/ (float-time overdue) 86400)))
+              (insert (format "- %s (%.1f日超過)\n"
+                              (file-name-nondirectory file)
+                              days))))
+          (insert "\n[d] 削除 [o] 開く [q] 閉じる")
+          (goto-char (point-min))
+          (view-mode)
+          (display-buffer (current-buffer))))))
+
+  ;; 起動時チェック
+  (add-hook 'after-init-hook
+            (lambda ()
+              (run-with-idle-timer 3 nil #'denote-check-expired)))
+
   ;; キーバインド
   :bind
-  (("C-c n n" . denote)           ; 新規ノート作成
-   ("C-c n f" . denote-open-or-create)  ; 検索または作成
-   ("C-c n i" . denote-link)      ; リンク挿入
-   ("C-c n b" . denote-backlinks) ; バックリンク表示
-   ))
+  (("C-c n n" . denote)
+   ("C-c n f" . denote-open-or-create)
+   ("C-c n i" . denote-link)
+   ("C-c n b" . denote-backlinks)
+   ("C-c n e" . denote-check-expired)))  
 
 (defun my/denote-with-template (template-name)
   "Denoteで新規ファイル作成後、テンプレート挿入"
@@ -1165,3 +1210,33 @@
   (define-key org-mode-map (kbd "C-c o d") 'org-deadline)
   (define-key org-mode-map (kbd "C-c o s") 'org-schedule)
   (define-key org-mode-map (kbd "C-c o t") 'org-todo))
+
+(use-package ellama
+  :ensure t
+  :config
+  (require 'llm-ollama)
+  (setq ellama-provider
+        (make-llm-ollama
+         :host ollama-host
+         :port ollama-port
+         :chat-model ollama-model
+         :embedding-model ollama-model)))
+
+(use-package ollama
+  :straight (:host github :repo "niklasbuehler/ollama.el")
+  :config
+  ;; ollamaサーバのURLを設定
+  (setq ollama:endpoint "http://wasu-reon:11434/api/generate")  ; あなたのサーバのIPとポートに変更
+  ;; または
+  ;; (setq ollama:endpoint "http://your-ollama-server:11434")
+
+  ;; デフォルトモデルの設定
+  (setq ollama:model "qwen2.5:7b-instruct")
+
+  :bind
+  ("C-c o l" . ollama/instruct-show-stream)
+  ("C-c o p" . ollama/instruct-stream)
+  ("C-c o r" . ollama/replace-current-line-stream)
+  ("C-c o R" . ollama/replace-current-selection-stream)
+  ("C-c o s" . ollama/select-model))
+

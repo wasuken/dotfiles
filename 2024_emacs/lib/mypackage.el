@@ -9,6 +9,9 @@
 
 (user-load-config)
 
+(defvar habitica-uid "")
+(defvar habitica-token "")
+
 ;; どうにもならないので無視
 (setq warning-suppress-types '((straight)))
 
@@ -1240,3 +1243,5 @@
   ("C-c o R" . ollama/replace-current-selection-stream)
   ("C-c o s" . ollama/select-model))
 
+
+(use-package habitica)

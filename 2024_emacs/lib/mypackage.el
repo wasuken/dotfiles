@@ -31,6 +31,8 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(straight-use-package 'org)
+
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)
 
@@ -1200,19 +1202,56 @@
 ;; キーバインド
 (global-set-key (kbd "C-c n t") #'my/denote-with-template)
 
-(setq org-agenda-files '("~/todo.org"))
-(setq org-capture-templates
-      '(("t" "Todo" entry (file "~/todo.org")
-         "* TODO %?\nDEADLINE: %^t\n")))
-;; 基本キーバインド
-(global-set-key (kbd "C-c a") 'org-agenda)
-(global-set-key (kbd "C-c c") 'org-capture)
+;; Org-mode基本設定
+(use-package org
+  :straight (:type built-in)
+  :bind (("C-c a" . org-agenda)
+         ("C-c c" . org-capture)
+         :map org-mode-map
+         ("C-c C-t" . org-todo)
+         ("C-c C-x C-a" . org-archive-subtree))
+  :config
+  ;; 複数ファイル管理
+  (setq org-agenda-files '("~/org/work.org"
+                           "~/org/hobby.org"
+                           "~/org/inbox.org"))
 
-;; org-mode内でのタスク操作
-(with-eval-after-load 'org
-  (define-key org-mode-map (kbd "C-c o d") 'org-deadline)
-  (define-key org-mode-map (kbd "C-c o s") 'org-schedule)
-  (define-key org-mode-map (kbd "C-c o t") 'org-todo))
+  ;; TODO状態
+  (setq org-todo-keywords
+        '((sequence "TODO" "DOING" "|" "DONE" "CANCELED")))
+
+  ;; キャプチャテンプレート
+  (setq org-capture-templates
+        '(("w" "仕事タスク" entry (file+headline "~/org/work.org" "Inbox")
+           "* TODO %?\nDEADLINE: %^t\n:PROPERTIES:\n:EFFORT: %^{見積|0:30|1:00|2:00}\n:END:\n")
+
+          ("h" "趣味タスク" entry (file+headline "~/org/hobby.org" "Inbox")
+           "* TODO %?\nSCHEDULED: %^t\n")
+
+          ("i" "とりあえずメモ" entry (file "~/org/inbox.org")
+           "* %?\n  %U\n")))
+
+  ;; アーカイブ先
+  (setq org-archive-location "~/org/archive/%s_archive::")
+
+  ;; ファイル存在確認と作成
+  (defvar my/org-file-templates
+    '(("~/org/work.org" . "#+TITLE: 仕事タスク\n#+STARTUP: overview\n\n* Inbox\n")
+      ("~/org/hobby.org" . "#+TITLE: 趣味・プロジェクト\n#+STARTUP: overview\n\n* Inbox\n")
+      ("~/org/inbox.org" . "#+TITLE: とりあえずメモ\n#+STARTUP: overview\n\n* Inbox\n")))
+
+  (dolist (file org-agenda-files)
+    (let* ((file-path (expand-file-name file))
+           (dir (file-name-directory file-path)))
+      ;; ディレクトリ作成
+      (unless (file-exists-p dir)
+        (make-directory dir t))
+      ;; ファイル作成（テンプレート付き）
+      (unless (file-exists-p file-path)
+        (with-temp-buffer
+          (insert (or (cdr (assoc file my/org-file-templates)) ""))
+          (write-file file-path))
+        (message "Created org file: %s" file-path)))))
 
 (use-package ellama
   :ensure t
@@ -1245,3 +1284,25 @@
 
 
 (use-package habitica)
+
+(use-package leetcode
+  :config
+  (setq leetcode-prefer-language "python3")
+  (setq leetcode-prefer-sql "mysql"))
+
+(use-package gptel
+  :ensure t
+  :config
+  (setq gptel-api-key gemini-api-key)
+
+  (setq-default gptel-backend (gptel-make-gemini "Gemini"
+						 :key gptel-api-key
+						 :stream t))
+
+  ;; モデルの切り替え（用途に合わせて M-x gptel-menu で選択可能）
+  (setq gptel-model 'gemini-2.0-flash-lite)
+
+  ;; 4. キーバインドの設定（お好みで）
+  (global-set-key (kbd "C-c g") 'gptel-menu)        ; メニューを開く
+  (global-set-key (kbd "C-c <return>") 'gptel-send) ; 送信
+  )

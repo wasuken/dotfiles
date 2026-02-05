@@ -1,4 +1,5 @@
 UltiSnips/*
 !UltiSnips/.gitkeep
 nvim/*.toml
-/config.el
+/config.elemacs/core/font.el
+emacs/core/config.el

@@ -3,3 +3,6 @@ UltiSnips/*
 nvim/*.toml
 /config.elemacs/core/font.el
 emacs/core/config.el
+emacs/core/font.el
+emacs/mypackages/*
+!emacs/mypackages/.gitkeep

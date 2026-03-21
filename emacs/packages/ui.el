@@ -63,7 +63,9 @@
 ;; モードライン
 (use-package nyan-mode
   :config
-  (setq nyan-bar-length 24)
+  (setq nyan-bar-length 16)        ;; 24→16に減らす
+  (setq nyan-animate-nyancat nil)  ;; アニメーション無効
+  (setq nyan-wavy-trail nil)       ;; 波アニメ無効
   (nyan-mode +1))
 
 (use-package minions

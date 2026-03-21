@@ -46,6 +46,11 @@
 
 (require 'vc-use-package)
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
+
 (use-package auto-package-update
   :config
   (setq auto-package-update-interval 7)
@@ -1296,8 +1301,8 @@
   (setq gptel-api-key gemini-api-key)
 
   (setq-default gptel-backend (gptel-make-gemini "Gemini"
-						 :key gptel-api-key
-						 :stream t))
+				:key gptel-api-key
+				:stream t))
 
   ;; モデルの切り替え（用途に合わせて M-x gptel-menu で選択可能）
   (setq gptel-model 'gemini-2.0-flash-lite)

@@ -21,8 +21,8 @@
 (setq native-comp-async-report-warnings-errors 'silent)
 (setq native-compile-prune-cache t)
 
-(setq gc-cons-percentage 0.2)
-(add-hook 'focus-out-hook #'garbage-collect)
+(setq gc-cons-percentage 0.1)
+;; (add-hook 'focus-out-hook #'garbage-collect)
 (setq garbage-collection-messages t)
 (setq-default show-trailing-whitespace t)
 (setq process-adaptive-read-buffering t)

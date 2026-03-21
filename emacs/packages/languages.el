@@ -5,6 +5,11 @@
 
 ;;; Code:
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
+
 ;; Tree-sitter設定
 (setq treesit-language-source-alist
       '((json "https://github.com/tree-sitter/tree-sitter-json")
@@ -163,6 +168,10 @@
   :config
   (global-set-key (kbd "C-=") 'expreg-expand)
   (global-set-key (kbd "C--") 'expreg-contract))
+
+(use-package inf-ruby
+  :ensure t
+  :hook (ruby-ts-mode . inf-ruby-minor-mode))
 
 (provide 'languages)
 ;;; languages.el ends here

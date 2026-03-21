@@ -75,18 +75,22 @@
            eglot-managed-mode) . my/set-super-capf))
   :config
   (defun my/set-super-capf (&optional arg)
-    (setq-local completion-at-point-functions
-                (list (cape-capf-properties
-                       (cape-capf-super
-                        (cape-capf-noninterruptible
-                         (cape-capf-buster
-                          (if arg
-                              arg
-                            (car completion-at-point-functions))))
-                        #'tempel-complete
-                        #'cape-dabbrev
-                        #'cape-file)
-                       :sort t)))))
+    (let ((first-capf (car completion-at-point-functions)))
+      (setq-local completion-at-point-functions
+                  (list (cape-capf-properties
+			 (cape-capf-super
+                          (cape-capf-noninterruptible
+                           (cape-capf-buster
+                            (if (and arg (functionp arg))
+				arg
+                              (if (functionp first-capf)
+                                  first-capf
+				#'cape-dabbrev))))  ;; tだったらフォールバック
+                          #'tempel-complete
+                          #'cape-dabbrev
+                          #'cape-file)
+			 :sort t)))))
+  )
 
 (setq tab-always-indent 'complete)
 
@@ -176,9 +180,9 @@
     (defvar corfu--total nil)
 
     (defun my/flx-tiebreaker (c1 c2)
-      (if (and (and (< vertico--total 3000)
-                    (< corfu--total 3000))
-               (> (length my/input-query) 0)
+      (if (and (and (< vertico--total 200)
+                    (< corfu--total 200))
+               (> (length my/input-query) 1)
                (< (length c1) 100)
                (< (length c2) 100))
           (let ((query my/input-query))

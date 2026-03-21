@@ -9,10 +9,17 @@
 ;; HTTP通信用 (util.elのcreate-md-link等で使用)
 (use-package request)
 
+(use-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize)
+  (print "test1")
+  )
+
 ;; ファイル自動保存
 (use-package files
   :straight (:type built-in)
   :config
+  (print "test2")
   (setq auto-save-visited-interval 30)
   (auto-save-visited-mode +1))
 

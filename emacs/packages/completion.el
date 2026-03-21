@@ -9,8 +9,8 @@
 (use-package corfu
   :demand t
   :bind ( :map corfu-map
-          ("TAB" . corfu-insert)
-          ([tab] . corfu-insert)
+          ;; ("TAB" . corfu-insert)
+          ;; ([tab] . corfu-insert)
           ("RET" . nil)
           ([return] . nil))
   :hook (prog-mode . (lambda ()
@@ -69,24 +69,20 @@
   (corfu-terminal-mode +1))
 
 (use-package cape
-  :hook (((prog-mode
-           text-mode
-           conf-mode
-           eglot-managed-mode) . my/set-super-capf))
+  ;; :hook (((prog-mode
+  ;;          text-mode
+  ;;          conf-mode
+  ;;          eglot-managed-mode) . my/set-super-capf))
   :config
-  (defun my/set-super-capf (&optional arg)
+  (defun my/set-super-capf-eglot ()
     (setq-local completion-at-point-functions
-                (list (cape-capf-properties
-                       (cape-capf-super
-                        (cape-capf-noninterruptible
-                         (cape-capf-buster
-                          (if arg
-                              arg
-                            (car completion-at-point-functions))))
-                        #'tempel-complete
-                        #'cape-dabbrev
-                        #'cape-file)
-                       :sort t)))))
+		(list (cape-capf-super
+                       (car completion-at-point-functions)  ; eglotのcapfを先頭に
+                       #'cape-dabbrev
+                       #'cape-file))))
+
+  (add-hook 'eglot-managed-mode-hook #'my/set-super-capf-eglot)
+  )
 
 (setq tab-always-indent 'complete)
 
@@ -111,7 +107,8 @@
   :straight (:type built-in)
   :config
   (setq vertico-buffer-display-action '(display-buffer-at-bottom))
-  (vertico-buffer-mode +1))
+  ;; (vertico-buffer-mode +1)
+  )
 
 ;; NOTE: nerd-iconsの矢印表示はui.elで設定 (nerd-icons読み込み後)
 

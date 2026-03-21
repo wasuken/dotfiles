@@ -33,7 +33,7 @@
   :config
   (setq eglot-events-buffer-config '(:size 0 :format short)
         eglot-ignored-server-capabilities '(:documentHighlightProvider)
-        eglot-stay-out-of '(flymake)
+        eglot-stay-out-of '()
         eglot-send-changes-idle-time 1.0)
 
   ;; LSP実行パスを再帰的に追加
@@ -48,7 +48,8 @@
     (interactive)
     (my/add-directory-to-exec-path-recursively "~/.emacs.d/.cache/"))
 
-  (my/load-lsp-exec-path))
+  ;; (my/load-lsp-exec-path)
+  )
 
 ;; Eglot-Tempel統合
 (use-package eglot-tempel
@@ -65,11 +66,12 @@
 (use-package jsonrpc
   :defer t
   :config
-  (setq jsonrpc-default-request-timeout 3000)
+  (setq jsonrpc-default-request-timeout 30)
   (fset #'jsonrpc--log-event #'ignore))
 
 ;; Eglot Booster - 高速化
 (use-package eglot-booster
+  :disabled t
   :after eglot
   :straight nil
   :vc ( :fetcher github :repo "jdtsmith/eglot-booster")

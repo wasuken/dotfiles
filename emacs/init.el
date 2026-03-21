@@ -51,9 +51,9 @@
 ;; Keymap (最後にload)
 (load (expand-file-name "core/keymap.el" dotfiles-emacs-dir))
 
-(add-to-list 'load-path "~/dotfiles/emacs/mypackages/live-comments")
-(require 'live-comments)
-(setq live-comments-gemini-api-key gemini-api-key)
+;; (add-to-list 'load-path "~/dotfiles/emacs/mypackages/live-comments")
+;; (require 'live-comments)
+;; (setq live-comments-gemini-api-key gemini-api-key)
 ;; (load (expand-file-name "mypackages/live-comments/live-comments.el" dotfiles-emacs-dir))
 
 (provide 'init)

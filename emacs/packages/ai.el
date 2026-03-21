@@ -12,10 +12,10 @@
   (setq gptel-api-key gemini-api-key)
 
   (setq-default gptel-backend (gptel-make-gemini "Gemini"
-                                                  :key gptel-api-key
-                                                  :stream t))
+                                :key gptel-api-key
+                                :stream t))
 
-  (setq gptel-model 'gemini-2.0-flash-lite)
+  (setq gptel-model 'gemini-2.5-flash)
 
   (global-set-key (kbd "C-c g") 'gptel-menu)
   (global-set-key (kbd "C-c <return>") 'gptel-send))

@@ -70,3 +70,4 @@ add-zsh-hook precmd sync_history
 
 # Created by `pipx` on 2025-03-27 14:24:29
 export PATH="$PATH:/home/wasu/.local/bin"
+export PATH=$PATH:$HOME/.maestro/bin

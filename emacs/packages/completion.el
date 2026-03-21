@@ -173,9 +173,9 @@
     (defvar corfu--total nil)
 
     (defun my/flx-tiebreaker (c1 c2)
-      (if (and (and (< vertico--total 3000)
-                    (< corfu--total 3000))
-               (> (length my/input-query) 0)
+      (if (and (and (< vertico--total 200)
+                    (< corfu--total 200))
+               (> (length my/input-query) 1)
                (< (length c1) 100)
                (< (length c2) 100))
           (let ((query my/input-query))

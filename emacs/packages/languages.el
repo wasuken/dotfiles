@@ -21,6 +21,7 @@
 
 (use-package treesit
   :straight (:type built-in)
+  :init (load "~/.emacs.d/init/treesit-predicate-rewrite" nil nil nil t)
   :config
   (setq treesit-font-lock-level 4)
   (setq go-ts-mode-indent-offset 4))
@@ -172,6 +173,22 @@
 (use-package inf-ruby
   :ensure t
   :hook (ruby-ts-mode . inf-ruby-minor-mode))
+
+(setq gofmt-command "goimports")  ; gofmtの代わりにgoimportsを使う
+(add-hook 'go-ts-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook #'gofmt-before-save nil t)))
+(add-hook 'go-ts-mode-hook #'eglot-ensure)
+
+(use-package go-mode
+  :config
+  (setq gofmt-command "goimports"))
+
+(add-hook 'go-ts-mode-hook #'eglot-ensure)
+(add-hook 'go-ts-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook #'gofmt-before-save nil t)))
+
 
 (provide 'languages)
 ;;; languages.el ends here

@@ -13,17 +13,26 @@
 ;; Tree-sitter設定
 (setq treesit-language-source-alist
       '((json "https://github.com/tree-sitter/tree-sitter-json")
-        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+        ;; (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+        ;; (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+	(tsx        "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src")
+	(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src")
+	(javascript "https://github.com/tree-sitter/tree-sitter-javascript" "v0.20.3")
         (go "https://github.com/tree-sitter/tree-sitter-go")
         (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
         (python "https://github.com/tree-sitter/tree-sitter-python")))
 
+
+;; mkdir -p ~/.emacs.d/init
+;; curl -o ~/.emacs.d/init/treesit-predicate-rewrite.el \
+;; https://raw.githubusercontent.com/mwolson/emacs-shared/master/init/treesit-predicate-rewrite.el
 (use-package treesit
   :straight (:type built-in)
+  :init
+  (load "~/.emacs.d/init/treesit-predicate-rewrite" nil nil nil t)
   :config
-  (setq treesit-font-lock-level 4)
-  (setq go-ts-mode-indent-offset 4))
+  (setq treesit-font-lock-level 3)
+  (setq go-ts-mode-indent-offset 2))
 
 (use-package treesit-auto
   :config

@@ -52,5 +52,13 @@
   (setq leetcode-prefer-language "python3")
   (setq leetcode-prefer-sql "mysql"))
 
+;; Google Translate
+(use-package google-translate
+  :config
+  (setq google-translate-default-source-language "en")
+  (setq google-translate-default-target-language "ja")
+  (global-set-key (kbd "C-c T t") 'google-translate-at-point)
+  (global-set-key (kbd "C-c T T") 'google-translate-query-translate))
+
 (provide 'optional)
 ;;; optional.el ends here

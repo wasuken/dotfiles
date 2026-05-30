@@ -721,5 +721,38 @@ DRAFT: 下書きとして保存する場合はt"
     
     (hatena-blog-post title content categories tags draft)))
 
+(defvar my/projects-file
+  (expand-file-name "projects.json" user-emacs-directory))
+
+(defun my/load-projects ()
+  "projects.jsonを読む。なければnilを返す。"
+  (if (file-exists-p my/projects-file)
+      (json-read-file my/projects-file)
+    nil))
+
+(defun my/save-projects (projects)
+  "projects.jsonに書き出す。"
+  (with-temp-file my/projects-file
+    (insert (json-encode projects))))
+
+(defun my/open-project ()
+  "プロジェクトをDiredで開く。"
+  (interactive)
+  (let ((projects (my/load-projects)))
+    (if (null projects)
+        (message "projects.json がありません。M-x my/register-project で登録してください。")
+      (let* ((name (completing-read "Project: " (mapcar #'car projects)))
+             (path (cdr (assoc (intern name) projects))))
+        (dired (expand-file-name path))))))
+
+(defun my/register-project ()
+  "プロジェクトを登録する。"
+  (interactive)
+  (let* ((name (read-string "Project name: "))
+         (path (read-directory-name "Directory: "))
+         (projects (or (my/load-projects) '())))
+    (my/save-projects (cons (cons (intern name) path) projects))
+    (message "登録しました: %s -> %s" name path)))
+
 (provide 'util)
 ;;; util.el ends here

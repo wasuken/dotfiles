@@ -32,5 +32,8 @@
 (global-set-key (kbd "C-c x r") #'revert-buffer-no-confirm)
 (global-set-key (kbd "C-c s s") #'replace-string)
 
+(global-set-key (kbd "C-c p o") #'my/open-project)
+(global-set-key (kbd "C-c p r") #'my/register-project)
+
 (provide 'keymap)
 ;;; keymap.el ends here

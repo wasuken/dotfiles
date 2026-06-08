@@ -83,6 +83,19 @@
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   (setq markdown-command "cmark"))
 
+;; md-mermaid - Markdown内Mermaidのインラインプレビュー
+(use-package md-mermaid
+  :straight (:host github :repo "ahmetus/md-mermaid")
+  :after markdown-mode
+  :config
+  (setq md-mermaid-live--resolved-snippet
+        (expand-file-name "straight/repos/md-mermaid/scripts/md_mermaid_snippet.py"
+                          user-emacs-directory))
+  (setenv "PATH" (concat (expand-file-name "~/.asdf/shims") ":" (getenv "PATH")))
+  (setq exec-path (cons (expand-file-name "~/.asdf/shims") exec-path))
+  (md-mermaid-keybindings-mode 1)
+  )
+
 ;; Org
 (use-package org
   :straight (:type built-in)

@@ -13,14 +13,12 @@
   (setq denote-file-type 'markdown-yaml)
   (setq denote-known-keywords '("note" "intel" "log" "project" "idea" "tech"))
   (setq denote-date-format "%Y%m%dT%H%M%S")
-
   ;; 期限設定
   (setq denote-expiration-days 7)
   (setq denote-expiration-overrides
         '(("idea" . 30)
           ("project" . 90)
           ("log" . 3)))
-
   ;; 期限切れチェック
   (defun denote-check-expired ()
     "期限切れのメモを検出して警告を表示"
@@ -52,18 +50,22 @@
           (goto-char (point-min))
           (view-mode)
           (display-buffer (current-buffer))))))
-
+  ;; Denoteディレクトリ全体をripgrepで検索
+  (defun my/denote-grep (regexp)
+    "Denoteディレクトリ全体をripgrepで検索."
+    (interactive "sSearch denote notes: ")
+    (consult-ripgrep denote-directory regexp))
   ;; 起動時チェック
   (add-hook 'after-init-hook
             (lambda ()
               (run-with-idle-timer 3 nil #'denote-check-expired)))
-
   :bind
   (("C-c n n" . denote)
    ("C-c n f" . denote-open-or-create)
    ("C-c n i" . denote-link)
    ("C-c n b" . denote-backlinks)
-   ("C-c n e" . denote-check-expired)))
+   ("C-c n e" . denote-check-expired)
+   ("C-c n g" . my/denote-grep)))
 
 ;; Denoteテンプレート挿入
 (defun my/denote-with-template (template-name)

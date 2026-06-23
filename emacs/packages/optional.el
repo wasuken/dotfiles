@@ -59,6 +59,8 @@
      my/elfeed-default-feeds)))
 
 (use-package elfeed
+  :bind (:map elfeed-search-mode-map
+	      ("U" . elfeed-update))
   :config
   (global-set-key (kbd "C-x w") 'elfeed)
   (setq elfeed-feeds (my/elfeed-load-feeds)))

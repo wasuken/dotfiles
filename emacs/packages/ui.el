@@ -183,5 +183,18 @@
   :config
   (golden-ratio-mode))
 
+(defun my/vterm-send-C-k ()
+  "Send C-k to vterm terminal."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (vterm-send-key "k" nil nil t)))
+
+(use-package vterm
+  :bind (:map vterm-mode-map
+              ("C-h" . vterm--self-insert)
+              ("C-k" . my/vterm-send-C-k))
+  :config
+  (setq vterm-term-environment-variable "xterm-256color"))
+
 (provide 'ui)
 ;;; ui.el ends here

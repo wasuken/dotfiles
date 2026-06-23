@@ -13,10 +13,11 @@
   (tr-ime-standard-install)
   (w32-ime-initialize))
 
-(use-package mozc
-  :config
-  (setq default-input-method "japanese-mozc")
-  (setq mozc-candidate-style 'overlay))
+(when (eq system-type 'gnu/linux)
+  (use-package mozc
+    :config
+    (setq default-input-method "japanese-mozc")
+    (setq mozc-candidate-style 'overlay)))
 
 ;; その他ツール
 (use-package restart-emacs

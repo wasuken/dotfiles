@@ -55,6 +55,12 @@
 ;; (require 'live-comments)
 ;; (setq live-comments-gemini-api-key gemini-api-key)
 ;; (load (expand-file-name "mypackages/live-comments/live-comments.el" dotfiles-emacs-dir))
+(let ((pkg-dir (expand-file-name "mypackages" dotfiles-emacs-dir)))
+  (dolist (pkg (directory-files pkg-dir t "^[^.]"))
+    (when (file-directory-p pkg)
+      (add-to-list 'load-path pkg))))
+
+(require 'code-watch)
 
 (provide 'init)
 ;;; init.el ends here

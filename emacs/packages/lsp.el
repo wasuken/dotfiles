@@ -73,12 +73,12 @@
 (add-to-list 'eglot-server-programs
              '((go-ts-mode go-mod-ts-mode) . ("gopls" "-remote=auto")))
 
-(use-package eglot-x
-  :straight nil
-  :vc ( :fetcher github :repo "nemethf/eglot-x")
-  :after eglot
-  :config
-  (eglot-x-setup))
+;; (use-package eglot-x
+;;   :straight nil
+;;   :vc ( :fetcher github :repo "nemethf/eglot-x")
+;;   :after eglot
+;;   :config
+;;   (eglot-x-setup))
 
 (provide 'lsp)
 ;;; lsp.el ends here

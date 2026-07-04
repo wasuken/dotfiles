@@ -189,12 +189,35 @@
   (let ((inhibit-read-only t))
     (vterm-send-key "k" nil nil t)))
 
+;; (use-package vterm
+;;   :bind (:map vterm-mode-map
+;;               ("C-h" . vterm--self-insert)
+;;               ("C-k" . my/vterm-send-C-k))
+;;   :config
+;;   (setq vterm-term-environment-variable "xterm-256color"))
+
 (use-package vterm
   :bind (:map vterm-mode-map
               ("C-h" . vterm--self-insert)
               ("C-k" . my/vterm-send-C-k))
   :config
-  (setq vterm-term-environment-variable "xterm-256color"))
+  (setq vterm-term-environment-variable "xterm-256color")
+  (setq vterm-keymap-exceptions
+        (delete "C-k" vterm-keymap-exceptions)))
+
+(use-package eat
+  :straight (eat :type git :host codeberg :repo "akib/emacs-eat"
+                 :files ("*.el" ("term" "term/*.el") "*.texi" "*.ti"
+                         ("terminfo/e" "terminfo/e/*")
+                         ("terminfo/65" "terminfo/65/*")
+                         ("integration" "integration/*")
+                         (:exclude ".dir-locals.el" "*-tests.el")))
+  :bind ("C-c v" . eat-project-other-window)
+  :config
+  (setq eat-semi-char-non-bound-keys
+        (delete [?\C-h] eat-semi-char-non-bound-keys))
+  (eat-update-semi-char-mode-map)
+  (eat-reload))
 
 (provide 'ui)
 ;;; ui.el ends here

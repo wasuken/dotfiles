@@ -8,6 +8,11 @@
 ;; package.elを無効化
 (setq package-enable-at-startup nil)
 
+(customize-set-variable
+ 'package-archives
+ (append package-archives
+         '(("nongnu" . "https://elpa.nongnu.org/nongnu/"))))
+
 ;; Load path
 (defvar dotfiles-emacs-dir (expand-file-name "~/dotfiles/emacs/"))
 

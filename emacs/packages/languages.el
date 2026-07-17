@@ -137,58 +137,27 @@
 
 (use-package mermaid-mode)
 
-;; 文字列変換
-(use-package string-inflection
-  :bind (("C-c C-u" . string-inflection-all-cycle))
-  :config
-  (defun my-string-inflection-cycle-auto ()
-    "Switching by major-mode"
-    (interactive)
-    (cond
-     ((or (eq major-mode 'typescript-mode)
-          (eq major-mode 'js-mode)
-          (eq major-mode 'jtsx-jsx-mode)
-          (eq major-mode 'jtsx-tsx-mode))
-      (string-inflection-java-style-cycle))
-     ((eq major-mode 'python-mode)
-      (string-inflection-python-style-cycle))
-     ((eq major-mode 'rust-mode)
-      (string-inflection-ruby-style-cycle))
-     (t
-      (string-inflection-all-cycle))))
-
-  (global-set-key (kbd "C-c u") 'my-string-inflection-cycle-auto))
-
-;; Puni - S式操作
-(use-package puni
-  :config
-  (puni-global-mode +1))
-
-;; Expreg - 賢い範囲選択
-(use-package expreg
-  :config
-  (global-set-key (kbd "C-=") 'expreg-expand)
-  (global-set-key (kbd "C--") 'expreg-contract))
-
 (use-package inf-ruby
   :ensure t
   :hook (ruby-ts-mode . inf-ruby-minor-mode))
 
-(setq gofmt-command "goimports")  ; gofmtの代わりにgoimportsを使う
-(add-hook 'go-ts-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook #'gofmt-before-save nil t)))
-(add-hook 'go-ts-mode-hook #'eglot-ensure)
-
+;; Go
 (use-package go-mode
-  :config
-  (setq gofmt-command "goimports"))
+  :defer t)
+
+;; gofmt-before-save は (eq major-mode 'go-mode) を直接チェックしており
+;; go-ts-mode では発火しないため、derived-mode-p で判定する自前関数を使う。
+(setq gofmt-command "goimports")  ; gofmtの代わりにgoimportsを使う
+
+(defun my/gofmt-before-save ()
+  "gofmt-before-save の go-ts-mode 非対応を回避するラッパー."
+  (when (derived-mode-p 'go-mode 'go-ts-mode)
+    (gofmt)))
 
 (add-hook 'go-ts-mode-hook #'eglot-ensure)
 (add-hook 'go-ts-mode-hook
           (lambda ()
-            (add-hook 'before-save-hook #'gofmt-before-save nil t)))
-
+            (add-hook 'before-save-hook #'my/gofmt-before-save nil t)))
 
 (provide 'languages)
 ;;; languages.el ends here

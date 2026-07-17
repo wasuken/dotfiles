@@ -19,6 +19,7 @@
 (setq vc-handled-backends '(Git))
 (setq auto-mode-case-fold nil)
 (setq-default bidi-display-reordering 'left-to-right)
+(setq-default tab-width 4)
 
 (setq browse-url-browser-function 'eww-browse-url)
 

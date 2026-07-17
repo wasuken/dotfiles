@@ -90,5 +90,38 @@
   (global-set-key (kbd "C-c T t") 'google-translate-at-point)
   (global-set-key (kbd "C-c T T") 'google-translate-query-translate))
 
+;; 文字列変換
+(use-package string-inflection
+  :bind (("C-c C-u" . string-inflection-all-cycle))
+  :config
+  (defun my-string-inflection-cycle-auto ()
+    "Switching by major-mode"
+    (interactive)
+    (cond
+     ((or (eq major-mode 'typescript-mode)
+          (eq major-mode 'js-mode)
+          (eq major-mode 'jtsx-jsx-mode)
+          (eq major-mode 'jtsx-tsx-mode))
+      (string-inflection-java-style-cycle))
+     ((eq major-mode 'python-mode)
+      (string-inflection-python-style-cycle))
+     ((eq major-mode 'rust-mode)
+      (string-inflection-ruby-style-cycle))
+     (t
+      (string-inflection-all-cycle))))
+
+  (global-set-key (kbd "C-c u") 'my-string-inflection-cycle-auto))
+
+;; Puni - S式操作
+(use-package puni
+  :config
+  (puni-global-mode +1))
+
+;; Expreg - 賢い範囲選択
+(use-package expreg
+  :config
+  (global-set-key (kbd "C-=") 'expreg-expand)
+  (global-set-key (kbd "C--") 'expreg-contract))
+
 (provide 'optional)
 ;;; optional.el ends here

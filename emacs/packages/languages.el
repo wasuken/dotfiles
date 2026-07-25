@@ -17,7 +17,12 @@
         (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
         (go "https://github.com/tree-sitter/tree-sitter-go")
         (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
-        (python "https://github.com/tree-sitter/tree-sitter-python")))
+        (python "https://github.com/tree-sitter/tree-sitter-python")
+		(php . ("https://github.com/tree-sitter/tree-sitter-php" "master" "php/src"))
+		(phpdoc . ("https://github.com/claytonrcarter/tree-sitter-phpdoc"))
+		))
+
+(add-to-list 'auto-mode-alist '("\\.php\\'" . php-ts-mode))
 
 (use-package treesit
   :straight (:type built-in)
@@ -158,6 +163,13 @@
 (add-hook 'go-ts-mode-hook
           (lambda ()
             (add-hook 'before-save-hook #'my/gofmt-before-save nil t)))
+
+(use-package terraform-mode
+  :mode (("\\.tf\\'"     . terraform-mode)
+         ("\\.tfvars\\'" . terraform-mode))
+  :custom
+  (terraform-indent-level 2)
+  (terraform-format-on-save t))
 
 (provide 'languages)
 ;;; languages.el ends here

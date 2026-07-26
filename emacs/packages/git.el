@@ -22,6 +22,23 @@
   :config
   (global-diff-hl-mode +1))
 
+(use-package git-safe-sync
+  :straight (:host github :repo "wasuken/git-safe-sync.el")
+  :custom
+  (git-safe-sync-save-debounce 30)
+  (git-safe-sync-required-idle 3)
+  (git-safe-sync-periodic-interval 300)
+  (git-safe-sync-notification-level 'failure)
+  (git-safe-sync-repositories
+   '((:path "~/knowledge"
+			:remote "origin"
+			:branch "main"
+			:auto-commit t
+			:auto-push t
+			:auto-pull t)))
+  :config
+  (git-safe-sync-mode 1))
+
 ;; (use-package difftastic
 ;;   :demand t
 ;;   :bind (:map magit-blame-read-only-mode-map

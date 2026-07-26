@@ -6,3 +6,4 @@ emacs/core/config.el
 emacs/core/font.el
 emacs/mypackages/*
 !emacs/mypackages/.gitkeep
+*.elc

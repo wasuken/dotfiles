@@ -14,12 +14,14 @@
 (add-to-list 'load-path (expand-file-name "core" dotfiles-emacs-dir))
 (add-to-list 'load-path (expand-file-name "packages" dotfiles-emacs-dir))
 
-;; Core configuration (全部load)
+;; Core configuration
+;; `env' and `custom' are already provided by Emacs itself, so `require'
+;; would skip these local configuration files.
 (load (expand-file-name "core/env.el" dotfiles-emacs-dir))
 (load (expand-file-name "core/custom.el" dotfiles-emacs-dir))
 
 ;; Package management
-(load (expand-file-name "packages/manager.el" dotfiles-emacs-dir))
+(require 'manager)
 
 ;; Custom file (secrets)
 (setq custom-file (expand-file-name "config.el" user-emacs-directory))
@@ -27,22 +29,22 @@
   (load custom-file))
 
 ;; Core packages
-(load (expand-file-name "packages/core.el" dotfiles-emacs-dir))
+(require 'core)
 
 ;; Utils
-(load (expand-file-name "core/util.el" dotfiles-emacs-dir))
+(require 'util)
 
-;; Packages (全部load)
-(load (expand-file-name "packages/completion.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/search.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/lsp.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/languages.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/ui.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/git.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/writing.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/ai.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/optional.el" dotfiles-emacs-dir))
-(load (expand-file-name "packages/code-reading.el" dotfiles-emacs-dir))
+;; Packages (keep this order because later configuration refers to earlier setup)
+(require 'completion)
+(require 'search)
+(require 'lsp)
+(require 'languages)
+(require 'ui)
+(require 'git)
+(require 'writing)
+(require 'ai)
+(require 'optional)
+(require 'code-reading)
 
 ;; Font
 (let ((font-config (expand-file-name "core/font.el" dotfiles-emacs-dir)))

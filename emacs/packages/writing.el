@@ -13,12 +13,41 @@
   (setq denote-file-type 'markdown-yaml)
   (setq denote-known-keywords '("note" "intel" "log" "project" "idea" "tech"))
   (setq denote-date-format "%Y%m%dT%H%M%S")
+
   ;; 期限設定
   (setq denote-expiration-days 7)
   (setq denote-expiration-overrides
         '(("idea" . 30)
           ("project" . 90)
           ("log" . 3)))
+
+  ;; 期限切れ一覧・削除用のmajor-mode
+  (define-derived-mode denote-expired-mode special-mode "Denote-Expired"
+    "Major mode for the denote expired files list.")
+
+  (define-key denote-expired-mode-map (kbd "d") #'denote-expired-delete-at-point)
+  (define-key denote-expired-mode-map (kbd "o") #'denote-expired-open-at-point)
+  (define-key denote-expired-mode-map (kbd "q") #'quit-window)
+
+  (defun denote-expired-delete-at-point ()
+    "カーソル行のファイルを削除."
+    (interactive)
+    (let ((file (get-text-property (line-beginning-position) 'denote-expired-file)))
+      (if (not file)
+          (message "この行にはファイルがありません")
+        (when (yes-or-no-p (format "%s を削除しますか？ " (file-name-nondirectory file)))
+          (delete-file file)
+          (let ((inhibit-read-only t))
+            (delete-region (line-beginning-position)
+                           (min (point-max) (1+ (line-end-position)))))
+          (message "削除しました: %s" (file-name-nondirectory file))))))
+
+  (defun denote-expired-open-at-point ()
+    "カーソル行のファイルを開く."
+    (interactive)
+    (let ((file (get-text-property (line-beginning-position) 'denote-expired-file)))
+      (if file (find-file file) (message "この行にはファイルがありません"))))
+
   ;; 期限切れチェック
   (defun denote-check-expired ()
     "期限切れのメモを検出して警告を表示"
@@ -34,31 +63,33 @@
                (expiry-time (time-add mtime (days-to-time expiry-days))))
           (when (time-less-p expiry-time current-time)
             (push (list file (time-subtract current-time expiry-time)) expired-files))))
-      (when expired-files
+      (if (not expired-files)
+          (message "期限切れのメモはありません")
         (with-current-buffer (get-buffer-create "*Denote Expired*")
-          (erase-buffer)
-          (insert (format "=== 期限切れメモ (%d件) ===\n\n" (length expired-files)))
-          (dolist (item (sort expired-files
-                              (lambda (a b) (time-less-p (cadr b) (cadr a)))))
-            (let* ((file (car item))
-                   (overdue (cadr item))
-                   (days (/ (float-time overdue) 86400)))
-              (insert (format "- %s (%.1f日超過)\n"
-                              (file-name-nondirectory file)
-                              days))))
-          (insert "\n[d] 削除 [o] 開く [q] 閉じる")
-          (goto-char (point-min))
-          (view-mode)
-          (display-buffer (current-buffer))))))
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (insert (format "=== 期限切れメモ (%d件) ===\n\n" (length expired-files)))
+            (dolist (item (sort expired-files
+                                (lambda (a b) (time-less-p (cadr b) (cadr a)))))
+              (let* ((file (car item))
+                     (overdue (cadr item))
+                     (days (/ (float-time overdue) 86400))
+                     (start (point)))
+                (insert (format "- %s (%.1f日超過)\n"
+                                (file-name-nondirectory file)
+                                days))
+                (put-text-property start (point) 'denote-expired-file file)))
+            (insert "\n[d] 削除 [o] 開く [q] 閉じる")
+            (goto-char (point-min))
+            (denote-expired-mode))
+          (pop-to-buffer (current-buffer))))))
+
   ;; Denoteディレクトリ全体をripgrepで検索
   (defun my/denote-grep (regexp)
     "Denoteディレクトリ全体をripgrepで検索."
     (interactive "sSearch denote notes: ")
     (consult-ripgrep denote-directory regexp))
-  ;; 起動時チェック
-  (add-hook 'after-init-hook
-            (lambda ()
-              (run-with-idle-timer 3 nil #'denote-check-expired)))
+
   :bind
   (("C-c n n" . denote)
    ("C-c n f" . denote-open-or-create)

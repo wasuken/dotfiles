@@ -42,6 +42,7 @@
 (load (expand-file-name "packages/writing.el" dotfiles-emacs-dir))
 (load (expand-file-name "packages/ai.el" dotfiles-emacs-dir))
 (load (expand-file-name "packages/optional.el" dotfiles-emacs-dir))
+(load (expand-file-name "packages/code-reading.el" dotfiles-emacs-dir))
 
 ;; Font
 (let ((font-config (expand-file-name "core/font.el" dotfiles-emacs-dir)))

@@ -13,9 +13,22 @@
                    :host github
                    :repo "joaotavora/eglot"
                    :files ("eglot.el"))
+  :hook ((rust-mode . eglot-ensure)
+         (jtsx-jsx-mode . eglot-ensure)
+         (jtsx-tsx-mode . eglot-ensure)
+         (jtsx-typescript-mode . eglot-ensure))
+  :bind
+  (:map eglot-mode-map
+        ("M-." . xref-find-definitions)
+        ("M-," . xref-go-back)
+        ("M-?" . xref-find-references))
   :config
   (setq eglot-events-buffer-config '(:size 100 :format full)
         eglot-send-changes-idle-time 1.0)
+  (setq eglot-server-programs
+        (assoc-delete-all '(go-mode go-dot-mod-mode go-dot-work-mode
+                                     go-ts-mode go-mod-ts-mode go-work-ts-mode)
+                           eglot-server-programs))
   (add-to-list 'eglot-server-programs
                '((go-ts-mode go-mod-ts-mode) . ("gopls" "-remote=auto"))))
 
@@ -66,12 +79,6 @@
   (add-hook 'eglot-managed-mode-hook #'my/set-super-capf-eglot))
 
 (setq eglot-ignored-server-capabilities '(:documentHighlightProvider))
-(setq eglot-server-programs
-      (assoc-delete-all '(go-mode go-dot-mod-mode go-dot-work-mode
-                                  go-ts-mode go-mod-ts-mode go-work-ts-mode)
-                        eglot-server-programs))
-(add-to-list 'eglot-server-programs
-             '((go-ts-mode go-mod-ts-mode) . ("gopls" "-remote=auto")))
 
 ;; (use-package eglot-x
 ;;   :straight nil

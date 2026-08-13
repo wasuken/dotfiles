@@ -7,82 +7,11 @@
 
 ;; Denote - メモ管理
 (use-package denote
-  :ensure t
   :config
   (setq denote-directory (expand-file-name "~/denote/"))
   (setq denote-file-type 'markdown-yaml)
   (setq denote-known-keywords '("note" "intel" "log" "project" "idea" "tech"))
   (setq denote-date-format "%Y%m%dT%H%M%S")
-
-  ;; 期限設定
-  (setq denote-expiration-days 7)
-  (setq denote-expiration-overrides
-        '(("idea" . 30)
-          ("project" . 90)
-          ("log" . 3)))
-
-  ;; 期限切れ一覧・削除用のmajor-mode
-  (define-derived-mode denote-expired-mode special-mode "Denote-Expired"
-    "Major mode for the denote expired files list.")
-
-  (define-key denote-expired-mode-map (kbd "d") #'denote-expired-delete-at-point)
-  (define-key denote-expired-mode-map (kbd "o") #'denote-expired-open-at-point)
-  (define-key denote-expired-mode-map (kbd "q") #'quit-window)
-
-  (defun denote-expired-delete-at-point ()
-    "カーソル行のファイルを削除."
-    (interactive)
-    (let ((file (get-text-property (line-beginning-position) 'denote-expired-file)))
-      (if (not file)
-          (message "この行にはファイルがありません")
-        (when (yes-or-no-p (format "%s を削除しますか？ " (file-name-nondirectory file)))
-          (delete-file file)
-          (let ((inhibit-read-only t))
-            (delete-region (line-beginning-position)
-                           (min (point-max) (1+ (line-end-position)))))
-          (message "削除しました: %s" (file-name-nondirectory file))))))
-
-  (defun denote-expired-open-at-point ()
-    "カーソル行のファイルを開く."
-    (interactive)
-    (let ((file (get-text-property (line-beginning-position) 'denote-expired-file)))
-      (if file (find-file file) (message "この行にはファイルがありません"))))
-
-  ;; 期限切れチェック
-  (defun denote-check-expired ()
-    "期限切れのメモを検出して警告を表示"
-    (interactive)
-    (let ((expired-files '())
-          (current-time (current-time)))
-      (dolist (file (directory-files denote-directory t "\\.md$"))
-        (let* ((attrs (file-attributes file))
-               (mtime (nth 5 attrs))
-               (tags (denote-extract-keywords-from-path file))
-               (expiry-days (or (cdr (assoc (car tags) denote-expiration-overrides))
-                                denote-expiration-days))
-               (expiry-time (time-add mtime (days-to-time expiry-days))))
-          (when (time-less-p expiry-time current-time)
-            (push (list file (time-subtract current-time expiry-time)) expired-files))))
-      (if (not expired-files)
-          (message "期限切れのメモはありません")
-        (with-current-buffer (get-buffer-create "*Denote Expired*")
-          (let ((inhibit-read-only t))
-            (erase-buffer)
-            (insert (format "=== 期限切れメモ (%d件) ===\n\n" (length expired-files)))
-            (dolist (item (sort expired-files
-                                (lambda (a b) (time-less-p (cadr b) (cadr a)))))
-              (let* ((file (car item))
-                     (overdue (cadr item))
-                     (days (/ (float-time overdue) 86400))
-                     (start (point)))
-                (insert (format "- %s (%.1f日超過)\n"
-                                (file-name-nondirectory file)
-                                days))
-                (put-text-property start (point) 'denote-expired-file file)))
-            (insert "\n[d] 削除 [o] 開く [q] 閉じる")
-            (goto-char (point-min))
-            (denote-expired-mode))
-          (pop-to-buffer (current-buffer))))))
 
   ;; Denoteディレクトリ全体をripgrepで検索
   (defun my/denote-grep (regexp)
@@ -95,19 +24,39 @@
    ("C-c n f" . denote-open-or-create)
    ("C-c n i" . denote-link)
    ("C-c n b" . denote-backlinks)
-   ("C-c n e" . denote-check-expired)
    ("C-c n g" . my/denote-grep)))
 
-;; Denoteテンプレート挿入
-(defun my/denote-with-template (template-name)
-  "Denoteで新規ファイル作成後、テンプレート挿入"
-  (interactive
-   (list (completing-read "Template: "
-                          '("log" "think" "daily" "collect"))))
-  (call-interactively #'denote)
-  (tempel-insert (intern template-name)))
+;; Denote拡張 - ライフサイクル管理(limit判定・期限一覧・空ファイルレビュー・振り分け)
+(use-package denote-lifecycle
+  :straight (:host github :repo "wasuken/denote-lifecycle")
+  :after denote
+  :commands (denote-lifecycle-list
+             denote-lifecycle-review-empty
+             denote-lifecycle-distribute)
+  :custom
+  (denote-lifecycle-default-limit 7)
+  (denote-lifecycle-category-limits '(("idea" . 30) ("project" . 90) ("log" . 3)))
+  (denote-lifecycle-distribution-rules
+   '((denote-lifecycle-active-p . "active")
+     (denote-lifecycle-old-p    . denote-fossil-intake)))
+  :bind
+  ("C-c n l" . denote-lifecycle-list)
+  ("C-c n r" . denote-lifecycle-review-empty))
 
-(global-set-key (kbd "C-c n t") #'my/denote-with-template)
+(use-package denote-fossil
+  :straight (:host github :repo "wasuken/denote-fossil")
+  :after denote
+  :commands (denote-fossil-scan-stale
+             denote-fossil-demote
+             denote-fossil-demote-stale
+             denote-fossil-search)
+  :custom
+  (denote-fossil-directory (expand-file-name "~/denote-fossil/"))
+  (denote-fossil-threshold-days 30)
+  :config
+  (add-hook 'find-file-hook #'denote-fossil--log-access)
+  :bind
+  ("C-c n z" . denote-fossil-search))
 
 ;; Markdown
 (use-package markdown-mode

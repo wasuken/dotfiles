@@ -54,16 +54,10 @@
 ;; Keymap (最後にload)
 (load (expand-file-name "core/keymap.el" dotfiles-emacs-dir))
 
-;; (add-to-list 'load-path "~/dotfiles/emacs/mypackages/live-comments")
-;; (require 'live-comments)
-;; (setq live-comments-gemini-api-key gemini-api-key)
-;; (load (expand-file-name "mypackages/live-comments/live-comments.el" dotfiles-emacs-dir))
-(let ((pkg-dir (expand-file-name "mypackages" dotfiles-emacs-dir)))
-  (dolist (pkg (directory-files pkg-dir t "^[^.]"))
-    (when (file-directory-p pkg)
-      (add-to-list 'load-path pkg))))
-
-(require 'code-watch)
+;; 環境にいれないもの
+(let ((local-config "~/dotfiles/emacs/local.el"))
+  (when (file-exists-p local-config)
+    (load local-config)))
 
 (provide 'init)
 ;;; init.el ends here

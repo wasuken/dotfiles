@@ -1,22 +1,14 @@
 #!/bin/sh
 
-# Zsh
-ln -sf ~/dotfiles/.zshrc ~/
-touch ~/dotfiles/zsh/config.zsh
+set -eu
 
-# Neovim (if still using)
-mkdir -p ~/.config
-NVIM_DIR="$HOME/.config/nvim"
-if [ -d "$NVIM_DIR/.git" ]; then
-  git -C "$NVIM_DIR" pull
-else
-  git clone git@github.com:wasuken/nvim.git "$NVIM_DIR"
-fi
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
-# Emacs
-mkdir -p ~/.emacs.d
-ln -sf ~/dotfiles/emacs/init.el ~/.emacs.d/init.el
-
-# Create secret files
-touch ~/.emacs.d/config.el
-echo "# Add your secrets here (habitica-uid, gemini-api-key, etc)" >>~/.emacs.d/config.el
+for setup_script in \
+  setup-emacs.sh \
+  setup-lazyvim.sh \
+  setup-zsh.sh \
+  setup-sway.sh
+do
+  "$SCRIPT_DIR/setup/$setup_script"
+done

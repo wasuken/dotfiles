@@ -27,21 +27,10 @@ set $browser firefox
 # set $menu dmenu_path | dmenu | xargs swaymsg exec --
 set $menu wofi -G --show drun| xargs swaymsg exec --
 
-# socketpathの指定
-# set $SWAYSOCK /run/user/$UID/sway-ipc.$(pidof sway).sock
-
 # モニタの設定
 # output eDP-1 pos 0 1080 res 1366x768
 # output HDMI-A-2 pos 0 0 res 1920x1080
 # output DP-1 pos 1920 0 res 1920x1080
-
-#archbox
-output DP-3 pos 0 0 res 1920x1080
-output HDMI-A-1 pos 1920 0 res 1920x1080
-
-# socketpathの設定
-# exec sway --socketpath=$SWAYSOCK
-
 
 # font adobe-source-code-pro-fonts
 
@@ -96,10 +85,6 @@ output * bg /usr/share/backgrounds/sway/arch2.jpg fill
 # input "1:1:AT_Translated_Set_2_keyboard" {
 #   events disabled
 # }
-input "type:keyboard" {
-  xkb_options caps:ctrl_modifier
-}
-
 ### Key bindings
 #
 # Basics:
@@ -248,40 +233,12 @@ bindsym $mod+r mode "resize"
 # Read `man 5 sway-bar` for more information about this section.
 bar {
     # position top
-
-    # # When the status_command prints a new line to stdout, swaybar updates.
-    # # The default just shows the current date and time.
-    # status_command while date +'%Y-%m-%d %I:%M:%S %p'; do sleep 1; done
-
-    # colors {
-    #     statusline #ffffff
-    #     background #323232
-    #     inactive_workspace #32323200 #32323200 #5c5c5c
-    # }
     swaybar_command waybar
-    # status_command i3status
 }
-
-exec wl-paste -t text --watch clipman store
-
-exec swayidle -w \
-  timeout 1200 'swaylock -f -c 000000' \
-  timeout 1201 'swaymsg "output * dpms off"' \
-	    resume 'swaymsg "output * dpms on"' \
-  before-sleep 'swaylock -f -c 000000' \
 
 bindsym $super+Shift+l exec swaylock -f -C ~/.config/swaylock/config
 
 include /etc/sway/config.d/*
-
-# exec fcitx5
-exec_always fcitx5 -d
-exec_always export GTK_IM_MODULE=fcitx5
-exec_always export QT_IM_MODULE=fcitx5
-exec_always export XMODIFIERS=@im=fcitx5
-
-exec mako
-exec /usr/share/sway/scripts/inactive-windows-transparency.py --opacity 0.8
 bindsym Mod4+Alt+2 exec /usr/share/sway/scripts/grimshot --notify save window  $HOME/Downloads/screenshot_$(date "+%y%m%d%H%M%S").png
 bindsym Mod4+Alt+3 exec /usr/share/sway/scripts/grimshot --notify save output  $HOME/Downloads/screenshot_$(date "+%y%m%d%H%M%S").png
 bindsym Mod4+Alt+4 exec /usr/share/sway/scripts/grimshot --notify save area    $HOME/Downloads/screenshot_$(date "+%y%m%d%H%M%S").png
@@ -294,4 +251,4 @@ bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
-exec nm-applet --indicator
+include ~/.config/sway/config.d/*

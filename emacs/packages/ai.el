@@ -7,14 +7,13 @@
 
 ;; GPTel - Gemini統合
 (use-package gptel
-  :ensure t
+  :if (bound-and-true-p gemini-api-key)
   :config
   (setq gptel-api-key gemini-api-key)
 
   (setq-default gptel-backend (gptel-make-gemini "Gemini"
                                 :key gptel-api-key
                                 :stream t))
-
   (setq gptel-model 'gemini-2.5-flash)
 
   (global-set-key (kbd "C-c g") 'gptel-menu)
@@ -22,7 +21,9 @@
 
 ;; Ellama - Ollama統合
 (use-package ellama
-  :ensure t
+  :if (and (bound-and-true-p ollama-host)
+		   (bound-and-true-p ollama-port)
+		   (bound-and-true-p ollama-model))
   :config
   (require 'llm-ollama)
   (setq ellama-provider
@@ -35,6 +36,9 @@
 ;; Ollama - ローカルLLM
 (use-package ollama
   :straight (:host github :repo "niklasbuehler/ollama.el")
+  :if (and (bound-and-true-p ollama-host)
+		   (bound-and-true-p ollama-port)
+		   (bound-and-true-p ollama-model))
   :config
   (setq ollama:endpoint (format "http://%s:%d/api/generate" ollama-host ollama-port))
   (setq ollama:model ollama-model)

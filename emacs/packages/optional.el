@@ -61,7 +61,7 @@
 
 (use-package elfeed
   :bind (:map elfeed-search-mode-map
-	      ("U" . elfeed-update))
+			  ("U" . elfeed-update))
   :config
   (global-set-key (kbd "C-x w") 'elfeed)
   (setq elfeed-feeds (my/elfeed-load-feeds)))
@@ -70,6 +70,8 @@
   :straight (mastodon :type git
                       :host codeberg
                       :repo "martianh/mastodon.el")
+  :if (and (bound-and-true-p mastodon-instance-url)
+           (bound-and-true-p mastodon-active-user))
   :custom
   (mastodon-instance-url mastodon-instance-url)
   (mastodon-active-user mastodon-active-user)
@@ -122,6 +124,17 @@
   :config
   (global-set-key (kbd "C-=") 'expreg-expand)
   (global-set-key (kbd "C--") 'expreg-contract))
+
+;; init.el
+(use-package graphviz-dot-mode
+  :mode "\\.dot\\'")
+
+;; svg生成→即座に外部ビューアで開くコマンド
+(defun my/depcruise-view ()
+  "Run dependency-cruiser and open result svg."
+  (interactive)
+  (shell-command "npx depcruise src --output-type dot | dot -T svg > /tmp/deps.svg")
+  (shell-command "xdg-open /tmp/deps.svg"))
 
 (provide 'optional)
 ;;; optional.el ends here

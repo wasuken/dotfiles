@@ -123,5 +123,23 @@
           (write-file file-path))
         (message "Created org file: %s" file-path)))))
 
+;; obsidian.el - Obsidian vault互換のMarkdownノート管理
+(use-package obsidian
+  :straight (:host github :repo "licht1stein/obsidian.el")
+  :config
+  (global-obsidian-mode t)
+  (obsidian-backlinks-mode t)
+  :custom
+  (obsidian-directory "~/knowledge/dev-reading")
+  (obsidian-inbox-directory "Inbox")
+  (markdown-enable-wiki-links t)
+  :bind (("C-c o n" . obsidian-capture)
+		 :map obsidian-mode-map
+         ("C-c C-n" . obsidian-capture)
+         ("C-c C-l" . obsidian-insert-link)
+         ("C-c C-o" . obsidian-follow-link-at-point)
+         ("C-c C-p" . obsidian-jump)
+         ("C-c C-b" . obsidian-backlink-jump)))
+
 (provide 'writing)
 ;;; writing.el ends here

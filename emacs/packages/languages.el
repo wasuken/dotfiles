@@ -18,9 +18,10 @@
         (go "https://github.com/tree-sitter/tree-sitter-go")
         (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
         (python "https://github.com/tree-sitter/tree-sitter-python")
-		(php . ("https://github.com/tree-sitter/tree-sitter-php" "master" "php/src"))
-		(phpdoc . ("https://github.com/claytonrcarter/tree-sitter-phpdoc"))
-		))
+        (php . ("https://github.com/tree-sitter/tree-sitter-php" "master" "php/src"))
+        (phpdoc . ("https://github.com/claytonrcarter/tree-sitter-phpdoc"))
+        (html "https://github.com/tree-sitter/tree-sitter-html")
+		(css "https://github.com/tree-sitter/tree-sitter-css")))
 
 (add-to-list 'auto-mode-alist '("\\.php\\'" . php-ts-mode))
 

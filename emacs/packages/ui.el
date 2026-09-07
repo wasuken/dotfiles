@@ -194,9 +194,11 @@
   :bind (:map vterm-mode-map
               ("C-h" . vterm--self-insert)
               ("C-k" . my/vterm-send-C-k))
-  :bind (("C-c v" . vterm))
+  :bind ("C-c v" . vterm)
   :config
-  (setq vterm-term-environment-variable "xterm-256color"))
+  (setq vterm-term-environment-variable "xterm-256color")
+  (setq vterm-keymap-exceptions
+        (delete "C-k" vterm-keymap-exceptions)))
 
 (provide 'ui)
 ;;; ui.el ends here

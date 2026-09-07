@@ -21,7 +21,8 @@
         (php . ("https://github.com/tree-sitter/tree-sitter-php" "master" "php/src"))
         (phpdoc . ("https://github.com/claytonrcarter/tree-sitter-phpdoc"))
         (html "https://github.com/tree-sitter/tree-sitter-html")
-		(css "https://github.com/tree-sitter/tree-sitter-css")))
+        (janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple"))
+        (css "https://github.com/tree-sitter/tree-sitter-css")))
 
 (add-to-list 'auto-mode-alist '("\\.php\\'" . php-ts-mode))
 
@@ -171,6 +172,29 @@
   :custom
   (terraform-indent-level 2)
   (terraform-format-on-save t))
+
+;; Janet
+(straight-use-package
+ '(janet-ts-mode :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
+
+(use-package janet-ts-mode
+  :straight t
+  :mode "\\.janet\\'")
+
+(straight-use-package
+ '(ajrepl :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl")))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(janet-ts-mode . ("janet-lsp"))))
+
+(add-hook 'janet-ts-mode-hook #'eglot-ensure)
+
+(use-package ajrepl
+  :straight t
+  :after janet-ts-mode
+  :config
+  (add-hook 'janet-ts-mode-hook #'ajrepl-interaction-mode))
 
 (provide 'languages)
 ;;; languages.el ends here

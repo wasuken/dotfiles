@@ -1,4 +1,4 @@
-;; templates --- Tempel templates for Denote memo system
+;;; tempel-templates.el --- Tempel templates for Denote memo system -*- lexical-binding: t; -*-
 
 ;; 8種類のメモテンプレート
 ;; 使い方: M-* (tempel-insert) でテンプレート名を選択

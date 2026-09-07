@@ -134,12 +134,12 @@
   (obsidian-inbox-directory "Inbox")
   (markdown-enable-wiki-links t)
   :bind (("C-c o n" . obsidian-capture)
-		 :map obsidian-mode-map
-         ("C-c C-n" . obsidian-capture)
-         ("C-c C-l" . obsidian-insert-link)
-         ("C-c C-o" . obsidian-follow-link-at-point)
-         ("C-c C-p" . obsidian-jump)
-         ("C-c C-b" . obsidian-backlink-jump)))
+         :map obsidian-mode-map
+         ("C-c o l" . obsidian-insert-link)
+         ("C-c o o" . obsidian-follow-link-at-point)
+         ("C-c o j" . obsidian-jump)
+         ("C-c o b" . obsidian-backlink-jump))
+  )
 
 (provide 'writing)
 ;;; writing.el ends here

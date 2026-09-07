@@ -46,18 +46,19 @@
 (require 'optional)
 (require 'code-reading)
 
+
+(defun dotfiles--load-if-exists (path)
+  (when (file-exists-p path)
+    (load path)))
+
 ;; Font
-(let ((font-config (expand-file-name "core/font.el" dotfiles-emacs-dir)))
-  (when (file-exists-p font-config)
-    (load font-config)))
+(dotfiles--load-if-exists (expand-file-name "core/font.el" dotfiles-emacs-dir))
 
 ;; Keymap (最後にload)
 (load (expand-file-name "core/keymap.el" dotfiles-emacs-dir))
 
 ;; 環境にいれないもの
-(let ((local-config "~/dotfiles/emacs/local.el"))
-  (when (file-exists-p local-config)
-    (load local-config)))
+(dotfiles--load-if-exists (expand-file-name "core/local.el" dotfiles-emacs-dir))
 
 (provide 'init)
 ;;; init.el ends here

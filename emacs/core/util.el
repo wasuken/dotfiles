@@ -1,3 +1,5 @@
+;;; util.el --- Utility functions -*- lexical-binding: t; -*-
+
 ;; tab-bar
 
 (defun insert-current-time()

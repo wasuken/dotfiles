@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package magit
+  :straight (:type built-in)
   :bind ("C-x g" . magit)
   :config
   (when IS-WINDOWS

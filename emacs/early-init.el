@@ -6,6 +6,11 @@
 
 ;;; Code:
 
+;; Older Roswell/SLIME sources and private config files may omit this cookie.
+;; Preserve their binding behavior while silencing only this Emacs 31 warning.
+(require 'warnings)
+(add-to-list 'warning-inhibit-types '(files missing-lexbind-cookie))
+
 ;; package.elを無効化 (straight.elを使用するため)
 (setq package-enable-at-startup nil)
 

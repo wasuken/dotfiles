@@ -63,6 +63,8 @@ emacs/
 
 `~/.emacs.d/config.el`を作成:
 ```elisp
+;;; config.el --- Private settings -*- lexical-binding: t; -*-
+
 ;; API Keys
 (setq gemini-api-key "your-key")
 (setq habitica-uid "your-uid")

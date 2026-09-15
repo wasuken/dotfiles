@@ -80,12 +80,14 @@
 
 (setq eglot-ignored-server-capabilities '(:documentHighlightProvider))
 
-;; (use-package eglot-x
-;;   :straight nil
-;;   :vc ( :fetcher github :repo "nemethf/eglot-x")
-;;   :after eglot
-;;   :config
-;;   (eglot-x-setup))
+(use-package dape
+  :straight t
+  :after eglot
+  :config
+  ;; 実行中に自動でウィンドウ再配置しない(好みで)
+  (setq dape-buffer-window-arrangement 'right)
+  ;; ブレークポイント行にインラインで変数値を出す
+  (setq dape-inline-variables t))
 
 (provide 'lsp)
 ;;; lsp.el ends here

@@ -58,6 +58,11 @@
 
   :hook (completion-list-mode . consult-preview-at-point-mode)
 
+  :init
+  ;; Consult uses the existing Vertico completion UI for xref selection.
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
   :config
   ;; Register formatting
   (setq register-preview-delay 0.5
@@ -67,11 +72,10 @@
 
   ;; Preview configuration
   (consult-customize
-   consult-theme :preview-key '(:debounce 1.0 any)
+   consult-theme :preview-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
-   :preview-key '(:debounce 0.4 any))
+   consult-bookmark consult-recent-file consult-xref
+   :preview-key "M-.")
 
   ;; Narrowing key
   (setq consult-narrow-key "<"))

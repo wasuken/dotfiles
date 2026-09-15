@@ -130,16 +130,16 @@
   :config
   (setq migemo-command "cmigemo")
   (setq migemo-options '("-q" "--emacs"))
-
-  ;; Windows環境の場合のみ辞書パスを設定
-  (when (memq system-type '(cygwin windows-nt ms-dos))
-    (setq migemo-dictionary
-          "C:/Users/u396/scoop/apps/cmigemo/current/cmigemo-mingw64/share/migemo/utf-8/migemo-dict"))
-
+  (pcase system-type
+    ((or 'cygwin 'windows-nt 'ms-dos)
+     (setq migemo-dictionary
+           "C:/Users/u396/scoop/apps/cmigemo/current/cmigemo-mingw64/share/migemo/utf-8/migemo-dict"))
+    ('gnu/linux
+     ;; ↓ 上のpacman -Qlで出てきた実パスに置き換える
+     (setq migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict")))
   (setq migemo-user-dictionary nil)
   (setq migemo-regex-dictionary nil)
   (setq migemo-coding-system 'utf-8-unix)
-
   (migemo-init))
 
 ;; Ripgrep

@@ -136,5 +136,11 @@
   (shell-command "npx depcruise src --output-type dot | dot -T svg > /tmp/deps.svg")
   (shell-command "xdg-open /tmp/deps.svg"))
 
+(with-eval-after-load 'tramp
+  (add-to-list 'tramp-remote-path "~/go/bin"))
+;; またはリモートのログインシェルのPATHをそのまま使う
+(with-eval-after-load 'tramp
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+
 (provide 'optional)
 ;;; optional.el ends here

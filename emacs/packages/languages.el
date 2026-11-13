@@ -22,9 +22,14 @@
         (phpdoc . ("https://github.com/claytonrcarter/tree-sitter-phpdoc"))
         (html "https://github.com/tree-sitter/tree-sitter-html")
         (janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple"))
-        (css "https://github.com/tree-sitter/tree-sitter-css")))
+        (css "https://github.com/tree-sitter/tree-sitter-css")
+		(kotlin "https://github.com/fwcd/tree-sitter-kotlin")
+		))
 
 (add-to-list 'auto-mode-alist '("\\.php\\'" . php-ts-mode))
+
+(use-package kotlin-ts-mode
+  :mode "\\.kts?\\'")
 
 (use-package treesit
   :straight (:type built-in)
